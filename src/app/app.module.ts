@@ -11,6 +11,7 @@ import { SidebarComponent } from './sidebar/sidebar.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { HttpClientModule } from '@angular/common/http';
 import { UserProfilComponent } from './user-profil/user-profil.component';
+import { CreateProjectComponent } from './create-project/create-project.component';
 
 
 @NgModule({
@@ -22,6 +23,7 @@ import { UserProfilComponent } from './user-profil/user-profil.component';
     SidebarComponent,
     NavbarComponent,
     UserProfilComponent,
+    CreateProjectComponent,
   ],
   imports: [
     BrowserModule,
