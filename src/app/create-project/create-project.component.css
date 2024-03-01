@@ -1,0 +1,8 @@
+.search_icon {
+  color: #808080; /* Graue Farbe */
+}
+
+table.thead{
+  position: sticky;
+  top:0;
+}
