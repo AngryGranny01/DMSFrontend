@@ -4,7 +4,6 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { LoginDropdownComponent } from './login-dropdown/login-dropdown.component';
 import { LoginPageComponent } from './login-page/login-page.component';
 import { UserManagmentPageComponent } from './user-managment-page/user-managment-page.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
@@ -17,7 +16,6 @@ import { CreateProjectComponent } from './create-project/create-project.componen
 @NgModule({
   declarations: [
     AppComponent,
-    LoginDropdownComponent,
     LoginPageComponent,
     UserManagmentPageComponent,
     SidebarComponent,
