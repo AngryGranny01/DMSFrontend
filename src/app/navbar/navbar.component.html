@@ -1,29 +1,61 @@
 <!-- Navbar -->
-<nav
-id="main-navbar"
-class="navbar navbar-expand-lg navbar-light fixed-top"
->
-<!-- Container wrapper -->
-<div class="container-fluid">
-<!-- Toggle button -->
-<a href="#" class="menu" title="Menu" data-mdb-toggle="collapse" data-mdb-target="#sidebarMenu" aria-controls="sidebarMenu" aria-expanded="false" aria-label="Toggle navigation">
-  <button class="navbar-toggler" type="button">
-    <i class="material-icons">&#xE5D2;</i>
-  </button>
-</a>
+<nav *ngIf="isLoggedIn()" id="main-navbar" class="navbar navbar-expand-lg navbar-light fixed-top">
+  <!-- Container wrapper -->
+  <div class="container-fluid">
+    <!-- Toggle button -->
+    <a
+      href="#"
+      class="menu"
+      title="Menu"
+      data-mdb-toggle="collapse"
+      data-mdb-target="#sidebarMenu"
+      aria-controls="sidebarMenu"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <button class="navbar-toggler" type="button">
+        <i class="material-icons">&#xE5D2;</i>
+      </button>
+    </a>
 
-<!-- Right links -->
-<ul class="navbar-nav ms-auto d-flex flex-row">
-  <li class="nav-item dropdown">
-    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><b>Login</b></a>
-    <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-      <a class="dropdown-item" href="#!">Log Out</a>
-      <div class="dropdown-divider"></div>
-      <a class="dropdown-item" href="#!">Profil bearbeiten</a>
-    </div>
-  </li>
-</ul>
-</div>
-<!-- Container wrapper -->
+    <!-- Right links -->
+    <ul class="navbar-nav ms-auto d-flex flex-row">
+      <li class="nav-item dropdown">
+        <a
+          class="nav-link dropdown-toggle"
+          id="navbarDropdown"
+          href="#"
+          role="button"
+          data-bs-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+          ><b>Login</b></a
+        >
+        <div
+          class="dropdown-menu dropdown-menu-end"
+          aria-labelledby="navbarDropdown"
+        >
+          <a
+            class="dropdown-item"
+            href="#!"
+            routerLink="/login"
+            routerLinkActive="true"
+            (click)="logOut()"
+            >Log Out</a
+          >
+          <div class="dropdown-divider"></div>
+          <a
+            class="dropdown-item"
+            href="#!"
+            routerLink="/profil"
+            routerLinkActive="true"
+            (click)="setEditModeToEditUser()"
+            >Profil bearbeiten</a
+          >
+        </div>
+      </li>
+    </ul>
+  </div>
+  <!-- Container wrapper -->
 </nav>
 <!-- Navbar -->

@@ -1,9 +1,10 @@
 <div class="form">
-
   <h1>LOGIN</h1>
-  <input type="text" placeholder="Enter Username" #uname required >
+  <form (ngSubmit)="onSignIn(login)" #login="ngForm">
+    <input type="text" placeholder="Enter Username" name = "username" class="form-control" id="username" ngModel required />
 
-  <input type="password" placeholder="Enter Password" #psw required >
+    <input type="password" placeholder="Enter Password" name = "password" class="form-control" id="password" ngModel required />
 
-  <button (click)="submit(uname.value, psw.value)">Login</button>
+    <button type="submit">Login</button>
+  </form>
 </div>

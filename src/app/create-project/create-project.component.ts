@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'app-create-project',
@@ -6,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrl: './create-project.component.css'
 })
 export class CreateProjectComponent {
-
+  startDateControl = new FormControl();
 }

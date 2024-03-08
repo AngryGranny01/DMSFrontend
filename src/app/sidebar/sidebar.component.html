@@ -1,23 +1,28 @@
-<!--Main Navigation-->
 <header>
   <!-- Sidebar -->
   <nav
-       id="sidebarMenu"
-       class="collapse d-lg-block sidebar collapse"
-       >
+    *ngIf="isLoggedIn()"
+    id="sidebarMenu"
+    class="collapse d-lg-block sidebar collapse"
+  >
     <div class="position-sticky">
       <div class="list-group list-group-flush mx-3 mt-4">
         <a
-           href="#"
-           class="list-group-item list-group-item-action py-4 ripple"
-           aria-current="true"
-           >
-            <span>Main Dashboard</span>
+          href="#"
+          class="list-group-item list-group-item-action py-4 ripple"
+          aria-current="true"
+          routerLink="/dashboard"
+          routerLinkActive="true"
+        >
+          <span>Main Dashboard</span>
         </a>
         <a
-           href="#"
-           class="list-group-item list-group-item-action py-4 ripple active"
-           >
+          *ngIf="isAdmin()"
+          href="#"
+          class="list-group-item list-group-item-action py-4 ripple active"
+          routerLink="/userManagment"
+          routerLinkActive="true"
+        >
           <span>User Managment</span>
         </a>
       </div>
@@ -25,5 +30,3 @@
   </nav>
   <!-- Sidebar -->
 </header>
-
-

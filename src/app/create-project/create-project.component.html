@@ -4,7 +4,7 @@
       <div class="card-body">
         <h5 class="card-title">Neues Projekt erstellen</h5>
         <div class="row">
-          <div class="col-md-5">
+          <div class="col-md-3">
             <label for="projectName">Projektname</label>
             <input
               type="text"
@@ -13,10 +13,8 @@
               placeholder="Projektname eingeben"
             />
           </div>
-        </div>
-        <div class="row">
-          <label for="projectManager">Projektmanager</label>
-          <div class="col-md-5">
+          <div class="col-md-6">
+            <label for="projectManager">Projektmanager</label>
             <div class="searchbar">
               <input
                 class="search_input"
@@ -28,6 +26,25 @@
                 ><i class="material-icons">search</i></a
               >
             </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-9">
+            <form>
+              <div class="row form-group">
+                <label for="date" class="col-sm-1 col-form-label">Date</label>
+                <div class="col-sm-4">
+                  <div class="input-group date" id="datepicker">
+                    <input type="text" class="form-control" />
+                    <span class="input-group-append">
+                      <span class="input-group-text bg-white">
+                        <i class="fa fa-calendar"></i>
+                      </span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
         <div class="col-md-9">
@@ -194,3 +211,4 @@
     </div>
   </div>
 </body>
+
