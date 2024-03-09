@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { UserService } from '../service/user.service';
 import { User } from '../models/userInterface';
 import { Role } from '../models/role';
+import { NiceDate } from '../models/niceDateInterface';
 
 @Component({
   selector: 'app-user-profil',
@@ -21,7 +22,7 @@ export class UserProfilComponent {
         this.user = { ...this.userService.currentUser }; // Load user data into the form fields
       }else{
         this.isEditMode = false;
-        this.user = new User('','','','',Role.USER,'')
+        this.user = new User(0,'','','','',Role.USER,'',new NiceDate(0,0,0,0,0))
       }
   }
 

@@ -1,0 +1,95 @@
+{
+  "logs": [
+    {
+      "logId": 1,
+      "userId": 1,
+      "ActivityName": "LOGIN",
+      "description": "User Max Mustermann logged in",
+      "dateTime": {
+        "year": 2020,
+        "month": 12,
+        "day": 1,
+        "hour": 21,
+        "minute": 0
+      }
+    },
+    {
+      "logId": 2,
+      "userId": 2,
+      "ActivityName": "LOGIN",
+      "description": "User Jane Doe logged in",
+      "dateTime": {
+        "year": 2021,
+        "month": 5,
+        "day": 15,
+        "hour": 10,
+        "minute": 30
+      }
+    },
+    {
+      "logId": 5,
+      "userId": 3,
+      "ActivityName": "LOGIN",
+      "description": "User John Smith logged in",
+      "dateTime": {
+        "year": 2022,
+        "month": 9,
+        "day": 3,
+        "hour": 18,
+        "minute": 45
+      }
+    },
+    {
+      "logId": 19,
+      "userId": 4,
+      "ActivityName": "CREATED",
+      "description": "User Alice Johnson was created",
+      "dateTime": {
+        "year": 2022,
+        "month": 9,
+        "day": 3,
+        "hour": 18,
+        "minute": 45
+      }
+    },
+    {
+      "logId": 15,
+      "userId": 5,
+      "ActivityName": "LOGIN",
+      "description": "User Bob Anderson logged in",
+      "dateTime": {
+        "year": 2023,
+        "month": 2,
+        "day": 10,
+        "hour": 14,
+        "minute": 15
+      }
+    },
+    {
+      "logId": 14,
+      "userId": 6,
+      "ActivityName": "LOGIN",
+      "description": "User Emily Davis logged in",
+      "dateTime": {
+        "year": 2023,
+        "month": 2,
+        "day": 10,
+        "hour": 14,
+        "minute": 15
+      }
+    },
+    {
+      "logId": 30,
+      "userId": 7,
+      "ActivityName": "LOGIN",
+      "description": "User Michael Brown logged in",
+      "dateTime": {
+        "year": 2023,
+        "month": 2,
+        "day": 10,
+        "hour": 14,
+        "minute": 15
+      }
+    }
+  ]
+}
