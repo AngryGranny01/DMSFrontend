@@ -1,0 +1,34 @@
+[{
+  "create new User JSON":"",
+
+  "username": "asdsd",
+  "firstName": "Michael",
+  "lastName": "Brown",
+  "email": "michael.brown@example.com",
+  "password": "password123",
+  "isAdmin": true,
+  "isProjectManager": true,
+  "log":{
+    "activityName": "LOGIN",
+    "description": "User Max Mustermann logged in",
+    "dateTime": {
+      "year": 2020,
+      "month": 12,
+      "day": 1,
+      "hour": 21,
+      "minute": 0
+    }
+  }
+}]
+
+"update User JSON":"",
+[{
+  "userID": 1,
+  "username": "asdsd",
+  "firstname": "Michael",
+  "lastname": "Brown",
+  "email": "michael.brown@example.com",
+  "password": "password123",
+  "isAdmin": true,
+  "isProjectManager": true,
+}]
