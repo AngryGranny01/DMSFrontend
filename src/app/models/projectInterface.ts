@@ -4,9 +4,10 @@ import { User } from './userInterface';
 export class Project {
   constructor(
     public name: string,
-    public manager: string,
+    public managerID: number,
     public users: User[],
     public description: string,
+    public key: string,
     public endDate: NiceDate
   ) {}
 }

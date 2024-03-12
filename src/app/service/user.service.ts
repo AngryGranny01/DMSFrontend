@@ -34,17 +34,12 @@ export class UserService {
     }
     return true;
   }
-  getUsers(): Observable<User[]> {
-    return this.http.get<any>(this.usersUrl).pipe(
-      // Use the map operator to extract the 'users' array from the response
-      map(response => response.users)
-    );
+
+  getCurrentUser(){
+
   }
 
-  getLogs(): Observable<Log[]> {
-    return this.http.get<any>(this.logsUrl).pipe(
-      map(response => response.logs)
-    );
+  getCurrentUserID(){
+    return this.currentUser.userId
   }
-
 }

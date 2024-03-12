@@ -27,10 +27,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let user of users">
+              <tr *ngFor="let user of users$ | async">
                 <th scope="row">{{ user.userId }}</th>
                 <td><a href="#">{{ user.firstname}} {{ user.lastname }}</a></td>
-                <td>{{ user.lastLogin.formatDate()}} <br>{{ user.lastLogin.formatTime()}}</td>
+                <td>{{ user.lastLogin.formatDate()}} <br>{{ user.lastLogin.formatTime()}} Uhr</td>
                 <td>{{ user.role }}</td>
                 <td>
                   <a href="#" class="openInNew" title="Logs"
@@ -41,7 +41,7 @@
                   <a href="#" class="settings" title="Settings" routerLink="/profil" routerLinkActive="active"
                     ><i class="material-icons">&#xE8B8;</i></a
                   >
-                  <a href="#" class="delete" title="Delete"
+                  <a href="#" class="delete" title="Delete" (click)="this.deleteUser(user)" routerLink="/userManagment" routerLinkActive="active"
                     ><i class="material-icons">&#xE5C9;</i></a
                   >
                 </td>

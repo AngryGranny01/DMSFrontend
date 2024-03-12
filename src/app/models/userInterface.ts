@@ -15,6 +15,6 @@ export class User{
 }
 
 
-export const userAdmin: User = new User(1,"admin","max","mustermann","1234", Role.ADMIN,"asdasd",new NiceDate(2022,2,4,14,0))
+export const userAdmin: User = new User(2,"admin","max","mustermann","1234", Role.ADMIN,"asdasd",new NiceDate(2022,2,4,14,0))
 export const userUser: User = new User(1,"user","max","mustermann","1234", Role.USER,"asdasd",new NiceDate(2022,2,4,14,0))
-export const userProjectManager: User = new User(1,"manager","max","mustermann","1234", Role.MANAGER,"asdasd",new NiceDate(2022,2,4,14,0))
+export const userProjectManager: User = new User(3,"manager","max","mustermann","1234", Role.MANAGER,"asdasd",new NiceDate(2022,2,4,14,0))

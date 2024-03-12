@@ -1,6 +1,6 @@
-[{
-  "create new User JSON":"",
+"create new User JSON":"",
 
+{
   "username": "asdsd",
   "firstName": "Michael",
   "lastName": "Brown",
@@ -8,27 +8,17 @@
   "password": "password123",
   "isAdmin": true,
   "isProjectManager": true,
-  "log":{
-    "activityName": "LOGIN",
-    "description": "User Max Mustermann logged in",
-    "dateTime": {
-      "year": 2020,
-      "month": 12,
-      "day": 1,
-      "hour": 21,
-      "minute": 0
-    }
-  }
-}]
+}
+"create new Project JSON":""
+{
+  "projectName": "Software Development",
+  "projectDescription": "Developing a new web application",
+  "projectKey": "WEBAPP123",
+  "projectEndDate": "2024-12-31",
+  "managerID": 1,
+  "userIDs": [
+    { "userID": 1 },
+    { "userID": 2 }
+  ]
+}
 
-"update User JSON":"",
-[{
-  "userID": 1,
-  "username": "asdsd",
-  "firstname": "Michael",
-  "lastname": "Brown",
-  "email": "michael.brown@example.com",
-  "password": "password123",
-  "isAdmin": true,
-  "isProjectManager": true,
-}]
