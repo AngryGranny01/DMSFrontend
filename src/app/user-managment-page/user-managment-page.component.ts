@@ -31,6 +31,11 @@ export class UserManagmentPageComponent {
     this.userService.isEditMode = false;
   }
 
+  editUser(user: User){
+    this.userService.isEditMode = true;
+    this.userService.setSelectedUser(user);
+  }
+
   loadAllUsers() {
     this.users$ = this.userDataService.getAllUsers();
   }

@@ -12,7 +12,7 @@ import { map } from 'rxjs/operators';
 })
 export class UserDataService {
   constructor(private http: HttpClient, private apiConfig: ApiConfigService) {}
-  private params = new HttpParams()
+  private params = new HttpParams();
   //-------------------------------------------- Get-Requests --------------------------------------------------------------//
   getAllUsers(): Observable<User[]> {
     return this.http
@@ -31,36 +31,69 @@ export class UserDataService {
   }
 
   checkIfUserEmailExists(userEmail: string) {
-    return this.http.get(
-      `${this.apiConfig.baseURL}/users/exists?email=${userEmail}`
-    );
+    return this.http
+      .get(`${this.apiConfig.baseURL}/user/exist?email=${userEmail}`)
+      .pipe(
+        map((response: any) => {
+          console.log(response);
+          return response.exist;
+        })
+      );
   }
 
   //check IF Password and Email is right
 
   //-------------------------------------------- Post-Requests --------------------------------------------------------------//
   createUser(user: User) {
-    return this.http.post(`${this.apiConfig.baseURL}/users`, user);
+    let isAdmin = false;
+    let isProjectManager = false;
+    console.log(user.role)
+    if (user.role === Role.ADMIN) {
+      isAdmin = true;
+    }
+    if (user.role === Role.MANAGER) {
+      isProjectManager = true;
+    }
+
+    const createUser = {
+      userName: user.username,
+      firstName: user.firstname,
+      lastName: user.lastname,
+      email: user.email,
+      passwordHash: user.password,
+      isAdmin: isAdmin,
+      isProjectManager: isProjectManager
+    };
+    return this.http.post(`${this.apiConfig.baseURL}/users`, createUser);
   }
 
   //-------------------------------------------- Put-Requests --------------------------------------------------------------//
   updateUser(user: User) {
-    return this.http.put(`${this.apiConfig.baseURL}/users`, user);
+    const updateUser = {
+      userID: user.userId,
+      userName: user.username,
+      firstName: user.firstname,
+      lastName: user.lastname,
+      email: user.email,
+      passwordHash: user.password,
+      role: user.role,
+    };
+    console.log(updateUser)
+    return this.http.put(`${this.apiConfig.baseURL}/users`, updateUser);
   }
 
   //-------------------------------------------- Delete-Requests --------------------------------------------------------------//
   deleteUser(userID: number) {
     const params = new HttpParams().set('userID', userID.toString());
-    
-    return this.http.delete(`${this.apiConfig.baseURL}/users`, { params });
 
+    return this.http.delete(`${this.apiConfig.baseURL}/users`, { params });
   }
 
   extractUser(response: any) {
     const role =
-      response.role === 'admin'
+      response.role === Role.ADMIN
         ? Role.ADMIN
-        : response.role === 'project manager'
+        : response.role === Role.MANAGER
         ? Role.MANAGER
         : Role.USER;
 
