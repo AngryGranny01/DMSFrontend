@@ -9,6 +9,7 @@ import { Log } from '../models/logInterface';
 import { Observable, Subscription, of } from 'rxjs';
 import { Role } from '../models/role';
 import { LogService } from '../service/log.service';
+import { LogDataService } from '../service/api/log-data.service';
 
 @Component({
   selector: 'app-user-managment-page',
@@ -24,24 +25,25 @@ export class UserManagmentPageComponent {
     private userService: UserService,
     private logService: LogService,
     private userDataService: UserDataService,
-    private managerDataService: ProjectManagerDataService
+    private managerDataService: ProjectManagerDataService,
+    private logDataService: LogDataService
   ) {}
 
   ngOnInit(): void {
     this.loadAllUsers();
   }
 
-  openUserLogs(user: User){
+  openUserLogs(user: User) {
     //set project Log to false because User Log should be opened
-    this.logService.setIsProjectLog(false)
-    this.userService.setSelectedUser(user)
+    this.logService.setIsProjectLog(false);
+    this.userService.setSelectedUser(user);
   }
 
   setEditModeToNewUser() {
     this.userService.isEditMode = false;
   }
 
-  editUser(user: User){
+  editUser(user: User) {
     this.userService.isEditMode = true;
     this.userService.setSelectedUser(user);
   }
@@ -61,31 +63,33 @@ export class UserManagmentPageComponent {
       }
 
       // Get Manager ID of the clicked User
-      this.managerDataService.getManagerID(user.userId).subscribe(
+      this.managerDataService.getManagerID(user.userID).subscribe(
         (managerID) => {
           console.log(managerID);
           // Update the Manager ID of the clicked User with the managerID of the person who deleted the user
-          this.managerDataService.updateManagerID(this.userService.getCurrentUserID(), managerID).subscribe(
-            () => {
-              // After successful update, delete the user
-              this.userDataService.deleteUser(user.userId).subscribe(
-                () => {
-                  // Refresh user data after successful deletion
-                  this.refreshUsers();
-                },
-                (error) => {
-                  // Handle error deleting user
-                  console.error('Error deleting user:', error);
-                  // Optionally, notify the user about the error
-                }
-              );
-            },
-            (error) => {
-              // Handle error updating manager ID
-              console.error('Error updating manager ID:', error);
-              // Optionally, notify the user about the error
-            }
-          );
+          this.managerDataService
+            .updateManagerID(this.userService.getCurrentUserID(), managerID)
+            .subscribe(
+              () => {
+                // After successful update, delete the user
+                this.userDataService.deleteUser(user.userID).subscribe(
+                  () => {
+                    // Refresh user data after successful deletion
+                    this.refreshUsers();
+                  },
+                  (error) => {
+                    // Handle error deleting user
+                    console.error('Error deleting user:', error);
+                    // Optionally, notify the user about the error
+                  }
+                );
+              },
+              (error) => {
+                // Handle error updating manager ID
+                console.error('Error updating manager ID:', error);
+                // Optionally, notify the user about the error
+              }
+            );
         },
         (error) => {
           // Handle error getting manager ID
@@ -94,7 +98,7 @@ export class UserManagmentPageComponent {
         }
       );
     } else {
-      this.userDataService.deleteUser(user.userId).subscribe(
+      this.userDataService.deleteUser(user.userID).subscribe(
         () => {
           // Refresh user data after successful deletion
           this.refreshUsers();

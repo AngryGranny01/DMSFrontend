@@ -9,5 +9,6 @@ export interface Log {
   activityName: ActivityName,
   description: string,
   dateTime: NiceDate
-}
+};
+
 

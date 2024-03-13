@@ -37,19 +37,24 @@ import { DashboardComponent } from './dashboard/dashboard.component';
     FormsModule,
     BsDatepickerModule.forRoot(),
     HttpClientModule,
+    BrowserModule,
+
+    // ngx-translate and the loader module
+    HttpClientModule,
     TranslateModule.forRoot({
-      loader: {
-        provide: TranslateLoader,
-        useFactory: HttpLoaderFactory,
-        deps: [HttpClient],
-      },
-    }),
+        loader: {
+            provide: TranslateLoader,
+            useFactory: HttpLoaderFactory,
+            deps: [HttpClient]
+        }
+    })
   ],
   providers: [],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
 
-export function HttpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http, '../assets/translation', '.json');
+
+export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
+  return new TranslateHttpLoader(http);
 }

@@ -22,6 +22,10 @@ export class LogService {
     return ActivityName.UNKNOWN;
   }
 
+  getLogDescriptionString(activityName: ActivityName){
+    return 
+  }
+
   getIsProjectLog(){
     return this.isProjectLog
   }

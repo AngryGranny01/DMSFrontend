@@ -15,7 +15,6 @@ import { ProjectManagerDataService } from '../service/api/project-manager-data.s
   providers: [UserManagmentPageComponent],
 })
 //TODO: Log Entrys
-
 export class UserProfilComponent {
   selectedRole: Role = Role.USER; // Default selected role
   user!: User;
@@ -93,7 +92,10 @@ export class UserProfilComponent {
   }
 
   updatedSelectedUser(user: User) {
-    if (user.role === Role.USER && Role.USER !== this.userService.getSelectedUser().role) {
+    if (
+      user.role === Role.USER &&
+      Role.USER !== this.userService.getSelectedUser().role
+    ) {
       const confirmResetToUser = confirm(
         'Wenn Sie den Benutzer auf "User" zurücksetzen, werden Sie zum Projektmanager für die offenen Projekte. Möchten Sie fortfahren?'
       );
@@ -101,32 +103,36 @@ export class UserProfilComponent {
         return; // User canceled the operation
       }
       // Get Manager ID of the clicked User
-      this.managerDataService.getManagerID(user.userId).subscribe(
+      this.managerDataService.getManagerID(user.userID).subscribe(
         (managerID) => {
           console.log(managerID);
           // Update the Manager ID of the clicked User with the managerID of the person who deleted the user
-          this.managerDataService.updateManagerID(this.userService.getCurrentUserID(), managerID).subscribe(
-            () => {
-              console.log(this.userService.getCurrentUserID())
-              //delete Manager ID
+          this.managerDataService
+            .updateManagerID(this.userService.getCurrentUserID(), managerID)
+            .subscribe(
+              () => {
+                console.log(this.userService.getCurrentUserID());
+                //delete Manager ID
 
-              this.managerDataService.deleteProjectManager(managerID).subscribe(
-                () => {
-                  // Refresh user data after successful deletion
-                  this.updateUserAndNavigate(user);
-                },
-                (error) => {
-                  // Handle error deleting user
-                  console.error('Error deleting Project Manager:', error);
-                  // Optionally, notify the user about the error
-                }
-              );
-            },
-            (error) => {
-              // Handle error updating manager ID
-              console.error('Error updating manager ID:', error);
-            }
-          );
+                this.managerDataService
+                  .deleteProjectManager(managerID)
+                  .subscribe(
+                    () => {
+                      // Refresh user data after successful deletion
+                      this.updateUserAndNavigate(user);
+                    },
+                    (error) => {
+                      // Handle error deleting user
+                      console.error('Error deleting Project Manager:', error);
+                      // Optionally, notify the user about the error
+                    }
+                  );
+              },
+              (error) => {
+                // Handle error updating manager ID
+                console.error('Error updating manager ID:', error);
+              }
+            );
         },
         (error) => {
           // Handle error getting manager ID
@@ -138,7 +144,6 @@ export class UserProfilComponent {
       this.updateUserAndNavigate(user);
     }
   }
-
 
   updateUserAndNavigate(user: User) {
     this.userDataService.updateUser(user).subscribe(
@@ -155,7 +160,6 @@ export class UserProfilComponent {
       }
     );
   }
-
 
   createNewUser(user: User) {
     this.userDataService.createUser(user).subscribe(

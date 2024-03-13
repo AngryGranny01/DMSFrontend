@@ -13,6 +13,14 @@ import { map } from 'rxjs/operators';
 export class UserDataService {
   constructor(private http: HttpClient, private apiConfig: ApiConfigService) {}
   private params = new HttpParams();
+
+  //-------------------------------------------- Login --------------------------------------------------------------//
+  checkLoginData(userPassword: string, userEmail: string): Observable<User> {
+    return this.http.get<any>(
+      `${this.apiConfig.baseURL}/user/login?email=${userEmail}&passwordHash=${userPassword}`
+    );
+  }
+
   //-------------------------------------------- Get-Requests --------------------------------------------------------------//
   getAllUsers(): Observable<User[]> {
     return this.http
@@ -47,7 +55,7 @@ export class UserDataService {
   createUser(user: User) {
     let isAdmin = false;
     let isProjectManager = false;
-    console.log(user.role)
+    console.log(user.role);
     if (user.role === Role.ADMIN) {
       isAdmin = true;
     }
@@ -62,7 +70,7 @@ export class UserDataService {
       email: user.email,
       passwordHash: user.password,
       isAdmin: isAdmin,
-      isProjectManager: isProjectManager
+      isProjectManager: isProjectManager,
     };
     return this.http.post(`${this.apiConfig.baseURL}/users`, createUser);
   }
@@ -70,7 +78,7 @@ export class UserDataService {
   //-------------------------------------------- Put-Requests --------------------------------------------------------------//
   updateUser(user: User) {
     const updateUser = {
-      userID: user.userId,
+      userID: user.userID,
       userName: user.username,
       firstName: user.firstname,
       lastName: user.lastname,
@@ -78,7 +86,7 @@ export class UserDataService {
       passwordHash: user.password,
       role: user.role,
     };
-    console.log(updateUser)
+    console.log(updateUser);
     return this.http.put(`${this.apiConfig.baseURL}/users`, updateUser);
   }
 

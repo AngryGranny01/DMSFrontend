@@ -1,0 +1,15 @@
+{
+  "LOGIN": "1",
+  "LOGOUT": "2",
+  "CREATE_USER": "3",
+  "CREATE_PROJECT": "4",
+  "UPDATE_USER": "5",
+  "UPDATE_PROJECT": "6",
+  "DELETE_USER": "7",
+  "DELETE_PROJECT": "8",
+  "VIEW_PROJECT": "9",
+  "VIEW_USER": "10",
+  "UPLOAD": "11",
+  "DOWNLOAD": "12",
+  "ERROR": "13"
+}

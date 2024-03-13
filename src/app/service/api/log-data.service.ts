@@ -12,6 +12,8 @@ import { LogService } from '../log.service';
 @Injectable({
   providedIn: 'root',
 })
+
+//TODO: Handle the switch in Language
 export class LogDataService {
   constructor(private http: HttpClient,private apiConfig: ApiConfigService, private logService: LogService) {}
 
@@ -29,14 +31,24 @@ export class LogDataService {
   }
 
   //-------------------------------------------- Post-Requests --------------------------------------------------------------//
-  createUserLog(user: User) {
-
-    return this.http.post(`${this.apiConfig.baseURL}/users`, user);
+  createUserLog(log: Log) {
+    console.log(log)
+    const data = {
+      userID: log.userId,
+      activityName: log.activityName,
+      activityDescription: log.description
+    }
+    return this.http.post(`${this.apiConfig.baseURL}/user-logs`, data);
   }
 
-  createProjectLog(user: User) {
-
-    return this.http.post(`${this.apiConfig.baseURL}/users`, user);
+  createProjectLog(log: Log, projectID: number) {
+    const data = {
+      projectID: projectID,
+      userID: log.userId,
+      activityName: log.activityName,
+      activityDescription: log.description,
+    }
+    return this.http.post(`${this.apiConfig.baseURL}/project-logs`, data);
   }
 
 

@@ -9,7 +9,8 @@ import { TranslateService } from '@ngx-translate/core';
 export class AppComponent {
   title = 'DMSFrontend';
   constructor(private translate: TranslateService) {
-    this.translate.setDefaultLang('en'); // Set default language
+    translate.setDefaultLang('en');
+    translate.use('en');
   }
 
   switchLanguage(lang: string) {

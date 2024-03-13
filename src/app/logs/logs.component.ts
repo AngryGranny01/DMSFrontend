@@ -27,13 +27,13 @@ export class LogsComponent {
   ) {}
 
   ngOnInit() {
-    this.isUserOrProjectLog = this.logService.getIsProjectLog()
+    this.isUserOrProjectLog = this.logService.getIsProjectLog();
     if (this.logService.getIsProjectLog()) {
       this.project = this.projectService.getSelectedProject();
       this.loadProjectLogs(this.project);
     } else {
       this.user = this.userService.getSelectedUser();
-      console.log(this.user)
+      console.log(this.user);
       this.loadUserLogs(this.user);
     }
   }
@@ -43,6 +43,6 @@ export class LogsComponent {
   }
 
   loadUserLogs(user: User) {
-    this.logs$ = this.logDataService.getUserLogs(user.userId);
+    this.logs$ = this.logDataService.getUserLogs(user.userID);
   }
 }
