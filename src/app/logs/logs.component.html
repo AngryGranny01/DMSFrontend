@@ -1,180 +1,70 @@
 <body>
-<div class="container mt-5">
-  <div class="card">
-    <div class="card-header">
-      <h2><b>Logs</b></h2>
-    </div>
-    <div class="card-body">
-      <!-- Dropdown-Buttons -->
-      <div class="btn-group">
-        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Alle Teilnehmer
-        </button>
-        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Ereignis
-        </button>
-        <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Alle Tage
-        </button>
+  <div class="container mt-5">
+    <div class="card">
+      <div class="card-header">
+        <h2>
+          <b>{{ isUserOrProjectLog ? "Project Log: " : "UserLog: " }}</b>
+        </h2>
       </div>
+      <div class="card-body">
+        <!-- Dropdown-Buttons -->
+        <div class="btn-group">
+          <button
+            type="button"
+            class="btn btn-primary dropdown-toggle"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            Alle Teilnehmer
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary dropdown-toggle"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            Ereignis
+          </button>
+          <button
+            type="button"
+            class="btn btn-primary dropdown-toggle"
+            data-toggle="dropdown"
+            aria-haspopup="true"
+            aria-expanded="false"
+          >
+            Alle Tage
+          </button>
+        </div>
 
-      <!-- Tabelle -->
-      <div class="table-responsive mt-3" style="max-height: 600px">
-        <table class="table table-striped table-hover">
-          <thead class="thead-dark">
-            <tr>
-              <th scope="col">Zeit</th>
-              <th scope="col">Benutzer</th>
-              <th scope="col">Ereignisname</th>
-              <th scope="col">Beschreibung</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Beispielzeilen -->
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <tr>
-              <td>08:00</td>
-              <td>Max Mustermann</td>
-              <td>Meeting</td>
-              <td>Besprechung mit Kunden</td>
-            </tr>
-            <!-- Weitere Zeilen können hier eingefügt werden -->
-          </tbody>
-        </table>
+        <!-- Tabelle -->
+        <div class="table-responsive mt-3" style="max-height: 600px">
+          <table class="table table-striped table-hover">
+            <thead class="thead-dark">
+              <tr>
+                <th scope="col">Zeit</th>
+                <th scope="col">Benutzer</th>
+                <th scope="col">Ereignisname</th>
+                <th scope="col">Beschreibung</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let log of logs$ | async">
+                <th scope="row">
+                  {{ log.dateTime.formatDate() }} <br />{{
+                    log.dateTime.formatTime()
+                  }}
+                  Uhr
+                </th>
+                <td>{{ log.firstName }} {{ log.lastName }}</td>
+                <td>{{log.activityName}}</td>
+                <td>{{log.description}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
-</div>
 </body>
-

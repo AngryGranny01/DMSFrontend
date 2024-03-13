@@ -1,9 +1,67 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { User } from '../../models/userInterface';
+import { Project } from '../../models/projectInterface';
+import { Observable, map } from 'rxjs';
+import { Log } from '../../models/logInterface';
+import { ApiConfigService } from './api-config.service';
+import { ActivityName } from '../../models/activityName';
+import { NiceDate } from '../../models/niceDateInterface';
+import { LogService } from '../log.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LogDataService {
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,private apiConfig: ApiConfigService, private logService: LogService) {}
+
+  //-------------------------------------------- Get-Requests --------------------------------------------------------------//
+  getUserLogs(userID: number): Observable<Log[]> {
+    return this.http.get<any[]>(`${this.apiConfig.baseURL}/logs/user?userID=${userID}`).pipe(
+      map((response: any[]) => response.map(userLog => this.extractLog(userLog)))
+    );
+  }
+
+  getProjectLogs(projectID: number): Observable<Log[]> {
+    return this.http.get<any[]>(`${this.apiConfig.baseURL}/logs/project?projectID=${projectID}`).pipe(
+      map((response: any[]) => response.map(projectLog => this.extractLog(projectLog)))
+    );
+  }
+
+  //-------------------------------------------- Post-Requests --------------------------------------------------------------//
+  createUserLog(user: User) {
+
+    return this.http.post(`${this.apiConfig.baseURL}/users`, user);
+  }
+
+  createProjectLog(user: User) {
+
+    return this.http.post(`${this.apiConfig.baseURL}/users`, user);
+  }
+
+
+  private extractLog(logData: any): Log {
+    // Implement your logic to extract Log data from logData object
+    // For example:
+    const timeStamp = new NiceDate(
+      logData.timeStamp.year,
+      logData.timeStamp.month,
+      logData.timeStamp.day,
+      logData.timeStamp.hour,
+      logData.timeStamp.minute
+    );
+
+    return {
+      logId: logData.logID,
+      userId: logData.userID,
+      firstName: logData.firstName,
+      lastName: logData.lastName,
+      activityName: this.logService.matchActivityNameWithString(logData.activityName),
+      description: logData.activityDescription,
+      dateTime: timeStamp
+    };
+  }
+
 }
+
+

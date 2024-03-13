@@ -8,23 +8,33 @@ import { User } from '../models/userInterface';
 import { Log } from '../models/logInterface';
 import { Observable, Subscription, of } from 'rxjs';
 import { Role } from '../models/role';
+import { LogService } from '../service/log.service';
 
 @Component({
   selector: 'app-user-managment-page',
   templateUrl: './user-managment-page.component.html',
   styleUrl: './user-managment-page.component.css',
 })
+
+//TODO: Log Entrys
 export class UserManagmentPageComponent {
   users$: Observable<User[]> = of([]); // Initialize with an empty observable array
 
   constructor(
     private userService: UserService,
+    private logService: LogService,
     private userDataService: UserDataService,
     private managerDataService: ProjectManagerDataService
   ) {}
 
   ngOnInit(): void {
     this.loadAllUsers();
+  }
+
+  openUserLogs(user: User){
+    //set project Log to false because User Log should be opened
+    this.logService.setIsProjectLog(false)
+    this.userService.setSelectedUser(user)
   }
 
   setEditModeToNewUser() {
@@ -40,6 +50,7 @@ export class UserManagmentPageComponent {
     this.users$ = this.userDataService.getAllUsers();
   }
 
+  //TODO: Log Entrys
   deleteUser(user: User) {
     if (user.role === Role.MANAGER) {
       const confirmDelete = confirm(
@@ -96,7 +107,6 @@ export class UserManagmentPageComponent {
       );
     }
   }
-
 
   refreshUsers() {
     this.loadAllUsers();

@@ -1,0 +1,15 @@
+{
+  "LOGIN": "User with ID {{userId}} and Username {{username}} logged in at {{loginTimestamp}}",
+  "LOGOUT": "User with ID {{userId}} and Username {{username}} logged out at {{logoutTimestamp}}",
+  "CREATE_USER": "User with ID {{userId}} and Username {{username}} created",
+  "CREATE_PROJECT": "Project '{{projectName}}' with ID {{projectId}} created",
+  "UPDATE_USER": "User with ID {{userId}} and Username {{username}} updated",
+  "UPDATE_PROJECT": "Project '{{projectName}}' with ID {{projectId}} updated",
+  "DELETE_USER": "User with ID {{userId}} and Username {{username}} deleted",
+  "DELETE_PROJECT": "Project '{{projectName}}' with ID {{projectId}} deleted",
+  "VIEW_PROJECT": "User with ID {{userId}} and Username {{username}} viewed project '{{projectName}}' with ID {{projectId}}",
+  "VIEW_USER": "User with ID {{userId}} and Username {{username}} viewed user with ID {{viewedUserId}} and Username {{viewedUsername}}",
+  "UPLOAD": "File '{{filename}}' uploaded",
+  "DOWNLOAD": "File '{{filename}}' downloaded",
+  "ERROR": "An error occurred: {{errorMessage}}"
+}

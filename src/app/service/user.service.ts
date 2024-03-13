@@ -10,7 +10,6 @@ import { Log } from '../models/logInterface';
   providedIn: 'root'
 })
 export class UserService {
-  users$: Observable<User[]> = of([]);
   public currentUser: User = {
     userId: 0,
     username: '',
@@ -27,7 +26,7 @@ export class UserService {
   public isEditMode: boolean = true;
   private selectedUser!: User;
 
-  constructor(private http: HttpClient) { }
+  constructor() { }
 
   isAdmin(): boolean {
     if (this.currentUser === undefined || this.currentUser.role !== Role.ADMIN) {

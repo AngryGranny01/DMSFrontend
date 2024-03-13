@@ -14,6 +14,8 @@ import { ProjectManagerDataService } from '../service/api/project-manager-data.s
   styleUrl: './user-profil.component.css',
   providers: [UserManagmentPageComponent],
 })
+//TODO: Log Entrys
+
 export class UserProfilComponent {
   selectedRole: Role = Role.USER; // Default selected role
   user!: User;
@@ -143,7 +145,7 @@ export class UserProfilComponent {
       () => {
         // Handle successful update
         this.userManagementPageComponent.refreshUsers();
-        // Log Entry
+        //TODO: Log Entry
         this.router.navigate(['/userManagment']);
         console.log('User profile updated:', user);
       },
