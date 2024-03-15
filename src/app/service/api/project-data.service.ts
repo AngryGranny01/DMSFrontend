@@ -47,28 +47,28 @@ export class ProjectDataService {
   }
 
   //-------------------------------------------- Post-Requests --------------------------------------------------------------//
-  createProject(project: Project) {
+  createProject(project: any,userIDs:any[]) {
     const createProject = {
       managerID: project.managerID,
-      projectName: project.name,
-      projectDescription: project.description,
-      projectKey: project.key,
-      projectEndDate: project.endDate,
-      //userIDs: project.users.userId,
+      projectName: project.projectName,
+      projectDescription: project.projectDescription,
+      projectKey: project.projectKey,
+      projectEndDate: project.projectEndDate,
+      userIDs: userIDs,
     };
     return this.http.post(`${this.apiConfig.baseURL}/projects`, createProject);
   }
 
   //-------------------------------------------- Put-Requests --------------------------------------------------------------//
-  updateProject(project: Project) {
+  updateProject(project: any, userIDs: any[]) {
     const updateProject = {
       projectID: project.projectID,
-      projectName: project.name,
-      projectDescription: project.description,
-      projectKey: project.key,
-      projectEndDate: project.endDate,
       managerID: project.managerID,
-      //userIDs: project.users.userId,
+      projectName: project.projectName,
+      projectDescription: project.projectDescription,
+      projectKey: project.projectKey,
+      projectEndDate: project.projectEndDate,
+      userIDs: userIDs,
     };
     console.log(updateProject);
     return this.http.put(`${this.apiConfig.baseURL}/projects`, updateProject);

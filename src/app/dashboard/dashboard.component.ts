@@ -14,6 +14,8 @@ import { ProjectService } from '../service/project.service';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
+
+//TODO: If Admin is logged in show all Projects or only Admin Projects
 export class DashboardComponent {
 createNewProject() {
 throw new Error('Method not implemented.');

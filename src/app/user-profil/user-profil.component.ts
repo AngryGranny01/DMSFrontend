@@ -54,6 +54,7 @@ export class UserProfilComponent {
     return this.userService.isAdmin();
   }
 
+  //TODO: CHECK USER NAME
   saveProfile() {
     // Get new user data from HTML form
     const updatedUser: User = {
