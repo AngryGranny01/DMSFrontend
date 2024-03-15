@@ -14,10 +14,11 @@
                     <a
                       href="#"
                       class="btn btn-secondary"
-                      routerLink="/profil"
+                      routerLink="/createProject"
                       routerLinkActive="active"
+                      (click)="this.createProject()"
                     >
-                      <span>Add New User</span></a
+                      <span>Add New Project</span></a
                     >
                   </div>
                 </div>
@@ -30,26 +31,50 @@
                     <th scope="col">Projektleiter</th>
                     <th scope="col">Projektende</th>
                     <th scope="col">Logs</th>
-                    <th scope="col">Delete</th>
+                    <th scope="col">Funktionen</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
+                  <tr *ngFor="let project of projects$ | async">
                     <th scope="row">
                       <a href="#" class="folder"
                         ><i class="material-icons">&#xE2C7;</i>
                       </a>
                     </th>
-                    <td><a href="#"> Weitergaben von Daten</a></td>
-                    <td>Max Mustermann</td>
-                    <td>06/09/2016</td>
                     <td>
-                      <a href="#" class="openInNew" title="Logs"
+                      <a href="#"> {{ project.name }}</a>
+                    </td>
+                    <td>{{ project.manager.firstname }} {{ project.manager.lastname }}</td>
+                    <td>{{ project.endDate.formatDate() }}</td>
+                    <td>
+                      <a
+                        href="#"
+                        class="openInNew"
+                        title="Logs"
+                        (click)="openProjectLogs(project)"
+                        routerLink="/logs"
+                        routerLinkActive="active"
                         ><i class="material-icons">&#xE89E;</i>
                       </a>
                     </td>
                     <td>
-                      <a href="#" class="delete" title="Delete"
+                      <td>
+                        <a
+                          href="#"
+                          class="settings"
+                          title="Settings"
+                          (click)="this.editProject(project)"
+                          routerLink="/createProject"
+                          routerLinkActive="active"
+                          ><i class="material-icons">&#xE8B8;</i></a
+                        >
+                      <a
+                        href="#"
+                        class="delete"
+                        title="Delete"
+                        (click)="this.deleteProject(project.projectID)"
+                        routerLink="/dashboard"
+                        routerLinkActive="active"
                         ><i class="material-icons">&#xE5C9;</i>
                       </a>
                     </td>

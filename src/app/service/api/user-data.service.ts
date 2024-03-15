@@ -12,7 +12,6 @@ import { map } from 'rxjs/operators';
 })
 export class UserDataService {
   constructor(private http: HttpClient, private apiConfig: ApiConfigService) {}
-  private params = new HttpParams();
 
   //-------------------------------------------- Login --------------------------------------------------------------//
   checkLoginData(userPassword: string, userEmail: string): Observable<User> {
@@ -40,7 +39,18 @@ export class UserDataService {
 
   checkIfUserEmailExists(userEmail: string) {
     return this.http
-      .get(`${this.apiConfig.baseURL}/user/exist?email=${userEmail}`)
+      .get(`${this.apiConfig.baseURL}/user/exist/email?email=${userEmail}`)
+      .pipe(
+        map((response: any) => {
+          console.log(response);
+          return response.exist;
+        })
+      );
+  }
+
+  checkIfUserNameExists(userName: string) {
+    return this.http
+      .get(`${this.apiConfig.baseURL}/user/exist/username/username=${userName}`)
       .pipe(
         map((response: any) => {
           console.log(response);
@@ -98,6 +108,7 @@ export class UserDataService {
   }
 
   extractUser(response: any) {
+    console.log(response)
     const role =
       response.role === Role.ADMIN
         ? Role.ADMIN

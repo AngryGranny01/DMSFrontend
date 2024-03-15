@@ -38,6 +38,9 @@ export class UserService {
     return true;
   }
 
+  concatenateFirstnameLastname(firstname: string, lastname: string): string {
+    return firstname + ' ' + lastname;
+  }
   getCurrentUserID() {
     return this.currentUser.userID;
   }

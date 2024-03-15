@@ -5,7 +5,7 @@ import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { LoginPageComponent } from './login-page/login-page.component';
@@ -17,6 +17,13 @@ import { UserProfilComponent } from './user-profil/user-profil.component';
 import { CreateProjectComponent } from './create-project/create-project.component';
 import { LogsComponent } from './logs/logs.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatInputModule } from '@angular/material/input';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatNativeDateModule } from '@angular/material/core'; // Import MatNativeDateModule
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { AsyncPipe } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -34,11 +41,15 @@ import { DashboardComponent } from './dashboard/dashboard.component';
     BrowserModule,
     MatIconModule,
     AppRoutingModule,
-    FormsModule,
+    FormsModule, // FormsModule imported once
+    ReactiveFormsModule, // ReactiveFormsModule imported once
     BsDatepickerModule.forRoot(),
-    HttpClientModule,
-    BrowserModule,
-
+    HttpClientModule, // HttpClientModule imported once
+    MatDatepickerModule,
+    MatInputModule,
+    MatNativeDateModule, // MatNativeDateModule imported once
+    MatAutocompleteModule,
+    MatFormFieldModule,
     // ngx-translate and the loader module
     HttpClientModule,
     TranslateModule.forRoot({
@@ -48,8 +59,11 @@ import { DashboardComponent } from './dashboard/dashboard.component';
             deps: [HttpClient]
         }
     })
+]
+,
+  providers: [
+    provideAnimationsAsync('noop')
   ],
-  providers: [],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

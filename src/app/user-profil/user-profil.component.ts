@@ -68,26 +68,43 @@ export class UserProfilComponent {
       // Email hasn't been changed, proceed with updating the user profile
       this.updatedSelectedUser(updatedUser);
     } else {
-      this.userDataService.checkIfUserEmailExists(updatedUser.email).subscribe(
-        (exists) => {
-          if (exists) {
-            // Email already exists, display an alert in the HTML
-            alert('Email already exists.');
-          } else {
-            if (this.isEditMode) {
-              // Logic to update user profile
-              this.updatedSelectedUser(updatedUser);
+      this.userDataService
+        .checkIfUserNameExists(updatedUser.username)
+        .subscribe(
+          (exists) => {
+            if (exists) {
+              // Email already exists, display an alert in the HTML
+              alert('Username already exists.');
             } else {
-              // Logic to create new user profile
-              this.createNewUser(updatedUser);
+              this.userDataService
+                .checkIfUserEmailExists(updatedUser.email)
+                .subscribe(
+                  (exists) => {
+                    if (exists) {
+                      // Email already exists, display an alert in the HTML
+                      alert('Email already exists.');
+                    } else {
+                      if (this.isEditMode) {
+                        // Logic to update user profile
+                        this.updatedSelectedUser(updatedUser);
+                      } else {
+                        // Logic to create new user profile
+                        this.createNewUser(updatedUser);
+                      }
+                    }
+                  },
+                  (error) => {
+                    // Handle error checking email existence
+                    console.error('Error checking if email exists:', error);
+                  }
+                );
             }
+          },
+          (error) => {
+            // Handle error checking email existence
+            console.error('Error checking if username exists:', error);
           }
-        },
-        (error) => {
-          // Handle error checking email existence
-          console.error('Error checking if email exists:', error);
-        }
-      );
+        );
     }
   }
 

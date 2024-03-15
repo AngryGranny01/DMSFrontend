@@ -9,7 +9,7 @@ export class ProjectService {
   constructor() { }
 
   private selectedProject!: Project;
-
+  public isProjectEditMode: boolean = true;
 
 
   setSelectedProject(project: Project) {

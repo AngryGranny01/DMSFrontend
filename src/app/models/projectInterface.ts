@@ -6,6 +6,7 @@ export class Project {
     public projectID: number,
     public name: string,
     public managerID: number,
+    public manager: User,
     public users: User[],
     public description: string,
     public key: string,

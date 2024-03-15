@@ -10,7 +10,7 @@ export class User {
     public password: string,
     public role: Role,
     public email: string,
-    public lastLogin: NiceDate
+    public lastLogin: NiceDate 
   ) {}
 }
 
