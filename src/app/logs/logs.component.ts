@@ -7,6 +7,7 @@ import { User } from '../models/userInterface';
 import { Project } from '../models/projectInterface';
 import { LogDataService } from '../service/api/log-data.service';
 import { LogService } from '../service/log.service';
+import { TranslationHelperService } from '../service/translation-helper.service';
 
 @Component({
   selector: 'app-logs',
@@ -23,7 +24,8 @@ export class LogsComponent {
     private projectService: ProjectService,
     private userService: UserService,
     private logService: LogService,
-    private logDataService: LogDataService
+    private logDataService: LogDataService,
+    private translationHelper: TranslationHelperService
   ) {}
 
   ngOnInit() {
@@ -39,10 +41,40 @@ export class LogsComponent {
   }
 
   loadProjectLogs(project: Project) {
-    this.logs$ = this.logDataService.getProjectLogs(project.projectID);
+    this.logDataService.getProjectLogs(project.projectID).subscribe(
+      (logs) => {
+        for (let log of logs) {
+          log.description = this.translationHelper.getTranslatedLogDescription(
+            log.activityName,
+            log.description
+          );
+          console.log(log.description);
+        }
+        this.logs$ = of(logs);
+      },
+      (error) => {
+        console.error('Error getting project logs:', error);
+        // Optionally, notify the user about the error
+      }
+    );
   }
 
   loadUserLogs(user: User) {
-    this.logs$ = this.logDataService.getUserLogs(user.userID);
+    this.logDataService.getUserLogs(user.userID).subscribe(
+      (logs) => {
+        for (let log of logs) {
+          log.description = this.translationHelper.getTranslatedLogDescription(
+            log.activityName,
+            log.description
+          );
+          console.log(log.description);
+        }
+        this.logs$ = of(logs);
+      },
+      (error) => {
+        console.error('Error getting User logs:', error);
+        // Optionally, notify the user about the error
+      }
+    );
   }
 }

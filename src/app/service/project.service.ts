@@ -10,7 +10,7 @@ export class ProjectService {
 
   private selectedProject!: Project;
   public isProjectEditMode: boolean = true;
-
+  public showAllProjects: boolean = false;
 
   setSelectedProject(project: Project) {
     this.selectedProject = project;

@@ -16,6 +16,8 @@ import { UserService } from '../service/user.service';
 import { ProjectManagerDataService } from '../service/api/project-manager-data.service';
 import { Router } from '@angular/router';
 import { ProjectDataService } from '../service/api/project-data.service';
+import { LogService } from '../service/log.service';
+import { LogDataService } from '../service/api/log-data.service';
 
 @Component({
   selector: 'app-create-project',
@@ -55,6 +57,7 @@ export class CreateProjectComponent {
     private userService: UserService,
     private projectManagerDataService: ProjectManagerDataService,
     private projectDataService: ProjectDataService,
+    private logDataService: LogDataService,
     private router: Router
   ) {
     this.filteredOptions = this.options.slice();
@@ -192,7 +195,11 @@ export class CreateProjectComponent {
     };
     // Call the createProject method and wait for its completion
     this.projectDataService.createProject(project, data.userIDs).subscribe(
-      () => {
+      (response: any) => {
+
+        // Log Entry
+        this.logDataService.addCreateProjectLog(response.projectID, project.projectName)
+
         // After project creation is successful, navigate to the dashboard
         this.router.navigate(['/dashboard']);
       },
@@ -214,6 +221,9 @@ export class CreateProjectComponent {
     // Call the createProject method and wait for its completion
     this.projectDataService.updateProject(project, data.userIDs).subscribe(
       () => {
+        // Log Entry
+        this.logDataService.addUpdateProjectLog(project.projectID, project.projectName)
+
         // After project creation is successful, navigate to the dashboard
         this.router.navigate(['/dashboard']);
       },

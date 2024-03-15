@@ -7,6 +7,8 @@ import { UserDataService } from '../service/api/user-data.service';
 import { UserManagmentPageComponent } from '../user-managment-page/user-managment-page.component';
 import { Router } from '@angular/router';
 import { ProjectManagerDataService } from '../service/api/project-manager-data.service';
+import { LogService } from '../service/log.service';
+import { LogDataService } from '../service/api/log-data.service';
 
 @Component({
   selector: 'app-user-profil',
@@ -24,6 +26,7 @@ export class UserProfilComponent {
     private userDataService: UserDataService,
     private managerDataService: ProjectManagerDataService,
     private userManagementPageComponent: UserManagmentPageComponent,
+    private logDataService: LogDataService,
     private router: Router
   ) {}
   isEditMode: boolean = false;
@@ -168,7 +171,8 @@ export class UserProfilComponent {
       () => {
         // Handle successful update
         this.userManagementPageComponent.refreshUsers();
-        //TODO: Log Entry
+        //Log Entry
+        this.logDataService.addUpdateUserLog(user);
         this.router.navigate(['/userManagment']);
         console.log('User profile updated:', user);
       },
@@ -181,10 +185,11 @@ export class UserProfilComponent {
 
   createNewUser(user: User) {
     this.userDataService.createUser(user).subscribe(
-      () => {
+      (response: any) => {
         // Handle successful creation
         this.userManagementPageComponent.refreshUsers();
-        //TODO: Log Entry
+        //Log Entry
+        this.logDataService.addCreateUserLog(response.userID, user.username)
         this.router.navigate(['/userManagment']);
         console.log('New user profile created:', user);
       },

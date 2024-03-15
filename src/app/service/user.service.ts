@@ -41,8 +41,12 @@ export class UserService {
   concatenateFirstnameLastname(firstname: string, lastname: string): string {
     return firstname + ' ' + lastname;
   }
-  getCurrentUserID() {
+  getCurrentUserID():number {
     return this.currentUser.userID;
+  }
+
+  getCurrentUsername(): string {
+    return this.currentUser.username;
   }
 
   //--------------------- Getter and Setter -------------------------------------//

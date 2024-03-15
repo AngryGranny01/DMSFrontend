@@ -17,6 +17,19 @@ export class UserDataService {
   checkLoginData(userPassword: string, userEmail: string): Observable<User> {
     return this.http.get<any>(
       `${this.apiConfig.baseURL}/user/login?email=${userEmail}&passwordHash=${userPassword}`
+    ).pipe(
+      map(userData => {
+        if (!userData) {
+          throw new Error('User data not found');
+        }
+
+        // Assuming NiceDate is a class with constructor (year: number, month: number, day: number, hour: number, minute: number)
+        let lastLogin = new NiceDate(userData.lastLogin.year, userData.lastLogin.month, userData.lastLogin.day, userData.lastLogin.hour, userData.lastLogin.minute);
+
+        // Assuming User is a class with constructor (userID: number, userName: string, firstName: string, lastName: string, passwordHash: string, role: string, email: string, lastLogin: NiceDate)
+        let user = new User(userData.userID, userData.userName, userData.firstName, userData.lastName, userData.passwordHash, userData.role, userData.email, lastLogin);
+        return user;
+      })
     );
   }
 

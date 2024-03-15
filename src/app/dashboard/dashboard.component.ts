@@ -18,7 +18,7 @@ import { ProjectService } from '../service/project.service';
 //TODO: If Admin is logged in show all Projects or only Admin Projects
 export class DashboardComponent {
   projects$: Observable<Project[]> = of([]); // Initialize with an empty observable array
-  showAllProjects: boolean = false;
+  showProjects: boolean;
   constructor(
     private userService: UserService,
     private logService: LogService,
@@ -26,12 +26,14 @@ export class DashboardComponent {
     private managerDataService: ProjectManagerDataService,
     private logDataService: LogDataService,
     private projectDataService: ProjectDataService
-  ) {}
+  ) {
+    this.showProjects = projectService.showAllProjects;
+  }
 
   ngOnInit(): void {
-    if(this.showAllProjects === true){
+    if (this.showProjects === true) {
       this.loadAllProjects();
-    }else{
+    } else {
       this.loadUserProjects();
     }
   }
@@ -40,14 +42,16 @@ export class DashboardComponent {
     this.projects$ = this.projectDataService.getAllProjects();
   }
 
-  loadUserProjects(){
-    this.projects$ = this.projectDataService.getProjectFromUser(this.userService.getCurrentUser().userID)
+  loadUserProjects() {
+    this.projects$ = this.projectDataService.getProjectFromUser(
+      this.userService.getCurrentUser().userID
+    );
   }
 
   refreshProjects() {
-    if(this.showAllProjects === true){
+    if (this.showProjects === true) {
       this.loadAllProjects();
-    }else{
+    } else {
       this.loadUserProjects();
     }
   }
@@ -65,9 +69,12 @@ export class DashboardComponent {
     return this.userService.isAdmin();
   }
 
-  deleteProject(projectID: number) {
-    this.projectDataService.deleteProject(projectID).subscribe(
+  deleteProject(project: Project) {
+    this.projectDataService.deleteProject(project.projectID).subscribe(
       () => {
+        //Log Entry
+        this.logDataService.addDeleteProjectLog(project);
+
         // Refresh Project data after successful deletion
         this.refreshProjects();
       },
@@ -80,13 +87,16 @@ export class DashboardComponent {
   }
 
   navigateToAllProjects() {
-    this.showAllProjects = true;
+    this.projectService.showAllProjects = true;
+    this.loadAllProjects(); // Check if this method is being called
   }
   navigateToMyProjects() {
-    this.showAllProjects = false;
+    this.projectService.showAllProjects = false;
+    this.loadUserProjects(); // Check if this method is being called
   }
 
-  openProjectLogs(_t30: any) {
-    throw new Error('Method not implemented.');
+  openProjectLogs(project: Project) {
+    this.logService.setIsProjectLog(true);
+    this.projectService.setSelectedProject(project);
   }
 }

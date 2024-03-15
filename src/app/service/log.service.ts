@@ -1,13 +1,22 @@
 import { Injectable } from '@angular/core';
 import { ActivityName } from '../models/activityName';
+import { User } from '../models/userInterface';
+import { Log } from '../models/logInterface';
+import { UserService } from './user.service';
+import { UserDataService } from './api/user-data.service';
+import { ProjectManagerDataService } from './api/project-manager-data.service';
+import { LogDataService } from './api/log-data.service';
+import { LogDescriptionValues } from '../models/logDescriptionValues';
+import { NiceDate } from '../models/niceDateInterface';
+import { Project } from '../models/projectInterface';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class LogService {
   isProjectLog: boolean = true;
 
-  constructor() { }
+  constructor() {}
 
   matchActivityNameWithString(activity: string): ActivityName {
     // Convert the string to uppercase for case-insensitive comparison
@@ -22,15 +31,12 @@ export class LogService {
     return ActivityName.UNKNOWN;
   }
 
-  getLogDescriptionString(activityName: ActivityName){
-    return 
+  getIsProjectLog() {
+    return this.isProjectLog;
   }
 
-  getIsProjectLog(){
-    return this.isProjectLog
-  }
-
-  setIsProjectLog(isProjectLog: boolean){
+  setIsProjectLog(isProjectLog: boolean) {
     this.isProjectLog = isProjectLog;
   }
+
 }
