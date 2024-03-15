@@ -24,6 +24,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatNativeDateModule } from '@angular/material/core'; // Import MatNativeDateModule
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { AsyncPipe } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
 
 @NgModule({
   declarations: [
@@ -50,6 +52,8 @@ import { AsyncPipe } from '@angular/common';
     MatNativeDateModule, // MatNativeDateModule imported once
     MatAutocompleteModule,
     MatFormFieldModule,
+    MatMenuModule,
+    MatButtonModule,
     // ngx-translate and the loader module
     HttpClientModule,
     TranslateModule.forRoot({

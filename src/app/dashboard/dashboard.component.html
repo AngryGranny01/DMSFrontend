@@ -20,6 +20,34 @@
                     >
                       <span>Add New Project</span></a
                     >
+                    <!-- All Projects button -->
+                    <button
+                      *ngIf="isAdmin()"
+                      mat-button
+                      [matMenuTriggerFor]="projectMenu"
+                      class="btn btn-primary"
+                    >
+                      All Projects
+                    </button>
+
+                    <mat-menu #projectMenu="matMenu">
+                      <button
+                        mat-menu-item
+                        (click)="navigateToAllProjects()"
+                        routerLink="/dashboard"
+                        routerLinkActive="active"
+                      >
+                        All Projects
+                      </button>
+                      <button
+                        mat-menu-item
+                        (click)="navigateToMyProjects()"
+                        routerLink="/dashboard"
+                        routerLinkActive="active"
+                      >
+                        My Projects
+                      </button>
+                    </mat-menu>
                   </div>
                 </div>
               </div>
@@ -44,7 +72,10 @@
                     <td>
                       <a href="#"> {{ project.name }}</a>
                     </td>
-                    <td>{{ project.manager.firstname }} {{ project.manager.lastname }}</td>
+                    <td>
+                      {{ project.manager.firstname }}
+                      {{ project.manager.lastname }}
+                    </td>
                     <td>{{ project.endDate.formatDate() }}</td>
                     <td>
                       <a
@@ -57,17 +88,17 @@
                         ><i class="material-icons">&#xE89E;</i>
                       </a>
                     </td>
+                    <td></td>
                     <td>
-                      <td>
-                        <a
-                          href="#"
-                          class="settings"
-                          title="Settings"
-                          (click)="this.editProject(project)"
-                          routerLink="/createProject"
-                          routerLinkActive="active"
-                          ><i class="material-icons">&#xE8B8;</i></a
-                        >
+                      <a
+                        href="#"
+                        class="settings"
+                        title="Settings"
+                        (click)="this.editProject(project)"
+                        routerLink="/createProject"
+                        routerLinkActive="active"
+                        ><i class="material-icons">&#xE8B8;</i></a
+                      >
                       <a
                         href="#"
                         class="delete"

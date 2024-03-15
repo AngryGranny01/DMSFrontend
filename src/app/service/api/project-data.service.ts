@@ -24,14 +24,14 @@ export class ProjectDataService {
       );
   }
 
-  //specific Project by userID
-  getProjectFromUser(userID: number): Observable<Project> {
+  //All Projects by userID
+  getProjectFromUser(userID: number): Observable<Project[]> {
     return this.http
-      .get(`${this.apiConfig.baseURL}/projects?userID=${userID}`)
+      .get<any[]>(`${this.apiConfig.baseURL}/projects/user?userID=${userID}`)
       .pipe(
-        map((response: any) => {
-          return this.extractProject(response);
-        })
+        map((response: any[]) =>
+          response.map((project) => this.extractProject(project))
+        )
       );
   }
 

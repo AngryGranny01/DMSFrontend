@@ -54,5 +54,7 @@ export class UserService {
     return this.selectedUser;
   }
 
-  getCurrentUser() {}
+  getCurrentUser(): User {
+    return this.currentUser
+  }
 }

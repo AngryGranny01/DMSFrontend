@@ -17,11 +17,8 @@ import { ProjectService } from '../service/project.service';
 
 //TODO: If Admin is logged in show all Projects or only Admin Projects
 export class DashboardComponent {
-createNewProject() {
-throw new Error('Method not implemented.');
-}
   projects$: Observable<Project[]> = of([]); // Initialize with an empty observable array
-
+  showAllProjects: boolean = false;
   constructor(
     private userService: UserService,
     private logService: LogService,
@@ -32,15 +29,27 @@ throw new Error('Method not implemented.');
   ) {}
 
   ngOnInit(): void {
-    this.loadAllProjects();
+    if(this.showAllProjects === true){
+      this.loadAllProjects();
+    }else{
+      this.loadUserProjects();
+    }
   }
 
   loadAllProjects() {
     this.projects$ = this.projectDataService.getAllProjects();
   }
 
+  loadUserProjects(){
+    this.projects$ = this.projectDataService.getProjectFromUser(this.userService.getCurrentUser().userID)
+  }
+
   refreshProjects() {
-    this.loadAllProjects();
+    if(this.showAllProjects === true){
+      this.loadAllProjects();
+    }else{
+      this.loadUserProjects();
+    }
   }
 
   editProject(project: Project) {
@@ -48,8 +57,12 @@ throw new Error('Method not implemented.');
     this.projectService.setSelectedProject(project);
   }
 
-  createProject(){
+  createProject() {
     this.projectService.isProjectEditMode = false;
+  }
+
+  isAdmin(): boolean {
+    return this.userService.isAdmin();
   }
 
   deleteProject(projectID: number) {
@@ -64,6 +77,13 @@ throw new Error('Method not implemented.');
         // Optionally, notify the user about the error
       }
     );
+  }
+
+  navigateToAllProjects() {
+    this.showAllProjects = true;
+  }
+  navigateToMyProjects() {
+    this.showAllProjects = false;
   }
 
   openProjectLogs(_t30: any) {
