@@ -24,6 +24,7 @@ export class NavbarComponent {
   }
 
   setEditModeToEditUser(){
+    this.userService.setSelectedUser(this.userService.currentUser)
     this.userService.isEditMode=true;
   }
 }
