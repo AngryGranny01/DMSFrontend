@@ -8,6 +8,7 @@ import { Project } from '../models/projectInterface';
 import { LogDataService } from '../service/api/log-data.service';
 import { LogService } from '../service/log.service';
 import { TranslationHelperService } from '../service/translation-helper.service';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-logs',
@@ -25,7 +26,8 @@ export class LogsComponent {
     private userService: UserService,
     private logService: LogService,
     private logDataService: LogDataService,
-    private translationHelper: TranslationHelperService
+    private translationHelper: TranslationHelperService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit() {
@@ -44,11 +46,16 @@ export class LogsComponent {
     this.logDataService.getProjectLogs(project.projectID).subscribe(
       (logs) => {
         for (let log of logs) {
-          log.description = this.translationHelper.getTranslatedLogDescription(
-            log.activityName,
-            log.description
-          );
-          console.log(log.description);
+          let activityDescription =
+            this.translationHelper.getTranslatedLogDescription(
+              log.activityName,
+              log.description
+            );
+          this.translate
+            .get(log.activityName, activityDescription)
+            .subscribe((translations) => {
+              log.description = translations;
+            });
         }
         this.logs$ = of(logs);
       },
@@ -63,11 +70,16 @@ export class LogsComponent {
     this.logDataService.getUserLogs(user.userID).subscribe(
       (logs) => {
         for (let log of logs) {
-          log.description = this.translationHelper.getTranslatedLogDescription(
+          let activityDescription =
+          this.translationHelper.getTranslatedLogDescription(
             log.activityName,
             log.description
           );
-          console.log(log.description);
+          this.translate
+          .get(log.activityName, activityDescription)
+          .subscribe((translations) => {
+            log.description = translations;
+          });
         }
         this.logs$ = of(logs);
       },

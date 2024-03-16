@@ -62,8 +62,8 @@ export class UserProfilComponent {
     // Get new user data from HTML form
     const updatedUser: User = {
       ...this.user,
+      role: this.selectedRole,
     };
-    updatedUser.role = this.selectedRole;
 
     if (
       this.isEditMode &&
@@ -71,45 +71,45 @@ export class UserProfilComponent {
     ) {
       // Email hasn't been changed, proceed with updating the user profile
       this.updatedSelectedUser(updatedUser);
-    } else {
-      this.userDataService
-        .checkIfUserNameExists(updatedUser.username)
-        .subscribe(
-          (exists) => {
-            if (exists) {
-              // Email already exists, display an alert in the HTML
-              alert('Username already exists.');
-            } else {
-              this.userDataService
-                .checkIfUserEmailExists(updatedUser.email)
-                .subscribe(
-                  (exists) => {
-                    if (exists) {
-                      // Email already exists, display an alert in the HTML
-                      alert('Email already exists.');
-                    } else {
-                      if (this.isEditMode) {
-                        // Logic to update user profile
-                        this.updatedSelectedUser(updatedUser);
-                      } else {
-                        // Logic to create new user profile
-                        this.createNewUser(updatedUser);
-                      }
-                    }
-                  },
-                  (error) => {
-                    // Handle error checking email existence
-                    console.error('Error checking if email exists:', error);
-                  }
-                );
-            }
-          },
-          (error) => {
-            // Handle error checking email existence
-            console.error('Error checking if username exists:', error);
-          }
-        );
+      return;
     }
+
+    // Check if the username exists
+    this.userDataService.checkIfUserNameExists(updatedUser.username).subscribe(
+      (usernameExists) => {
+        if (usernameExists) {
+          // Username already exists, display an alert
+          alert('Username already exists.');
+          return;
+        }
+
+        // Check if the email exists
+        this.userDataService
+          .checkIfUserEmailExists(updatedUser.email)
+          .subscribe(
+            (emailExists) => {
+              if (emailExists) {
+                // Email already exists, display an alert
+                alert('Email already exists.');
+                return;
+              }
+
+              // If it's edit mode, update the user profile, otherwise create a new user profile
+              this.isEditMode
+                ? this.updatedSelectedUser(updatedUser)
+                : this.createNewUser(updatedUser);
+            },
+            (emailError) => {
+              // Handle error checking email existence
+              console.error('Error checking if email exists:', emailError);
+            }
+          );
+      },
+      (usernameError) => {
+        // Handle error checking username existence
+        console.error('Error checking if username exists:', usernameError);
+      }
+    );
   }
 
   updatedSelectedUser(user: User) {
@@ -126,15 +126,11 @@ export class UserProfilComponent {
       // Get Manager ID of the clicked User
       this.managerDataService.getManagerID(user.userID).subscribe(
         (managerID) => {
-          console.log(managerID);
           // Update the Manager ID of the clicked User with the managerID of the person who deleted the user
           this.managerDataService
             .updateManagerID(this.userService.getCurrentUserID(), managerID)
             .subscribe(
               () => {
-                console.log(this.userService.getCurrentUserID());
-                //delete Manager ID
-
                 this.managerDataService
                   .deleteProjectManager(managerID)
                   .subscribe(
@@ -169,12 +165,9 @@ export class UserProfilComponent {
   updateUserAndNavigate(user: User) {
     this.userDataService.updateUser(user).subscribe(
       () => {
-        // Handle successful update
-        this.userManagementPageComponent.refreshUsers();
         //Log Entry
         this.logDataService.addUpdateUserLog(user);
         this.router.navigate(['/userManagment']);
-        console.log('User profile updated:', user);
       },
       (error) => {
         // Handle error
@@ -186,12 +179,18 @@ export class UserProfilComponent {
   createNewUser(user: User) {
     this.userDataService.createUser(user).subscribe(
       (response: any) => {
-        // Handle successful creation
-        this.userManagementPageComponent.refreshUsers();
         //Log Entry
-        this.logDataService.addCreateUserLog(response.userID, user.username)
-        this.router.navigate(['/userManagment']);
-        console.log('New user profile created:', user);
+        this.logDataService
+          .addCreateUserLog(response.userID, user.username)
+          .subscribe(
+            () => {
+              this.router.navigate(['/userManagment']);
+            },
+            (logError) => {
+              // Handle error creating log entry
+              console.error('Error creating log entry:', logError);
+            }
+          );
       },
       (error) => {
         // Handle error

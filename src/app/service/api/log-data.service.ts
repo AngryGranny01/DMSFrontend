@@ -21,7 +21,7 @@ export class LogDataService {
     private http: HttpClient,
     private apiConfig: ApiConfigService,
     private logService: LogService,
-    private userService: UserService,
+    private userService: UserService
   ) {}
 
   //-------------------------------------------- Get-Requests --------------------------------------------------------------//
@@ -48,22 +48,24 @@ export class LogDataService {
   }
 
   //-------------------------------------------- Post-Requests --------------------------------------------------------------//
-  createUserLog(log: Log) {
+  createUserLog(log: Log): Observable<any> {
     const data = {
       userID: log.userId,
       activityName: log.activityName,
       activityDescription: log.description,
     };
+    console.log('User Log Data: ', data);
     return this.http.post(`${this.apiConfig.baseURL}/user-logs`, data);
   }
 
-  createProjectLog(log: Log, projectID: number) {
+  createProjectLog(log: Log, projectID: number): Observable<any> {
     const data = {
       projectID: projectID,
       userID: log.userId,
       activityName: log.activityName,
       activityDescription: log.description,
     };
+    console.log('Create Project Data: ', data);
     return this.http.post(`${this.apiConfig.baseURL}/project-logs`, data);
   }
 
@@ -146,10 +148,7 @@ export class LogDataService {
       dateTime: new NiceDate(0, 0, 0, 0, 0),
     };
 
-    this.createUserLog(log).subscribe(
-      () => console.log('User creation logged successfully'),
-      (error) => console.error('Error logging user creation:', error)
-    );
+    return this.createUserLog(log);
   }
 
   addUpdateUserLog(user: User) {
@@ -198,8 +197,10 @@ export class LogDataService {
     const log: Log = {
       description: LogDescriptionValues.createLogDescription(
         ActivityName.CREATE_PROJECT,
-        projectID,
-        projectName
+        '',
+        '',
+        projectName,
+        projectID
       ),
       activityName: ActivityName.CREATE_PROJECT,
       userId: this.userService.getCurrentUserID(),
@@ -209,10 +210,7 @@ export class LogDataService {
       dateTime: new NiceDate(0, 0, 0, 0, 0),
     };
 
-    this.createProjectLog(log, projectID).subscribe(
-      () => console.log('Project creation logged successfully'),
-      (error) => console.error('Error logging project creation:', error)
-    );
+    return this.createProjectLog(log, projectID);
   }
 
   addUpdateProjectLog(projectID: number, projectName: string) {

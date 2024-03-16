@@ -71,7 +71,6 @@ export class CreateProjectComponent {
     } else {
       this.isEditMode = false;
       this.setInputFieldsForNewProject();
-      console.log(this.users$);
     }
     this.loadAllUsers();
   }
@@ -196,12 +195,19 @@ export class CreateProjectComponent {
     // Call the createProject method and wait for its completion
     this.projectDataService.createProject(project, data.userIDs).subscribe(
       (response: any) => {
-
         // Log Entry
-        this.logDataService.addCreateProjectLog(response.projectID, project.projectName)
-
-        // After project creation is successful, navigate to the dashboard
-        this.router.navigate(['/dashboard']);
+        this.logDataService
+          .addCreateProjectLog(response.projectID, project.projectName)
+          .subscribe(
+            () => {
+              // After project creation is successful, navigate to the dashboard
+              this.router.navigate(['/dashboard']);
+            },
+            (logError) => {
+              // Handle error creating log entry
+              console.error('Error creating log entry:', logError);
+            }
+          );
       },
       (error) => {
         // Handle error if project creation fails
@@ -222,7 +228,10 @@ export class CreateProjectComponent {
     this.projectDataService.updateProject(project, data.userIDs).subscribe(
       () => {
         // Log Entry
-        this.logDataService.addUpdateProjectLog(project.projectID, project.projectName)
+        this.logDataService.addUpdateProjectLog(
+          project.projectID,
+          project.projectName
+        );
 
         // After project creation is successful, navigate to the dashboard
         this.router.navigate(['/dashboard']);

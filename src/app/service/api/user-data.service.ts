@@ -63,7 +63,7 @@ export class UserDataService {
 
   checkIfUserNameExists(userName: string) {
     return this.http
-      .get(`${this.apiConfig.baseURL}/user/exist/username/username=${userName}`)
+      .get(`${this.apiConfig.baseURL}/user/exist/username?username=${userName}`)
       .pipe(
         map((response: any) => {
           console.log(response);
