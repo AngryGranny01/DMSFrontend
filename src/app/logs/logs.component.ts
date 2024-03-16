@@ -71,15 +71,15 @@ export class LogsComponent {
       (logs) => {
         for (let log of logs) {
           let activityDescription =
-          this.translationHelper.getTranslatedLogDescription(
-            log.activityName,
-            log.description
-          );
+            this.translationHelper.getTranslatedLogDescription(
+              log.activityName,
+              log.description
+            );
           this.translate
-          .get(log.activityName, activityDescription)
-          .subscribe((translations) => {
-            log.description = translations;
-          });
+            .get(log.activityName, activityDescription)
+            .subscribe((translations) => {
+              log.description = translations;
+            });
         }
         this.logs$ = of(logs);
       },
