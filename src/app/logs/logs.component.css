@@ -2,24 +2,28 @@
   margin-top: 56px; /* Adjust this value to keep space for top navigation */
    /* Set height to fill remaining viewport height */
 }
+
 body {
   color: #566787;
   background: #f5f5f5;
   font-family: 'Varela Round', sans-serif;
   font-size: 13px;
 }
+
 .table-responsive {
   max-height: 800px;
-  min-width:min-content;
+  min-width: min-content;
+  overflow-x: auto; /* Enable horizontal scrolling */
 }
 
 .table-wrapper {
   min-width: 1000px;
   background: #fff;
   padding: 20px 25px;
-
   box-shadow: 0 1px 1px rgba(0,0,0,.05);
+  overflow-x: auto; /* Enable horizontal scrolling */
 }
+
 .btn {
   color: #000000;
   float: right;
@@ -31,4 +35,69 @@ body {
   border: none;
   outline: none !important;
   margin-left: 10px;
+}
+
+.search-box {
+  position: relative;
+  float: right;
+}
+
+.search-box input {
+  height: 34px;
+  border-radius: 20px;
+  padding-left: 35px;
+  border-color: #ddd;
+  box-shadow: none;
+}
+
+.search-box input:focus {
+  border-color: #3FBAE4;
+}
+
+.search-box i {
+  color: #a0a5b1;
+  position: absolute;
+  font-size: 19px;
+  top: 8px;
+  left: 10px;
+}
+
+/* Style for the table */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Style for the table header */
+.table thead {
+  background-color: #343a40;
+  color: #fff;
+}
+
+/* Style for the table header cells */
+.table th {
+  padding: 10px;
+  text-align: left;
+}
+
+/* Style for the table body */
+.table tbody {
+  background-color: #fff;
+}
+
+/* Style for the table rows */
+.table tr {
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Style for the table cells */
+.table td {
+  padding: 10px;
+}
+
+/* Make the table header fixed while scrolling */
+.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1; /* Ensure the header stays above other content */
 }

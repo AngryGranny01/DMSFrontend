@@ -32,6 +32,8 @@ export class AuthService {
         if (userData) {
           // User login successful
           this.userService.currentUser = userData;
+          this.userService.currentUsername.next(userData.username);
+          console.log("User: ", userData)
           this.isAuthenticated = true;
 
           // Log Entry

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { User } from '../models/userInterface';
 import { Role } from '../models/role';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map, of } from 'rxjs';
+import { BehaviorSubject, Observable, map, of } from 'rxjs';
 import { NiceDate } from '../models/niceDateInterface';
 import { Log } from '../models/logInterface';
 
@@ -21,10 +21,9 @@ export class UserService {
     lastLogin: new NiceDate(2022, 2, 4, 14, 0),
   }; // Initialize currentUser with default values for properties
 
-  private usersUrl = 'assets/mockUsers.json'; // JSON file URL
-  private logsUrl = 'assets/mockLogsUsers.json'; // JSON file URL
   public isEditMode: boolean = true;
   private selectedUser!: User;
+  public currentUsername: BehaviorSubject<string> = new BehaviorSubject<string>("");
 
   constructor() {}
 
@@ -41,7 +40,7 @@ export class UserService {
   concatenateFirstnameLastname(firstname: string, lastname: string): string {
     return firstname + ' ' + lastname;
   }
-  getCurrentUserID():number {
+  getCurrentUserID(): number {
     return this.currentUser.userID;
   }
 
@@ -59,6 +58,6 @@ export class UserService {
   }
 
   getCurrentUser(): User {
-    return this.currentUser
+    return this.currentUser;
   }
 }

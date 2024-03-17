@@ -56,10 +56,10 @@
                   <label class="control-label">Email</label>
                   <input
                     aria-describedby="addon-right addon-left"
-                    type="text"
+                    type="email"
                     placeholder="Email"
                     class="form-control"
-                    [(ngModel)]="user!.email"
+                    [(ngModel)]="email"
                     required
                   />
                 </div>
@@ -73,7 +73,8 @@
                       type="password"
                       placeholder="Password"
                       class="form-control"
-                      [(ngModel)]="user!.password"
+                      [(ngModel)]="password"
+                      minlength="8"
                       required
                     />
                   </div>
@@ -86,6 +87,8 @@
                       type="password"
                       placeholder="Repeat Password"
                       class="form-control"
+                      [(ngModel)]="repeatPassword"
+                      minlength="8"
                       required
                     />
                   </div>
