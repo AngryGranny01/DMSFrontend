@@ -12,16 +12,25 @@ export class ProjectManagerDataService {
   constructor(private http: HttpClient, private apiConfig: ApiConfigService) {}
 
   //-------------------------------------------- Get-Requests --------------------------------------------------------------//
+  getManagerAndAdminPassword(userID: number): Observable<any> {
+    return this.http
+      .get(`${this.apiConfig.baseURL}/projectAdminAndManager/passwords/${userID}`)
+      .pipe(
+        map((response: any) => {
+          return response;
+        })
+      );
+  }
+
   getManagerID(userID: number): Observable<number> {
     return this.http
-      .get(`${this.apiConfig.baseURL}/projectManager/${userID}`)
+      .get(`${this.apiConfig.baseURL}/projectAdminAndManager/passwords/${userID}`)
       .pipe(
         map((response: any) => {
           return response.managerID;
         })
       );
   }
-
   //-------------------------------------------- Put-Requests --------------------------------------------------------------//
   updateManagerID(userID: number, managerID: number): Observable<boolean> {
     const params = new HttpParams()

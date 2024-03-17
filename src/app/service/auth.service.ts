@@ -8,6 +8,8 @@ import { UserDataService } from './api/user-data.service';
 import { TranslateService } from '@ngx-translate/core';
 import { LogDescriptionValues } from '../models/logDescriptionValues';
 import { LogService } from './log.service';
+import CryptoJS from 'crypto-js';
+import { EncryptionService } from './encryption.service';
 
 @Injectable({
   providedIn: 'root',
@@ -20,6 +22,7 @@ export class AuthService {
     private userService: UserService,
     private logDataService: LogDataService,
     private userDataService: UserDataService,
+    private encryptionService: EncryptionService,
     private logService: LogService
   ) {}
 
@@ -27,11 +30,11 @@ export class AuthService {
     this.userDataService.checkLoginData(password, email).subscribe(
       (userData) => {
         if (userData) {
-          // User login successful 654321
+          // User login successful
           this.userService.currentUser = userData;
           this.isAuthenticated = true;
 
-          //Log Entry
+          // Log Entry
           this.logDataService.addLoginLog();
 
           this.router.navigate(['/dashboard']);
@@ -42,11 +45,13 @@ export class AuthService {
       },
       (error) => {
         // Handle login data retrieval error
+        alert('Username or Password is incorrect');
         console.error('Error logging in:', error);
         // You can display an error message or perform other error handling actions here
       }
     );
   }
+
 
   isLoggedIn(): boolean {
     return this.isAuthenticated;

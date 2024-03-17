@@ -5,30 +5,60 @@ import { ApiConfigService } from './api-config.service';
 import { Role } from '../../models/role';
 import { NiceDate } from '../../models/niceDateInterface';
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
+import { AuthService } from '../auth.service';
+import { EncryptionService } from '../encryption.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserDataService {
-  constructor(private http: HttpClient, private apiConfig: ApiConfigService) {}
+  constructor(
+    private http: HttpClient,
+    private apiConfig: ApiConfigService,
+    private encryptionService: EncryptionService
+  ) {}
 
   //-------------------------------------------- Login --------------------------------------------------------------//
   checkLoginData(userPassword: string, userEmail: string): Observable<User> {
-    return this.http.get<any>(
-      `${this.apiConfig.baseURL}/user/login?email=${userEmail}&passwordHash=${userPassword}`
-    ).pipe(
-      map(userData => {
-        if (!userData) {
-          throw new Error('User data not found');
-        }
+    return this.getSaltByEmail(userEmail).pipe(
+      switchMap((response: any) => {
+        console.log(response.salt);
+        const hashedPassword = this.encryptionService.encryptPBKDF2(
+          userPassword,
+          response.salt
+        );
+        return this.http
+          .get<any>(
+            `${this.apiConfig.baseURL}/user/login?email=${userEmail}&passwordHash=${hashedPassword}`
+          )
+          .pipe(
+            map((userData) => {
+              if (!userData) {
+                throw new Error('User data not found');
+              }
 
-        // Assuming NiceDate is a class with constructor (year: number, month: number, day: number, hour: number, minute: number)
-        let lastLogin = new NiceDate(userData.lastLogin.year, userData.lastLogin.month, userData.lastLogin.day, userData.lastLogin.hour, userData.lastLogin.minute);
+              let lastLogin = new NiceDate(
+                userData.lastLogin.year,
+                userData.lastLogin.month,
+                userData.lastLogin.day,
+                userData.lastLogin.hour,
+                userData.lastLogin.minute
+              );
 
-        // Assuming User is a class with constructor (userID: number, userName: string, firstName: string, lastName: string, passwordHash: string, role: string, email: string, lastLogin: NiceDate)
-        let user = new User(userData.userID, userData.userName, userData.firstName, userData.lastName, userData.passwordHash, userData.role, userData.email, lastLogin);
-        return user;
+              let user = new User(
+                userData.userID,
+                userData.userName,
+                userData.firstName,
+                userData.lastName,
+                userData.passwordHash,
+                userData.role,
+                userData.email,
+                lastLogin
+              );
+              return user;
+            })
+          );
       })
     );
   }
@@ -48,6 +78,16 @@ export class UserDataService {
         return this.extractUser(response);
       })
     );
+  }
+
+  getSaltByEmail(email: string): Observable<string> {
+    return this.http
+      .get(`${this.apiConfig.baseURL}/user/findSalt?email=${email}`)
+      .pipe(
+        map((response: any) => {
+          return response;
+        })
+      );
   }
 
   checkIfUserEmailExists(userEmail: string) {
@@ -86,12 +126,19 @@ export class UserDataService {
       isProjectManager = true;
     }
 
+    let salt = this.encryptionService.generateSalt();
+    let passwordHash = this.encryptionService.encryptPBKDF2(
+      user.password,
+      salt
+    );
+
     const createUser = {
       userName: user.username,
       firstName: user.firstname,
       lastName: user.lastname,
       email: user.email,
-      passwordHash: user.password,
+      passwordHash: passwordHash,
+      salt: salt,
       isAdmin: isAdmin,
       isProjectManager: isProjectManager,
     };
@@ -121,7 +168,7 @@ export class UserDataService {
   }
 
   extractUser(response: any) {
-    console.log(response)
+    console.log(response);
     const role =
       response.role === Role.ADMIN
         ? Role.ADMIN

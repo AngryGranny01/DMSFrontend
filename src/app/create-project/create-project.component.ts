@@ -18,6 +18,7 @@ import { Router } from '@angular/router';
 import { ProjectDataService } from '../service/api/project-data.service';
 import { LogService } from '../service/log.service';
 import { LogDataService } from '../service/api/log-data.service';
+import { EncryptionService } from '../service/encryption.service';
 
 @Component({
   selector: 'app-create-project',
@@ -58,6 +59,7 @@ export class CreateProjectComponent {
     private projectManagerDataService: ProjectManagerDataService,
     private projectDataService: ProjectDataService,
     private logDataService: LogDataService,
+    private encryptionService: EncryptionService,
     private router: Router
   ) {
     this.filteredOptions = this.options.slice();
@@ -158,17 +160,24 @@ export class CreateProjectComponent {
     }
     const userID = selectedUser.userID;
 
-    // Fetch the managerID corresponding to the userID
-    this.projectManagerDataService.getManagerID(userID).subscribe(
-      (managerID: number) => {
+    // Fetch the managerID and Password and Admin password corresponding to the userID
+    this.projectManagerDataService.getManagerAndAdminPassword(userID).subscribe(
+      (response: any) => {
+        let projectKey: string = this.encryptionService.generateProjectKey(
+          response.adminPasswordHash,
+          response.managerPasswordHash
+        );
         const projectData = {
           projectID: 0,
           projectName: this.projectName,
           projectDescription: this.projectDescription,
-          projectKey: '1234',
+          projectKey: projectKey,
           projectEndDate: this.myDate,
-          managerID: managerID,
-          userIDs: this.selectedUsers.map((user) => ({ userID: user.userID })), // Get only the IDs of selected users
+          managerID: response.managerID,
+          userIDsAndPasswordHash: this.selectedUsers.map((user) => ({
+            userID: user.userID,
+            passwordHash: user.password,
+          })), // Get only the IDs of selected users
         };
         if (this.isEditMode === true) {
           projectData.projectID = this.project.projectID;
@@ -193,27 +202,29 @@ export class CreateProjectComponent {
       managerID: data.managerID,
     };
     // Call the createProject method and wait for its completion
-    this.projectDataService.createProject(project, data.userIDs).subscribe(
-      (response: any) => {
-        // Log Entry
-        this.logDataService
-          .addCreateProjectLog(response.projectID, project.projectName)
-          .subscribe(
-            () => {
-              // After project creation is successful, navigate to the dashboard
-              this.router.navigate(['/dashboard']);
-            },
-            (logError) => {
-              // Handle error creating log entry
-              console.error('Error creating log entry:', logError);
-            }
-          );
-      },
-      (error) => {
-        // Handle error if project creation fails
-        console.error('Error creating project:', error);
-      }
-    );
+    this.projectDataService
+      .createProject(project, data.userIDsAndPasswordHash, project.projectKey)
+      .subscribe(
+        (response: any) => {
+          // Log Entry
+          this.logDataService
+            .addCreateProjectLog(response.projectID, project.projectName)
+            .subscribe(
+              () => {
+                // After project creation is successful, navigate to the dashboard
+                this.router.navigate(['/dashboard']);
+              },
+              (logError) => {
+                // Handle error creating log entry
+                console.error('Error creating log entry:', logError);
+              }
+            );
+        },
+        (error) => {
+          // Handle error if project creation fails
+          console.error('Error creating project:', error);
+        }
+      );
   }
   updateProject(data: any) {
     let project = {
@@ -225,22 +236,24 @@ export class CreateProjectComponent {
       managerID: data.managerID,
     };
     // Call the createProject method and wait for its completion
-    this.projectDataService.updateProject(project, data.userIDs).subscribe(
-      () => {
-        // Log Entry
-        this.logDataService.addUpdateProjectLog(
-          project.projectID,
-          project.projectName
-        );
+    this.projectDataService
+      .updateProject(project, data.userIDsAndPasswordHash)
+      .subscribe(
+        () => {
+          // Log Entry
+          this.logDataService.addUpdateProjectLog(
+            project.projectID,
+            project.projectName
+          );
 
-        // After project creation is successful, navigate to the dashboard
-        this.router.navigate(['/dashboard']);
-      },
-      (error) => {
-        // Handle error if project creation fails
-        console.error('Error creating project:', error);
-      }
-    );
+          // After project creation is successful, navigate to the dashboard
+          this.router.navigate(['/dashboard']);
+        },
+        (error) => {
+          // Handle error if project creation fails
+          console.error('Error creating project:', error);
+        }
+      );
     this.router.navigate(['/dashboard']);
   }
 

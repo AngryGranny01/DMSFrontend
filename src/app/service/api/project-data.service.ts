@@ -6,12 +6,17 @@ import { Project } from '../../models/projectInterface';
 import { User } from '../../models/userInterface';
 import { Role } from '../../models/role';
 import { NiceDate } from '../../models/niceDateInterface';
+import { EncryptionService } from '../encryption.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProjectDataService {
-  constructor(private http: HttpClient, private apiConfig: ApiConfigService) {}
+  constructor(
+    private http: HttpClient,
+    private apiConfig: ApiConfigService,
+    private encryptionService: EncryptionService
+  ) {}
 
   //-------------------------------------------- Get-Requests --------------------------------------------------------------//
   getAllProjects(): Observable<Project[]> {
@@ -47,16 +52,23 @@ export class ProjectDataService {
   }
 
   //-------------------------------------------- Post-Requests --------------------------------------------------------------//
-  createProject(project: any,userIDs:any[]) {
-    const createProject = {
-      managerID: project.managerID,
-      projectName: project.projectName,
-      projectDescription: project.projectDescription,
-      projectKey: project.projectKey,
-      projectEndDate: project.projectEndDate,
-      userIDs: userIDs,
-    };
-    return this.http.post(`${this.apiConfig.baseURL}/projects`, createProject);
+  createProject(
+    project: any,
+    userIDs: any[],
+    projectKey: string
+  ): Observable<any> {
+    // Encrypt sensitive project data before sending it to the server
+    const encryptedProject = this.encryptionService.encryptProjectData(
+      project,
+      userIDs,
+      projectKey
+    );
+
+    // Send the encrypted project data and user IDs to the server
+    return this.http.post(
+      `${this.apiConfig.baseURL}/projects`,
+      encryptedProject
+    );
   }
 
   //-------------------------------------------- Put-Requests --------------------------------------------------------------//
@@ -93,15 +105,15 @@ export class ProjectDataService {
       Role.MANAGER,
       '',
       new NiceDate(0, 0, 0, 0, 0)
-    )
+    );
 
     for (const user of project.users) {
       const role =
-      user.role === Role.ADMIN
-        ? Role.ADMIN
-        : user.role === Role.MANAGER
-        ? Role.MANAGER
-        : Role.USER;
+        user.role === Role.ADMIN
+          ? Role.ADMIN
+          : user.role === Role.MANAGER
+          ? Role.MANAGER
+          : Role.USER;
 
       users.push(
         new User(
@@ -124,7 +136,6 @@ export class ProjectDataService {
       project.endDate.hour,
       project.endDate.minutes
     );
-
 
     return new Project(
       project.projectID,
