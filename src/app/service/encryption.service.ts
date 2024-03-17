@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import CryptoJS, { SHA512 } from 'crypto-js';
+import { Log } from '../models/logInterface';
 
 @Injectable({
   providedIn: 'root',
@@ -12,19 +13,33 @@ export class EncryptionService {
   encryptProjectData(project: any, userIDs: any[], projectKey: string) {
     const encryptedProject = {
       projectName: this.encryptUsingAES256(project.projectName, projectKey),
-      projectDescription: this.encryptUsingAES256(project.projectDescription, projectKey),
+      projectDescription: this.encryptUsingAES256(
+        project.projectDescription,
+        projectKey
+      ),
       projectKey: projectKey,
-      projectEndDate: this.encryptUsingAES256(project.projectEndDate.toString(), projectKey), // Todo: Verify if this needs to be encrypted or not
-      managerID: this.encryptUsingAES256(project.managerID.toString(), projectKey),
+      projectEndDate: this.encryptUsingAES256(
+        project.projectEndDate,
+        projectKey
+      ),
+      managerID: this.encryptUsingAES256(
+        project.managerID.toString(),
+        projectKey
+      ),
       userIDs: this.encryptUserIDs(userIDs, projectKey), // Call the method to encrypt user IDs
     };
+    console.log('DATE: ' + encryptedProject.projectEndDate);
     return encryptedProject;
   }
 
   encryptUserIDs(userIDs: any[], projectKey: string) {
     const encryptedUserIDs = userIDs.map((user) => {
-      const userProjectKey = this.generateUserProjectKey(user.passwordHash, projectKey);
-      const encryptedUserID = this.encryptUsingAES256(user.userID.toString(), userProjectKey);
+      const userProjectKey = this.generateUserProjectKey(
+        user.passwordHash,
+        projectKey
+      );
+      const encryptedUserID = user.userID //encryptUsingAES256
+
       return { userID: encryptedUserID, projectUserKey: userProjectKey };
     });
     return encryptedUserIDs;
@@ -35,13 +50,31 @@ export class EncryptionService {
     return this.encryptPBKDF2(userPasswordHash, projectKey);
   }
 
-  generateProjectKey(adminPasswordHash: string, projectManagerPasswordHash: string): string {
+  generateProjectKey(
+    adminPasswordHash: string,
+    projectManagerPasswordHash: string
+  ): string {
     // Generate a project-specific key based on the password hashes of the admin and project manager
     // Concatenate the password hashes and use PBKDF2 to derive the project key
     const combinedHash = adminPasswordHash + projectManagerPasswordHash;
     return this.encryptPBKDF2(combinedHash, ''); // Empty salt as we're not using salt for key generation
   }
 
+  //--------------------------- Log Encryption ------------------------//
+  encryptLogData(log: any, userProjectKey: string) {
+    console.log("LOG: ", log)
+    const encryptedLog = {
+      projectID: this.encryptUsingAES256(log.projectID, userProjectKey),
+      userID: this.encryptUsingAES256(log.userID, userProjectKey),
+      activityName: this.encryptUsingAES256(log.activityName, userProjectKey),
+      activityDescription: this.encryptUsingAES256(
+        log.activityDescription,
+        userProjectKey
+      ),
+      userProjectKey:userProjectKey
+    };
+    return encryptedLog;
+  }
   //--------------------------- Encryption ---------------------------------//
   //PDKF2
   encryptPBKDF2(password: string, salt: string): string {
@@ -56,10 +89,14 @@ export class EncryptionService {
   }
 
   //AES 256
-  encryptUsingAES256(data: string, cipherKeyAES: string): string {
+  encryptUsingAES256(data: any, cipherKeyAES: string): string {
+    if (typeof data !== "string") {
+      data = JSON.stringify(data);
+    }
     let _key = CryptoJS.enc.Utf8.parse(cipherKeyAES);
     let _iv = CryptoJS.enc.Utf8.parse(cipherKeyAES);
-    return CryptoJS.AES.encrypt(JSON.stringify(data), _key, {
+
+    return CryptoJS.AES.encrypt(data, _key, {
       keySize: 16,
       iv: _iv,
       mode: CryptoJS.mode.ECB,
@@ -67,15 +104,17 @@ export class EncryptionService {
     }).toString();
   }
 
-  decryptUsingAES256(data: string, cipherKeyAES: string) {
+  decryptUsingAES256(data: string, cipherKeyAES: string): string {
     let _key = CryptoJS.enc.Utf8.parse(cipherKeyAES);
     let _iv = CryptoJS.enc.Utf8.parse(cipherKeyAES);
 
-    return CryptoJS.AES.decrypt(data, _key, {
+    let decryptedData = CryptoJS.AES.decrypt(data, _key, {
       keySize: 16,
       iv: _iv,
       mode: CryptoJS.mode.ECB,
       padding: CryptoJS.pad.Pkcs7,
-    }).toString(CryptoJS.enc.Utf8);
+    });
+
+    return decryptedData.toString(CryptoJS.enc.Utf8);
   }
 }

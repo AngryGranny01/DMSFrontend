@@ -12,6 +12,7 @@ import { LogDescriptionValues } from '../../models/logDescriptionValues';
 import { ProjectManagerDataService } from './project-manager-data.service';
 import { UserDataService } from './user-data.service';
 import { UserService } from '../user.service';
+import { EncryptionService } from '../encryption.service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,7 +22,8 @@ export class LogDataService {
     private http: HttpClient,
     private apiConfig: ApiConfigService,
     private logService: LogService,
-    private userService: UserService
+    private userService: UserService,
+    private encryptionService: EncryptionService
   ) {}
 
   //-------------------------------------------- Get-Requests --------------------------------------------------------------//
@@ -58,14 +60,15 @@ export class LogDataService {
     return this.http.post(`${this.apiConfig.baseURL}/user-logs`, data);
   }
 
-  createProjectLog(log: Log, projectID: number): Observable<any> {
+  createProjectLog(log: Log, projectID: number, userKey: string): Observable<any> {
     const data = {
       projectID: projectID,
       userID: log.userId,
       activityName: log.activityName,
       activityDescription: log.description,
     };
-    console.log('Create Project Data: ', data);
+    let encryptedData = this.encryptionService.encryptLogData(data, userKey)
+
     return this.http.post(`${this.apiConfig.baseURL}/project-logs`, data);
   }
 
@@ -210,7 +213,7 @@ export class LogDataService {
       dateTime: new NiceDate(0, 0, 0, 0, 0),
     };
 
-    return this.createProjectLog(log, projectID);
+    return this.createProjectLog(log, projectID, this.userService.getCurrentUser().password);
   }
 
   addUpdateProjectLog(projectID: number, projectName: string) {
@@ -228,7 +231,7 @@ export class LogDataService {
       dateTime: new NiceDate(0, 0, 0, 0, 0),
     };
 
-    this.createProjectLog(log, projectID).subscribe(
+    this.createProjectLog(log, projectID, this.userService.getCurrentUser().password).subscribe(
       () => console.log('Project update logged successfully'),
       (error) => console.error('Error logging project update:', error)
     );
@@ -249,7 +252,7 @@ export class LogDataService {
       dateTime: new NiceDate(0, 0, 0, 0, 0),
     };
 
-    this.createProjectLog(log, project.projectID).subscribe(
+    this.createProjectLog(log, project.projectID,this.userService.getCurrentUser().password).subscribe(
       () => console.log('Project deletion logged successfully'),
       (error) => console.error('Error logging project deletion:', error)
     );
@@ -289,7 +292,7 @@ export class LogDataService {
       dateTime: new NiceDate(0, 0, 0, 0, 0),
     };
 
-    this.createProjectLog(log, project.projectID).subscribe(
+    this.createProjectLog(log, project.projectID, this.userService.getCurrentUser().password).subscribe(
       () => console.log('Project deletion logged successfully'),
       (error) => console.error('Error logging project deletion:', error)
     );

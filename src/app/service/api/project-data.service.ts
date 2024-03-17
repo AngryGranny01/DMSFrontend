@@ -63,11 +63,18 @@ export class ProjectDataService {
       userIDs,
       projectKey
     );
-
+    const unencryptedProject = {
+      projectName: project.projectName,
+      projectDescription: project.projectDescription,
+      projectKey: projectKey,
+      projectEndDate: project.projectEndDate,
+      managerID: project.managerID,
+      userIDs: this.encryptionService.encryptUserIDs(userIDs, projectKey), // Call the method to encrypt user IDs
+    };
     // Send the encrypted project data and user IDs to the server
     return this.http.post(
       `${this.apiConfig.baseURL}/projects`,
-      encryptedProject
+      unencryptedProject
     );
   }
 

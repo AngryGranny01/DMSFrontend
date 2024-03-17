@@ -172,7 +172,7 @@ export class CreateProjectComponent {
           projectName: this.projectName,
           projectDescription: this.projectDescription,
           projectKey: projectKey,
-          projectEndDate: this.myDate,
+          projectEndDate: this.myDate.toString(),
           managerID: response.managerID,
           userIDsAndPasswordHash: this.selectedUsers.map((user) => ({
             userID: user.userID,
