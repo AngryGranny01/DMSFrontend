@@ -58,7 +58,7 @@ export class UserProfilComponent {
   }
 
   saveProfile() {
-    if (!this.isPasswordStrong(this.password)) {
+    if (!this.userService.isPasswordStrong(this.password)) {
       alert(
         'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one number'
       );
@@ -69,7 +69,7 @@ export class UserProfilComponent {
       alert('Passwords do not match');
       return;
     }
-    if (!this.checkIfEmailIsValidEmail(this.email)) {
+    if (!this.userService.checkIfEmailIsValidEmail(this.email)) {
       alert('Email isnt a valid email');
       return;
     }
@@ -192,18 +192,5 @@ export class UserProfilComponent {
         console.error('Error creating user profile:', error);
       }
     );
-  }
-
-  isPasswordStrong(password: string): boolean {
-    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
-    return passwordRegex.test(password);
-  }
-
-  checkIfEmailIsValidEmail(email: string): boolean {
-    // Regular expression pattern for basic email format validation
-    const emailPattern: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    // Test if the email matches the pattern
-    return emailPattern.test(email);
   }
 }

@@ -60,4 +60,17 @@ export class UserService {
   getCurrentUser(): User {
     return this.currentUser;
   }
+
+  isPasswordStrong(password: string): boolean {
+    const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+    return passwordRegex.test(password);
+  }
+
+  checkIfEmailIsValidEmail(email: string): boolean {
+    // Regular expression pattern for basic email format validation
+    const emailPattern: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // Test if the email matches the pattern
+    return emailPattern.test(email);
+  }
 }

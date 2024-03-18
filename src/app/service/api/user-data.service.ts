@@ -167,6 +167,20 @@ export class UserDataService {
     return this.http.delete(`${this.apiConfig.baseURL}/users`, { params });
   }
 
+  verifyToken(
+    token: string,
+    passwordHash: string,
+    salt: string
+  ): Observable<string> {
+    const data = {
+      token: token,
+      passwordHash: passwordHash,
+      salt: salt,
+    };
+
+    return this.http.put<string>(`${this.apiConfig.baseURL}/verifyToken`, data);
+  }
+
   extractUser(response: any) {
     console.log(response);
     const role =

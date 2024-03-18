@@ -7,6 +7,7 @@ import { CreateProjectComponent } from './create-project/create-project.componen
 import { LogsComponent } from './logs/logs.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { AuthGuard } from './guard/auth.guard';
+import { EmailPageComponent } from './email-page/email-page.component';
 
 const routes: Routes = [
   {path: 'login', component: LoginPageComponent},
@@ -15,6 +16,7 @@ const routes: Routes = [
   {path: 'createProject', component: CreateProjectComponent, canActivate: [AuthGuard]},
   {path: 'logs', component: LogsComponent, canActivate: [AuthGuard]},
   {path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard]},
+  { path: 'setPassword', component: EmailPageComponent},
   { path: '', redirectTo: '/login', pathMatch: 'full' } // Default redirect to login
 ];
 

@@ -1,0 +1,30 @@
+<h2>Set Password</h2>
+<label for="password">New Password:</label>
+<input
+  type="password"
+  id="password"
+  minlength="8"
+  [(ngModel)]="password"
+  required
+/>
+
+<label for="confirmPassword">Confirm Password:</label>
+<input
+  type="password"
+  id="confirmPassword"
+  minlength="8"
+  [(ngModel)]="confirmPassword"
+  required
+/>
+
+<button
+  type="submit"
+  (click)="setPassword()"
+>
+  Set Password
+</button>
+
+<!-- Display error message if errorMessage is defined -->
+<div *ngIf="errorMessage" class="error-message">
+  {{ errorMessage }}
+</div>

@@ -23,9 +23,9 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatNativeDateModule } from '@angular/material/core'; // Import MatNativeDateModule
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { AsyncPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
+import { EmailPageComponent } from './email-page/email-page.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +38,7 @@ import { MatMenuModule } from '@angular/material/menu';
     CreateProjectComponent,
     LogsComponent,
     DashboardComponent,
+    EmailPageComponent,
   ],
   imports: [
     BrowserModule,
