@@ -1,122 +1,114 @@
-<body>
-  <main>
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-lg-10">
-          <div class="folder-box">
-            <div class="table-responsive">
-              <div class="table-title">
-                <div class="row">
-                  <div class="col-sm-4">
-                    <h2><b>User Management</b></h2>
-                  </div>
-                  <div class="col-sm-7">
-                    <a
-                      href="#"
-                      class="btn btn-secondary"
-                      routerLink="/createProject"
-                      routerLinkActive="active"
-                      (click)="this.createProject()"
-                    >
-                      <span>Add New Project</span></a
-                    >
-                    <!-- All Projects button -->
-                    <button
-                      *ngIf="isAdmin()"
-                      mat-button
-                      [matMenuTriggerFor]="projectMenu"
-                      class="btn btn-primary"
-                    >
-                      All Projects
-                    </button>
+<div class="mother">
+  <div class="container-xl">
+    <div class="table-responsive">
+      <div class="table-wrapper">
+        <div class="table-title">
+          <div class="row">
+            <div class="col-sm-6">
+              <h2><b>Project Management</b></h2>
+            </div>
+            <div class="col-sm-6 d-flex justify-content-end align-items-center">
+              <a
+                href="#"
+                class="btn btn-secondary"
+                routerLink="/createProject"
+                routerLinkActive="active"
+                (click)="this.createProject()"
+              >
+                <span>Add New Project</span></a
+              >
 
-                    <mat-menu #projectMenu="matMenu">
-                      <button
-                        mat-menu-item
-                        (click)="navigateToAllProjects()"
-                        routerLink="/dashboard"
-                        routerLinkActive="active"
-                      >
-                        All Projects
-                      </button>
-                      <button
-                        mat-menu-item
-                        (click)="navigateToMyProjects()"
-                        routerLink="/dashboard"
-                        routerLinkActive="active"
-                      >
-                        My Projects
-                      </button>
-                    </mat-menu>
-                  </div>
-                </div>
-              </div>
-              <table class="table table-striped table-hover mb-0">
-                <thead>
-                  <tr class="table-primary">
-                    <th scope="col">Ordner</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Projektleiter</th>
-                    <th scope="col">Projektende</th>
-                    <th scope="col">Logs</th>
-                    <th scope="col">Funktionen</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let project of projects$ | async">
-                    <th scope="row">
-                      <a href="#" class="folder"
-                        ><i class="material-icons">&#xE2C7;</i>
-                      </a>
-                    </th>
-                    <td>
-                      <a href="#"> {{ project.name }}</a>
-                    </td>
-                    <td>
-                      {{ project.manager.firstname }}
-                      {{ project.manager.lastname }}
-                    </td>
-                    <td>{{ project.endDate.formatDate() }}</td>
-                    <td>
-                      <a
-                        href="#"
-                        class="openInNew"
-                        title="Logs"
-                        (click)="openProjectLogs(project)"
-                        routerLink="/logs"
-                        routerLinkActive="active"
-                        ><i class="material-icons">&#xE89E;</i>
-                      </a>
-                    </td>
-                    <td></td>
-                    <td>
-                      <a
-                        href="#"
-                        class="settings"
-                        title="Settings"
-                        (click)="this.editProject(project)"
-                        routerLink="/createProject"
-                        routerLinkActive="active"
-                        ><i class="material-icons">&#xE8B8;</i></a
-                      >
-                      <a
-                        href="#"
-                        class="delete"
-                        title="Delete"
-                        (click)="this.deleteProject(project)"
-                        routerLink="/dashboard"
-                        routerLinkActive="active"
-                        ><i class="material-icons">&#xE5C9;</i>
-                      </a>
-                    </td>
-                  </tr>
-                  <!-- Weitere Zeilen hier hinzufügen -->
-                </tbody>
-              </table>
+              <button
+                *ngIf="isAdmin()"
+                mat-button
+                [matMenuTriggerFor]="projectMenu"
+                class="btn btn-primary"
+              >
+                <span>{{selectedOption}}</span>
+              </button>
+
+              <mat-menu #projectMenu="matMenu">
+                <button
+                  mat-menu-item
+                  (click)="navigateToAllProjects()"
+                  routerLink="/dashboard"
+                  routerLinkActive="active"
+                >
+                  All Projects
+                </button>
+                <button
+                  mat-menu-item
+                  (click)="navigateToMyProjects()"
+                  routerLink="/dashboard"
+                  routerLinkActive="active"
+                >
+                  My Projects
+                </button>
+              </mat-menu>
             </div>
           </div>
         </div>
+        <table class="table table-striped table-hover mb-0">
+          <thead>
+            <tr class="table-primary">
+              <th scope="col">Ordner</th>
+              <th scope="col">Name</th>
+              <th scope="col">Projektleiter</th>
+              <th scope="col">Projektende</th>
+              <th scope="col">Logs</th>
+              <th scope="col">Funktionen</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let project of projects$ | async">
+              <th scope="row">
+                <a href="#" class="folder"
+                  ><i class="material-icons">&#xE2C7;</i>
+                </a>
+              </th>
+              <td>
+                <a href="#"> {{ project.name }}</a>
+              </td>
+              <td>
+                {{ project.manager.firstname }}
+                {{ project.manager.lastname }}
+              </td>
+              <td>{{ project.endDate.formatDate() }}</td>
+              <td>
+                <a
+                  href="#"
+                  class="openInNew"
+                  title="Logs"
+                  (click)="openProjectLogs(project)"
+                  routerLink="/logs"
+                  routerLinkActive="active"
+                  ><i class="material-icons">&#xE89E;</i>
+                </a>
+              </td>
+              <td>
+                <a
+                  href="#"
+                  class="settings"
+                  title="Settings"
+                  (click)="this.editProject(project)"
+                  routerLink="/createProject"
+                  routerLinkActive="active"
+                  ><i class="material-icons">&#xE8B8;</i></a
+                >
+                <a
+                  href="#"
+                  class="delete"
+                  title="Delete"
+                  (click)="this.deleteProject(project)"
+                  routerLink="/dashboard"
+                  routerLinkActive="active"
+                  ><i class="material-icons">&#xE5C9;</i>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-  </main>
-</body>
+  </div>
+</div>

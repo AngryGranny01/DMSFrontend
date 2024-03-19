@@ -1,3 +1,11 @@
-nav{
-  background-color: lightgrey;
+.navbar {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  height: 60px;
+}
+
+.navbarText {
+  color: var(--main_content);
 }

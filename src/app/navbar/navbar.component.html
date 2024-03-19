@@ -1,47 +1,48 @@
-<nav
-  *ngIf="isLoggedIn()"
-  id="main-navbar"
-  class="navbar navbar-expand-lg navbar-light fixed-top"
->
-  <!-- Right links -->
-  <ul class="navbar-nav ms-auto d-flex flex-row">
-    <li class="nav-item dropdown">
-      <a
-        class="nav-link dropdown-toggle"
-        id="navbarDropdown"
-        href="#"
-        role="button"
-        data-bs-toggle="dropdown"
-        aria-haspopup="true"
-        aria-expanded="false"
-
-        ><b>{{ loginName }}</b></a
-      >
-      <div
-        class="dropdown-menu dropdown-menu-end"
-        aria-labelledby="navbarDropdown"
-      >
+<header>
+  <nav
+    *ngIf="isLoggedIn()"
+    id="main-navbar"
+    class="navbar navbar-expand-lg navbar-light fixed-top"
+  >
+    <!-- Right links -->
+    <ul class="navbar-nav ms-auto d-flex flex-row">
+      <li class="nav-item dropdown">
         <a
-          class="dropdown-item"
-          href="#!"
-          routerLink="/login"
-          routerLinkActive="true"
-          (click)="logOut()"
-          >Log Out</a
+          class="nav-link dropdown-toggle"
+          id="navbarDropdown"
+          href="#"
+          role="button"
+          data-bs-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+          ><b class="navbarText">{{ loginName }}</b></a
         >
-        <div class="dropdown-divider"></div>
-        <a
-          class="dropdown-item"
-          href="#!"
-          routerLink="/profil"
-          routerLinkActive="true"
-          (click)="setEditModeToEditUser()"
-          >Profil bearbeiten</a
+        <div
+          class="dropdown-menu dropdown-menu-end"
+          aria-labelledby="navbarDropdown"
         >
-      </div>
-    </li>
-  </ul>
+          <a
+            class="dropdown-item"
+            href="#!"
+            routerLink="/login"
+            routerLinkActive="true"
+            (click)="logOut()"
+            >Log Out</a
+          >
+          <div class="dropdown-divider"></div>
+          <a
+            class="dropdown-item"
+            href="#!"
+            routerLink="/profil"
+            routerLinkActive="true"
+            (click)="setEditModeToEditUser()"
+            >Profil bearbeiten</a
+          >
+        </div>
+      </li>
+    </ul>
 
-  <!-- Container wrapper -->
-</nav>
+    <!-- Container wrapper -->
+  </nav>
+</header>
 <!-- Navbar -->

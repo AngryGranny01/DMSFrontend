@@ -1,86 +1,84 @@
-<main style="margin-top: 58px">
-  <body>
-    <div class="container-xl">
-      <div class="table-responsive">
-        <div class="table-wrapper">
-          <div class="table-title">
-            <div class="row">
-              <div class="col-sm-5">
-                <h2><b>User Management</b></h2>
-              </div>
-              <div class="col-sm-7">
-                <a
-                  href="#"
-                  class="btn btn-secondary"
-                  routerLink="/profil"
-                  routerLinkActive="active"
-                  (click)="setEditModeToNewUser()"
-                >
-                  <span>Add New User</span></a
-                >
-              </div>
+<div class="mother">
+  <div class="container-xl">
+    <div class="table-responsive">
+      <div class="table-wrapper">
+        <div class="table-title">
+          <div class="row">
+            <div class="col-sm-5">
+              <h2><b>User Management</b></h2>
+            </div>
+            <div class="col-sm-7">
+              <a
+                href="#"
+                class="btn btn-secondary"
+                routerLink="/profil"
+                routerLinkActive="active"
+                (click)="setEditModeToNewUser()"
+              >
+                <span>Add New User</span></a
+              >
             </div>
           </div>
-          <table class="table table-striped table-hover mb-0">
-            <thead>
-              <tr class="table-primary">
-                <th scope="col">#</th>
-                <th scope="col">Name</th>
-                <th scope="col">Last Login</th>
-                <th scope="col">Role</th>
-                <th scope="col">Logs</th>
-                <th scope="col">Function</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let user of users$ | async">
-                <th scope="row">{{ user.userID }}</th>
-                <td>
-                  <a href="#">{{ user.firstname }} {{ user.lastname }}</a>
-                </td>
-                <td>
-                  {{ user.lastLogin.formatDate() }} <br />{{
-                    user.lastLogin.formatTime()
-                  }}
-                  Uhr
-                </td>
-                <td>{{ user.role }}</td>
-                <td>
-                  <a
-                    href="#"
-                    class="openInNew"
-                    title="Logs"
-                    (click)="openUserLogs(user)"
-                    routerLink="/logs"
-                    routerLinkActive="active"
-                    ><i class="material-icons">&#xE89E;</i>
-                  </a>
-                </td>
-                <td>
-                  <a
-                    href="#"
-                    class="settings"
-                    title="Settings"
-                    (click)="this.editUser(user)"
-                    routerLink="/profil"
-                    routerLinkActive="active"
-                    ><i class="material-icons">&#xE8B8;</i></a
-                  >
-                  <a
-                    href="#"
-                    class="delete"
-                    title="Delete"
-                    (click)="this.deleteUser(user)"
-                    routerLink="/userManagment"
-                    routerLinkActive="active"
-                    ><i class="material-icons">&#xE5C9;</i></a
-                  >
-                </td>
-              </tr>
-            </tbody>
-          </table>
         </div>
+        <table class="table table-striped table-hover mb-0">
+          <thead>
+            <tr class="table-primary">
+              <th scope="col">#</th>
+              <th scope="col">Name</th>
+              <th scope="col">Last Login</th>
+              <th scope="col">Role</th>
+              <th scope="col">Logs</th>
+              <th scope="col">Function</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of users$ | async">
+              <th scope="row">{{ user.userID }}</th>
+              <td>
+                <a href="#">{{ user.firstname }} {{ user.lastname }}</a>
+              </td>
+              <td>
+                {{ user.lastLogin.formatDate() }} <br />{{
+                  user.lastLogin.formatTime()
+                }}
+                Uhr
+              </td>
+              <td>{{ user.role }}</td>
+              <td>
+                <a
+                  href="#"
+                  class="openInNew"
+                  title="Logs"
+                  (click)="openUserLogs(user)"
+                  routerLink="/logs"
+                  routerLinkActive="active"
+                  ><i class="material-icons">&#xE89E;</i>
+                </a>
+              </td>
+              <td>
+                <a
+                  href="#"
+                  class="settings"
+                  title="Settings"
+                  (click)="this.editUser(user)"
+                  routerLink="/profil"
+                  routerLinkActive="active"
+                  ><i class="material-icons">&#xE8B8;</i></a
+                >
+                <a
+                  href="#"
+                  class="delete"
+                  title="Delete"
+                  (click)="this.deleteUser(user)"
+                  routerLink="/userManagment"
+                  routerLinkActive="active"
+                  ><i class="material-icons">&#xE5C9;</i></a
+                >
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
-  </body>
-</main>
+  </div>
+</div>

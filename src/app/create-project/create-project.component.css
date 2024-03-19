@@ -7,31 +7,17 @@
   color: #000; /* Black text color */
 }
 
-/* Make labels big */
-.card-title,
-label {
-  font-size: 20px; /* Big font size */
-}
-
-
-
-body {
-  color: #566787;
-  background: #f5f5f5;
-  font-family: 'Varela Round', sans-serif;
-  font-size: 13px;
-}
-
 .table-responsive {
   max-height: 800px;
-  min-width:min-content;
+}
+
+.card-body{
+  margin-left: 10px;
 }
 
 .table-wrapper {
-  min-width: 1000px;
+  min-width: 600px;
   background: #fff;
-  padding: 20px 25px;
-
   box-shadow: 0 1px 1px rgba(0,0,0,.05);
 }
 
@@ -44,6 +30,7 @@ body {
   min-width: 50px;
   border-radius: 2px;
   margin-left: 10px;
+  margin-bottom: 10px;
 }
 
 table.table tr th, table.table tr td {
@@ -95,6 +82,3 @@ table.table td a.delete {
 ::ng-deep .mat-option-text::after {
   color: grey; /* Change the color to grey */
 }
-
-
-

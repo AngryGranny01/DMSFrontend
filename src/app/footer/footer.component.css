@@ -1,0 +1,11 @@
+#footer-one {
+  position: fixed;
+  bottom: 0;
+  font-size: small;
+  width: 100%;
+  height: auto;
+}
+
+.text-center{
+  color: var(--main_content);
+}

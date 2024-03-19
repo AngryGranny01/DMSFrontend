@@ -15,8 +15,7 @@ export class NavbarComponent {
 
   constructor(
     private authService: AuthService,
-    private userService: UserService,
-    private readonly router: Router
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {

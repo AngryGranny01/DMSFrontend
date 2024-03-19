@@ -19,6 +19,7 @@ import { ProjectDataService } from '../service/api/project-data.service';
 import { LogService } from '../service/log.service';
 import { LogDataService } from '../service/api/log-data.service';
 import { EncryptionService } from '../service/encryption.service';
+import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 
 @Component({
   selector: 'app-create-project',
@@ -167,12 +168,18 @@ export class CreateProjectComponent {
           response.adminPasswordHash,
           response.managerPasswordHash
         );
+
+        const projectEndDate = {
+          year: this.myDate.getFullYear(),
+          month: this.myDate.getMonth()+1,
+          day: this.myDate.getDay()
+        }
         const projectData = {
           projectID: 0,
           projectName: this.projectName,
           projectDescription: this.projectDescription,
           projectKey: projectKey,
-          projectEndDate: this.myDate.toString(),
+          projectEndDate: projectEndDate,
           managerID: response.managerID,
           userIDsAndPasswordHash: this.selectedUsers.map((user) => ({
             userID: user.userID,
@@ -201,6 +208,7 @@ export class CreateProjectComponent {
       projectEndDate: data.projectEndDate,
       managerID: data.managerID,
     };
+    console.log("Data: ",data.projectEndDate)
     // Call the createProject method and wait for its completion
     this.projectDataService
       .createProject(project, data.userIDsAndPasswordHash, project.projectKey)

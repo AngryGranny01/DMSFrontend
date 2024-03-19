@@ -1,10 +1,28 @@
-<div class="form">
-  <h1>LOGIN</h1>
-  <form (ngSubmit)="onSignIn(login)" #login="ngForm">
-    <input type="text" placeholder="Enter Email" name = "email" class="form-control" id="email" ngModel required />
+<div class="login">
+  <div class="form">
+    <h1>LOGIN</h1>
+    <form (ngSubmit)="onSignIn(login)" #login="ngForm">
+      <input
+        type="text"
+        placeholder="Enter Email"
+        name="email"
+        class="form-control"
+        id="email"
+        ngModel
+        required
+      />
 
-    <input type="password" placeholder="Enter Password" name = "password" class="form-control" id="password" ngModel required />
+      <input
+        type="password"
+        placeholder="Enter Password"
+        name="password"
+        class="form-control"
+        id="password"
+        ngModel
+        required
+      />
 
-    <button type="submit" >Login</button>
-  </form>
+      <button type="submit">Login</button>
+    </form>
+  </div>
 </div>

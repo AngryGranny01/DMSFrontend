@@ -3,7 +3,6 @@ import { UserService } from '../service/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserDataService } from '../service/api/user-data.service';
 import { EncryptionService } from '../service/encryption.service';
-import { catchError, throwError } from 'rxjs';
 
 @Component({
   selector: 'app-email-page',
@@ -53,7 +52,7 @@ export class EmailPageComponent {
     );
 
     this.userDataService.verifyToken(this.token, passwordHash, salt).subscribe(
-      (response) => {
+      () => {
         // Success response handling
         alert('Password updated successfully!'); // You may replace this with your preferred success message
         this.router.navigate(['/login']);
@@ -67,7 +66,6 @@ export class EmailPageComponent {
         } else {
           this.errorMessage = 'Error updating password';
         }
-        // You may choose to display the error message or handle it differently
         alert(this.errorMessage);
       }
     );

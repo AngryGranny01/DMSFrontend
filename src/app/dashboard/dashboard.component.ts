@@ -19,6 +19,8 @@ import { ProjectService } from '../service/project.service';
 export class DashboardComponent {
   projects$: Observable<Project[]> = of([]); // Initialize with an empty observable array
   showProjects: boolean;
+  selectedOption: string = "All Projects";
+
   constructor(
     private userService: UserService,
     private logService: LogService,
@@ -88,10 +90,12 @@ export class DashboardComponent {
 
   navigateToAllProjects() {
     this.projectService.showAllProjects = true;
+    this.selectedOption = "All Projects"
     this.loadAllProjects(); // Check if this method is being called
   }
   navigateToMyProjects() {
     this.projectService.showAllProjects = false;
+    this.selectedOption = "My Projects"
     this.loadUserProjects(); // Check if this method is being called
   }
 
