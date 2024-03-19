@@ -37,6 +37,15 @@ export class UserService {
     return true;
   }
 
+  selectedUserIsAdmin(): boolean{
+    if (
+      this.selectedUser === undefined ||
+      this.selectedUser.role !== Role.ADMIN
+    ) {
+      return false;
+    }
+    return true;
+  }
   concatenateFirstnameLastname(firstname: string, lastname: string): string {
     return firstname + ' ' + lastname;
   }

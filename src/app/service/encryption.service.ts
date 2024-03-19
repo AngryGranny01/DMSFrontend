@@ -28,7 +28,6 @@ export class EncryptionService {
       ),
       userIDs: this.encryptUserIDs(userIDs, projectKey), // Call the method to encrypt user IDs
     };
-    console.log('DATE: ' + encryptedProject.projectEndDate);
     return encryptedProject;
   }
 
@@ -38,7 +37,7 @@ export class EncryptionService {
         user.passwordHash,
         projectKey
       );
-      const encryptedUserID = user.userID //encryptUsingAES256
+      const encryptedUserID = user.userID; //encryptUsingAES256
 
       return { userID: encryptedUserID, projectUserKey: userProjectKey };
     });
@@ -47,7 +46,7 @@ export class EncryptionService {
 
   generateUserProjectKey(userPasswordHash: string, projectKey: string): string {
     // Generate a project-specific key for a user based on their password hash and the project key
-    return this.encryptPBKDF2(userPasswordHash, projectKey);
+    return this.encryptPBKDF2Key(userPasswordHash, projectKey);
   }
 
   generateProjectKey(
@@ -57,12 +56,11 @@ export class EncryptionService {
     // Generate a project-specific key based on the password hashes of the admin and project manager
     // Concatenate the password hashes and use PBKDF2 to derive the project key
     const combinedHash = adminPasswordHash + projectManagerPasswordHash;
-    return this.encryptPBKDF2(combinedHash, ''); // Empty salt as we're not using salt for key generation
+    return this.encryptPBKDF2Key(combinedHash, ''); // Empty salt as we're not using salt for key generation
   }
 
   //--------------------------- Log Encryption ------------------------//
   encryptLogData(log: any, userProjectKey: string) {
-    console.log("LOG: ", log)
     const encryptedLog = {
       projectID: this.encryptUsingAES256(log.projectID, userProjectKey),
       userID: this.encryptUsingAES256(log.userID, userProjectKey),
@@ -71,13 +69,13 @@ export class EncryptionService {
         log.activityDescription,
         userProjectKey
       ),
-      userProjectKey:userProjectKey
+      userProjectKey: userProjectKey,
     };
     return encryptedLog;
   }
   //--------------------------- Encryption ---------------------------------//
   //PDKF2
-  encryptPBKDF2(password: string, salt: string): string {
+  encryptPBKDF2Key(password: string, salt: string): string {
     return CryptoJS.PBKDF2(password, salt, {
       keySize: this.keySizePBKDF2 / 32,
       iterations: this.iterationsPBKDF2,
@@ -90,7 +88,7 @@ export class EncryptionService {
 
   //AES 256
   encryptUsingAES256(data: any, cipherKeyAES: string): string {
-    if (typeof data !== "string") {
+    if (typeof data !== 'string') {
       data = JSON.stringify(data);
     }
     let _key = CryptoJS.enc.Utf8.parse(cipherKeyAES);

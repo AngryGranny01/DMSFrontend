@@ -26,14 +26,15 @@ export class AuthService {
     private logService: LogService
   ) {}
 
-  loginUsers(email: string, password: string) {
-    this.userDataService.checkLoginData(password, email).subscribe(
+  loginUsers(email: string, passwordPlain: string) {
+    this.userDataService.checkLoginData(passwordPlain, email).subscribe(
       (userData) => {
         if (userData) {
           // User login successful
           this.userService.currentUser = userData;
+          this.userService.currentUser.password = passwordPlain;
           this.userService.currentUsername.next(userData.username);
-          console.log("User: ", userData)
+
           this.isAuthenticated = true;
 
           // Log Entry

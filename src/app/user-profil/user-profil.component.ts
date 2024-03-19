@@ -35,7 +35,7 @@ export class UserProfilComponent {
     if (this.userService.isEditMode) {
       this.isEditMode = true;
       this.user = this.userService.getSelectedUser();
-      this.password = this.user.password;
+      this.password = "";
       this.email = this.user.email;
       this.selectedRole = this.user.role;
     } else {
@@ -55,6 +55,10 @@ export class UserProfilComponent {
 
   isAdmin(): boolean {
     return this.userService.isAdmin();
+  }
+
+  selectedUserIsAdmin(): boolean {
+    return this.userService.selectedUserIsAdmin();
   }
 
   saveProfile() {
@@ -130,7 +134,6 @@ export class UserProfilComponent {
       if (!confirmResetToUser) {
         return;
       }
-
       this.managerDataService.getManagerID(user.userID).subscribe(
         (managerID) => {
           this.managerDataService

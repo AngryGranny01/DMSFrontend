@@ -54,22 +54,21 @@ export class ProjectDataService {
   //-------------------------------------------- Post-Requests --------------------------------------------------------------//
   createProject(
     project: any,
-    userIDs: any[],
-    projectKey: string
+    userIDs: any[]
   ): Observable<any> {
     // Encrypt sensitive project data before sending it to the server
     const encryptedProject = this.encryptionService.encryptProjectData(
       project,
       userIDs,
-      projectKey
+      project.projectKey
     );
     const unencryptedProject = {
       projectName: project.projectName,
       projectDescription: project.projectDescription,
-      projectKey: projectKey,
+      projectKey: project.projectKey,
       projectEndDate: project.projectEndDate,
       managerID: project.managerID,
-      userIDs: this.encryptionService.encryptUserIDs(userIDs, projectKey), // Call the method to encrypt user IDs
+      userIDs: this.encryptionService.encryptUserIDs(userIDs, project.projectKey), // Call the method to encrypt user IDs
     };
     // Send the encrypted project data and user IDs to the server
     return this.http.post(
@@ -87,9 +86,8 @@ export class ProjectDataService {
       projectDescription: project.projectDescription,
       projectKey: project.projectKey,
       projectEndDate: project.projectEndDate,
-      userIDs: userIDs,
+      userIDs: this.encryptionService.encryptUserIDs(userIDs, project.projectKey),
     };
-    console.log(updateProject);
     return this.http.put(`${this.apiConfig.baseURL}/projects`, updateProject);
   }
 

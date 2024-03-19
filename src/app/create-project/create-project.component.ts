@@ -208,10 +208,9 @@ export class CreateProjectComponent {
       projectEndDate: data.projectEndDate,
       managerID: data.managerID,
     };
-    console.log("Data: ",data.projectEndDate)
     // Call the createProject method and wait for its completion
     this.projectDataService
-      .createProject(project, data.userIDsAndPasswordHash, project.projectKey)
+      .createProject(project, data.userIDsAndPasswordHash)
       .subscribe(
         (response: any) => {
           // Log Entry

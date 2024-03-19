@@ -100,10 +100,10 @@
                   class="form-check-input"
                   type="radio"
                   name="role"
-                  id="admin"
-                  value="admin"
+                  id="ADMIN"
+                  value="ADMIN"
                   [(ngModel)]="selectedRole"
-                  [disabled]="!isAdmin()"
+                  [disabled]="!isAdmin() || isAdmin()"
                 />
                 <label class="form-check-label" for="admin"> Admin </label>
               </div>
@@ -112,10 +112,10 @@
                   class="form-check-input"
                   type="radio"
                   name="role"
-                  id="projectManager"
-                  value="projectManager"
+                  id="PROJECT MANAGER"
+                  value="PROJECT MANAGER"
                   [(ngModel)]="selectedRole"
-                  [disabled]="!isAdmin()"
+                  [disabled]="!isAdmin() || (isEditMode && selectedUserIsAdmin())"
                 />
                 <label class="form-check-label" for="projectManager">
                   Project Manager
@@ -126,10 +126,10 @@
                   class="form-check-input"
                   type="radio"
                   name="role"
-                  id="user"
-                  value="user"
+                  id="USER"
+                  value="USER"
                   [(ngModel)]="selectedRole"
-                  [disabled]="!isAdmin()"
+                  [disabled]="!isAdmin() || (isEditMode && selectedUserIsAdmin())"
                 />
                 <label class="form-check-label" for="user"> User </label>
               </div>

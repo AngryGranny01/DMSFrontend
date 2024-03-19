@@ -30,9 +30,6 @@ export class EmailPageComponent {
   }
 
   setPassword() {
-    console.log(this.password);
-    console.log(this.confirmPassword);
-
     if (!this.userService.isPasswordStrong(this.password)) {
       alert(
         'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one number'
@@ -46,7 +43,7 @@ export class EmailPageComponent {
     }
 
     let salt = this.encryptionService.generateSalt();
-    let passwordHash = this.encryptionService.encryptPBKDF2(
+    let passwordHash = this.encryptionService.encryptPBKDF2Key(
       this.password,
       salt
     );

@@ -26,7 +26,6 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { EmailPageComponent } from './email-page/email-page.component';
-import { FooterComponent } from './footer/footer.component';
 
 @NgModule({
   declarations: [
@@ -39,8 +38,7 @@ import { FooterComponent } from './footer/footer.component';
     CreateProjectComponent,
     LogsComponent,
     DashboardComponent,
-    EmailPageComponent,
-    FooterComponent,
+    EmailPageComponent
   ],
   imports: [
     BrowserModule,

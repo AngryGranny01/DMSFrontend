@@ -56,7 +56,6 @@ export class LogDataService {
       activityName: log.activityName,
       activityDescription: log.description,
     };
-    console.log('User Log Data: ', data);
     return this.http.post(`${this.apiConfig.baseURL}/user-logs`, data);
   }
 

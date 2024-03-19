@@ -4,6 +4,7 @@
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 20px;
+  font-size: 36px;
 }
 
 /* Styles for table */
@@ -60,7 +61,7 @@ table.table tr td {
 }
 
 table.table tr th:first-child {
-  width: 60px;
+  width: 100px;
 }
 
 table.table tr th:last-child {
@@ -69,7 +70,7 @@ table.table tr th:last-child {
 
 /* Styles for icons in table */
 table.table th i {
-  font-size: 13px;
+  font-size: 30px;
   margin: 0 5px;
   cursor: pointer;
 }
@@ -88,7 +89,7 @@ table.table td a {
   text-decoration: none;
 }
 
-table.table td a:hover {
+table.table td a i:hover {
   color: #2196f3;
 }
 

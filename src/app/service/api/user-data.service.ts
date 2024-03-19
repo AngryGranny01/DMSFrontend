@@ -23,8 +23,7 @@ export class UserDataService {
   checkLoginData(userPassword: string, userEmail: string): Observable<User> {
     return this.getSaltByEmail(userEmail).pipe(
       switchMap((response: any) => {
-        console.log(response.salt);
-        const hashedPassword = this.encryptionService.encryptPBKDF2(
+        const hashedPassword = this.encryptionService.encryptPBKDF2Key(
           userPassword,
           response.salt
         );
@@ -95,7 +94,6 @@ export class UserDataService {
       .get(`${this.apiConfig.baseURL}/user/exist/email?email=${userEmail}`)
       .pipe(
         map((response: any) => {
-          console.log(response);
           return response.exist;
         })
       );
@@ -106,7 +104,6 @@ export class UserDataService {
       .get(`${this.apiConfig.baseURL}/user/exist/username?username=${userName}`)
       .pipe(
         map((response: any) => {
-          console.log(response);
           return response.exist;
         })
       );
@@ -118,7 +115,7 @@ export class UserDataService {
   createUser(user: User) {
     let isAdmin = false;
     let isProjectManager = false;
-    console.log(user.role);
+
     if (user.role === Role.ADMIN) {
       isAdmin = true;
     }
@@ -127,7 +124,7 @@ export class UserDataService {
     }
 
     let salt = this.encryptionService.generateSalt();
-    let passwordHash = this.encryptionService.encryptPBKDF2(
+    let passwordHash = this.encryptionService.encryptPBKDF2Key(
       user.password,
       salt
     );
@@ -147,16 +144,18 @@ export class UserDataService {
 
   //-------------------------------------------- Put-Requests --------------------------------------------------------------//
   updateUser(user: User) {
+    let salt = this.encryptionService.generateSalt()
+    let passwordHash = this.encryptionService.encryptPBKDF2Key(user.password,salt)
     const updateUser = {
       userID: user.userID,
       userName: user.username,
       firstName: user.firstname,
       lastName: user.lastname,
       email: user.email,
-      passwordHash: user.password,
+      passwordHash: passwordHash,
+      salt: salt,
       role: user.role,
     };
-    console.log(updateUser);
     return this.http.put(`${this.apiConfig.baseURL}/users`, updateUser);
   }
 
@@ -182,7 +181,6 @@ export class UserDataService {
   }
 
   extractUser(response: any) {
-    console.log(response);
     const role =
       response.role === Role.ADMIN
         ? Role.ADMIN

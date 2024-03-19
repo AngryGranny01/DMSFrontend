@@ -21,7 +21,6 @@ export class NavbarComponent {
   ngOnInit(): void {
     this.usernameSubscription = this.userService.currentUsername.subscribe(username => {
       this.loginName = username;
-      console.log("Login Name: ", this.loginName);
     });
   }
 
