@@ -26,6 +26,7 @@
   position: absolute;
   top: 60px; /* Height of navbar */
   left: 240px; /* Width of sidebar */
+  bottom: 20px;
   right: 0;
   overflow-y: auto; /* Enable vertical scrolling if content exceeds container height */
 }

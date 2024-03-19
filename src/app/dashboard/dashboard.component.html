@@ -1,53 +1,53 @@
 <div class="mother">
   <div class="container-xl">
-    <div class="table-responsive">
-      <div class="table-wrapper">
-        <div class="table-title">
-          <div class="row">
-            <div class="col-sm-6">
-              <h2><b>Project Management</b></h2>
-            </div>
-            <div class="col-sm-6 d-flex justify-content-end align-items-center">
-              <a
-                href="#"
-                class="btn btn-secondary"
-                routerLink="/createProject"
-                routerLinkActive="active"
-                (click)="this.createProject()"
-              >
-                <span>Add New Project</span></a
-              >
+    <div class="table-wrapper">
+      <div class="table-title">
+        <div class="row">
+          <div class="col-sm-6">
+            <h2><b>Project Management</b></h2>
+          </div>
+          <div class="col-sm-6 d-flex justify-content-end align-items-center">
+            <a
+              href="#"
+              class="btn btn-secondary"
+              routerLink="/createProject"
+              routerLinkActive="active"
+              (click)="this.createProject()"
+            >
+              <span>Add New Project</span></a
+            >
 
+            <button
+              *ngIf="isAdmin()"
+              mat-button
+              [matMenuTriggerFor]="projectMenu"
+              class="btn btn-primary"
+            >
+              <span>{{ selectedOption }}</span>
+            </button>
+
+            <mat-menu #projectMenu="matMenu">
               <button
-                *ngIf="isAdmin()"
-                mat-button
-                [matMenuTriggerFor]="projectMenu"
-                class="btn btn-primary"
+                mat-menu-item
+                (click)="navigateToAllProjects()"
+                routerLink="/dashboard"
+                routerLinkActive="active"
               >
-                <span>{{selectedOption}}</span>
+                All Projects
               </button>
-
-              <mat-menu #projectMenu="matMenu">
-                <button
-                  mat-menu-item
-                  (click)="navigateToAllProjects()"
-                  routerLink="/dashboard"
-                  routerLinkActive="active"
-                >
-                  All Projects
-                </button>
-                <button
-                  mat-menu-item
-                  (click)="navigateToMyProjects()"
-                  routerLink="/dashboard"
-                  routerLinkActive="active"
-                >
-                  My Projects
-                </button>
-              </mat-menu>
-            </div>
+              <button
+                mat-menu-item
+                (click)="navigateToMyProjects()"
+                routerLink="/dashboard"
+                routerLinkActive="active"
+              >
+                My Projects
+              </button>
+            </mat-menu>
           </div>
         </div>
+      </div>
+      <div class="table-responsive">
         <table class="table table-striped table-hover mb-0">
           <thead>
             <tr class="table-primary">

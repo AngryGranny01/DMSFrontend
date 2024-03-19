@@ -1,5 +1,5 @@
 .table-responsive {
-  max-height: 800px;
+  max-height: 600px;
   min-width:min-content;
 }
 
@@ -10,6 +10,14 @@
 
   box-shadow: 0 1px 1px rgba(0,0,0,.05);
 }
+
+/* Make the table header fixed while scrolling */
+.table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1000; /* Ensure the header stays above other content */
+}
+
 
 .table-title {
   padding-bottom: 15px;

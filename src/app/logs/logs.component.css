@@ -1,26 +1,20 @@
-.card {
-  margin-top: 56px; /* Adjust this value to keep space for top navigation */
-   /* Set height to fill remaining viewport height */
-}
-
 body {
   color: #566787;
   background: #f5f5f5;
-  font-family: 'Varela Round', sans-serif;
+  font-family: "Varela Round", sans-serif;
   font-size: 13px;
 }
 
 .table-responsive {
-  max-height: 800px;
+  max-height: 600px;
   min-width: min-content;
-  overflow-x: auto; /* Enable horizontal scrolling */
 }
 
 .table-wrapper {
   min-width: 1000px;
   background: #fff;
   padding: 10px 25px;
-  box-shadow: 0 1px 1px rgba(0,0,0,.05);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
   overflow-x: auto; /* Enable horizontal scrolling */
 }
 
@@ -51,7 +45,7 @@ body {
 }
 
 .search-box input:focus {
-  border-color: #3FBAE4;
+  border-color: #3fbae4;
 }
 
 .search-box i {
@@ -95,9 +89,8 @@ body {
   padding: 10px;
 }
 
-/* Make the table header fixed while scrolling */
-.table thead th {
+.table thead {
   position: sticky;
   top: 0;
-  z-index: 1; /* Ensure the header stays above other content */
+  z-index: 1000; /* Ensure the header stays above other content */
 }
