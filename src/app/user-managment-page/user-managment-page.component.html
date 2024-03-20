@@ -35,12 +35,12 @@
             <tr *ngFor="let user of users$ | async">
               <th scope="row">{{ user.userID }}</th>
               <td>
-                <a href="#">{{ user.firstname }} {{ user.lastname }}</a>
+                <a href="#">{{ user.firstName }} {{ user.lastName }}</a>
               </td>
               <td>
-                {{ user.lastLogin.formatDate() }} <br />{{
+                <!---{{ user.lastLogin.formatDate() }} <br />{{
                   user.lastLogin.formatTime()
-                }}
+                }}--->
                 Uhr
               </td>
               <td>{{ user.role }}</td>

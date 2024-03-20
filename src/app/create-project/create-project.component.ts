@@ -85,8 +85,8 @@ export class CreateProjectComponent {
     // Set Project Manager Field
     this.selectedManager.fullName =
       this.userService.concatenateFirstnameLastname(
-        this.project.manager.firstname,
-        this.project.manager.lastname
+        this.project.manager.firstName,
+        this.project.manager.lastName
       );
 
     this.selectedManager.userID = this.project.manager.userID;
@@ -123,7 +123,7 @@ export class CreateProjectComponent {
           (user) => user.role === Role.ADMIN || user.role === Role.MANAGER
         )
         .map((user) => ({
-          fullName: `${user.firstname} ${user.lastname}`,
+          fullName: `${user.firstName} ${user.lastName}`,
           userID: user.userID,
         }));
       this.filteredOptions = [...this.options];
@@ -171,9 +171,9 @@ export class CreateProjectComponent {
 
         const projectEndDate = {
           year: this.myDate.getFullYear(),
-          month: this.myDate.getMonth()+1,
-          day: this.myDate.getDay()
-        }
+          month: this.myDate.getMonth() + 1,
+          day: this.myDate.getDay(),
+        };
         const projectData = {
           projectID: 0,
           projectName: this.projectName,
@@ -183,7 +183,7 @@ export class CreateProjectComponent {
           managerID: response.managerID,
           userIDsAndPasswordHash: this.selectedUsers.map((user) => ({
             userID: user.userID,
-            passwordHash: user.password,
+            passwordHash: user.passwordHash,
           })), // Get only the IDs of selected users
         };
         if (this.isEditMode === true) {

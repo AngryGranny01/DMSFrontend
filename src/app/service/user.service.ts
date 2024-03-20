@@ -12,18 +12,21 @@ import { Log } from '../models/logInterface';
 export class UserService {
   public currentUser: User = {
     userID: 0,
-    username: '',
-    firstname: '',
-    lastname: '',
-    password: '',
+    userName: '',
+    firstName: '',
+    lastName: '',
+    passwordHash: '',
     email: '',
     role: Role.USER,
-    lastLogin: new NiceDate(2022, 2, 4, 14, 0),
+    orgEinheit: '',
+    publicKey: '',
   }; // Initialize currentUser with default values for properties
 
   public isEditMode: boolean = true;
   private selectedUser!: User;
-  public currentUsername: BehaviorSubject<string> = new BehaviorSubject<string>("");
+  public currentUsername: BehaviorSubject<string> = new BehaviorSubject<string>(
+    ''
+  );
 
   constructor() {}
 
@@ -37,7 +40,7 @@ export class UserService {
     return true;
   }
 
-  selectedUserIsAdmin(): boolean{
+  selectedUserIsAdmin(): boolean {
     if (
       this.selectedUser === undefined ||
       this.selectedUser.role !== Role.ADMIN
@@ -54,7 +57,7 @@ export class UserService {
   }
 
   getCurrentUsername(): string {
-    return this.currentUser.username;
+    return this.currentUser.userName;
   }
 
   //--------------------- Getter and Setter -------------------------------------//

@@ -13,6 +13,8 @@ import { Router } from '@angular/router';
   templateUrl: './user-profil.component.html',
   styleUrls: ['./user-profil.component.css'],
 })
+
+//TODO: Last Login anschauen
 export class UserProfilComponent {
   selectedRole: Role = Role.USER;
   user!: User;
@@ -35,7 +37,7 @@ export class UserProfilComponent {
     if (this.userService.isEditMode) {
       this.isEditMode = true;
       this.user = this.userService.getSelectedUser();
-      this.password = "";
+      this.password = '';
       this.email = this.user.email;
       this.selectedRole = this.user.role;
     } else {
@@ -48,7 +50,8 @@ export class UserProfilComponent {
         '',
         Role.USER,
         '',
-        new NiceDate(0, 0, 0, 0, 0)
+        '',
+        '',
       );
     }
   }
@@ -78,7 +81,7 @@ export class UserProfilComponent {
       return;
     }
     this.user.email = this.email;
-    this.user.password = this.password;
+    this.user.passwordHash = this.password;
     const updatedUser: User = {
       ...this.user,
       role: this.selectedRole,
@@ -92,7 +95,7 @@ export class UserProfilComponent {
       return;
     }
 
-    this.userDataService.checkIfUserNameExists(updatedUser.username).subscribe(
+    this.userDataService.checkIfUserNameExists(updatedUser.userName).subscribe(
       (usernameExists) => {
         if (usernameExists) {
           alert('Username already exists.');
@@ -181,7 +184,7 @@ export class UserProfilComponent {
     this.userDataService.createUser(user).subscribe(
       (response: any) => {
         this.logDataService
-          .addCreateUserLog(response.userID, user.username)
+          .addCreateUserLog(response.userID, user.userName)
           .subscribe(
             () => {
               this.router.navigate(['/userManagment']);

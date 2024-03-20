@@ -109,7 +109,8 @@ export class ProjectDataService {
       '',
       Role.MANAGER,
       '',
-      new NiceDate(0, 0, 0, 0, 0)
+      projectManager.orgEinheit,
+      projectManager.publicKey
     );
 
     for (const user of project.users) {
@@ -129,7 +130,8 @@ export class ProjectDataService {
           '',
           role,
           '',
-          new NiceDate(0, 0, 0, 0, 0)
+          user.orgEinheit,
+          user.publicKey
         )
       );
     }

@@ -4,10 +4,14 @@ import { User } from '../../models/userInterface';
 import { ApiConfigService } from './api-config.service';
 import { Role } from '../../models/role';
 import { NiceDate } from '../../models/niceDateInterface';
-import { Observable } from 'rxjs';
+import { Observable, generate } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { AuthService } from '../auth.service';
 import { EncryptionService } from '../encryption.service';
+import { UserService } from '../user.service';
+import { STANDARD_PRIVATE_KEY, STANDARD_PUBLIC_KEY } from '../../constants/env';
+// Retrieve private and public keys from environment variables
+
 
 @Injectable({
   providedIn: 'root',
@@ -16,44 +20,45 @@ export class UserDataService {
   constructor(
     private http: HttpClient,
     private apiConfig: ApiConfigService,
-    private encryptionService: EncryptionService
+    private encryptionService: EncryptionService,
+    private userService: UserService
   ) {}
 
   //-------------------------------------------- Login --------------------------------------------------------------//
-  checkLoginData(userPassword: string, userEmail: string): Observable<User> {
+  checkLoginData(passwordPlain: string, userEmail: string): Observable<User> {
     return this.getSaltByEmail(userEmail).pipe(
       switchMap((response: any) => {
-        const hashedPassword = this.encryptionService.encryptPBKDF2Key(
-          userPassword,
+        const hashedPassword = this.encryptionService.getPBKDF2Key(
+          passwordPlain,
           response.salt
         );
+        let keys = this.encryptionService.generateRSAKeyPairFromHash(hashedPassword);
         return this.http
           .get<any>(
-            `${this.apiConfig.baseURL}/user/login?email=${userEmail}&passwordHash=${hashedPassword}`
+            `${this.apiConfig.baseURL}/users/login?email=${userEmail}&passwordHash=${keys.privateKey}`
           )
           .pipe(
             map((userData) => {
               if (!userData) {
                 throw new Error('User data not found');
               }
-
-              let lastLogin = new NiceDate(
-                userData.lastLogin.year,
-                userData.lastLogin.month,
-                userData.lastLogin.day,
-                userData.lastLogin.hour,
-                userData.lastLogin.minute
+              let decryptedData = JSON.parse(
+                this.encryptionService.decryptRSA(
+                  userData,
+                  this.userService.currentUser.passwordHash
+                )
               );
 
               let user = new User(
                 userData.userID,
-                userData.userName,
-                userData.firstName,
-                userData.lastName,
-                userData.passwordHash,
-                userData.role,
-                userData.email,
-                lastLogin
+                decryptedData.userName,
+                decryptedData.firstName,
+                decryptedData.lastName,
+                hashedPassword,
+                decryptedData.role,
+                decryptedData.email,
+                decryptedData.orgEinheit,
+                keys.publicKey
               );
               return user;
             })
@@ -71,6 +76,14 @@ export class UserDataService {
       );
   }
 
+  getLastLoginUsers(): Observable<any> {
+    return this.http
+      .get<any[]>(`${this.apiConfig.baseURL}/users/lastLogin`)
+      .pipe(
+        map((response: any[]) => response.map((user) => this.extractUser(user)))
+      );
+  }
+
   getUser(userID: number): Observable<User> {
     return this.http.get(`${this.apiConfig.baseURL}/users/${userID}`).pipe(
       map((response: any) => {
@@ -81,7 +94,7 @@ export class UserDataService {
 
   getSaltByEmail(email: string): Observable<string> {
     return this.http
-      .get(`${this.apiConfig.baseURL}/user/findSalt?email=${email}`)
+      .get(`${this.apiConfig.baseURL}/users/findSalt?email=${email}`)
       .pipe(
         map((response: any) => {
           return response;
@@ -123,34 +136,35 @@ export class UserDataService {
       isProjectManager = true;
     }
 
-    let salt = this.encryptionService.generateSalt();
-    let passwordHash = this.encryptionService.encryptPBKDF2Key(
-      user.password,
-      salt
-    );
-
     const createUser = {
-      userName: user.username,
-      firstName: user.firstname,
-      lastName: user.lastname,
+      userName: user.userName,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
-      passwordHash: passwordHash,
-      salt: salt,
-      isAdmin: isAdmin,
-      isProjectManager: isProjectManager,
+      isAdmin: isAdmin.toString(),
+      isProjectManager: isProjectManager.toString(),
     };
-    return this.http.post(`${this.apiConfig.baseURL}/users`, createUser);
+
+    // Encrypt the createUser object using the encryption service
+    const encryptedUser = this.encryptionService.encryptUserDataRSA(
+      createUser,
+      STANDARD_PUBLIC_KEY
+    );
+    return this.http.post(`${this.apiConfig.baseURL}/users`, encryptedUser);
   }
 
   //-------------------------------------------- Put-Requests --------------------------------------------------------------//
   updateUser(user: User) {
-    let salt = this.encryptionService.generateSalt()
-    let passwordHash = this.encryptionService.encryptPBKDF2Key(user.password,salt)
+    let salt = this.encryptionService.generateSalt();
+    let passwordHash = this.encryptionService.getPBKDF2Key(
+      user.passwordHash,
+      salt
+    );
     const updateUser = {
       userID: user.userID,
-      userName: user.username,
-      firstName: user.firstname,
-      lastName: user.lastname,
+      userName: user.userName,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
       passwordHash: passwordHash,
       salt: salt,
@@ -188,14 +202,6 @@ export class UserDataService {
         ? Role.MANAGER
         : Role.USER;
 
-    const lastLogin = new NiceDate(
-      response.lastLogin.year,
-      response.lastLogin.month,
-      response.lastLogin.day,
-      response.lastLogin.hour,
-      response.lastLogin.minute
-    );
-
     return new User(
       response.userID,
       response.userName,
@@ -204,7 +210,8 @@ export class UserDataService {
       response.passwordHash,
       role,
       response.email,
-      lastLogin
+      response.orgEinheit,
+      response.publicKey
     );
   }
 }

@@ -59,14 +59,18 @@ export class LogDataService {
     return this.http.post(`${this.apiConfig.baseURL}/user-logs`, data);
   }
 
-  createProjectLog(log: Log, projectID: number, userKey: string): Observable<any> {
+  createProjectLog(
+    log: Log,
+    projectID: number,
+    userKey: string
+  ): Observable<any> {
     const data = {
       projectID: projectID,
       userID: log.userId,
       activityName: log.activityName,
       activityDescription: log.description,
     };
-    let encryptedData = this.encryptionService.encryptLogData(data, userKey)
+    let encryptedData = this.encryptionService.encryptLogData(data, userKey);
 
     return this.http.post(`${this.apiConfig.baseURL}/project-logs`, data);
   }
@@ -158,7 +162,7 @@ export class LogDataService {
       description: LogDescriptionValues.createLogDescription(
         ActivityName.UPDATE_USER,
         user.userID,
-        user.username
+        user.userName
       ),
       activityName: ActivityName.UPDATE_USER,
       userId: this.userService.getCurrentUserID(),
@@ -179,7 +183,7 @@ export class LogDataService {
       description: LogDescriptionValues.createLogDescription(
         ActivityName.DELETE_USER,
         user.userID,
-        user.username
+        user.userName
       ),
       activityName: ActivityName.DELETE_USER,
       userId: this.userService.getCurrentUserID(),
@@ -212,7 +216,11 @@ export class LogDataService {
       dateTime: new NiceDate(0, 0, 0, 0, 0),
     };
 
-    return this.createProjectLog(log, projectID, this.userService.getCurrentUser().password);
+    return this.createProjectLog(
+      log,
+      projectID,
+      this.userService.getCurrentUser().passwordHash
+    );
   }
 
   addUpdateProjectLog(projectID: number, projectName: string) {
@@ -230,7 +238,11 @@ export class LogDataService {
       dateTime: new NiceDate(0, 0, 0, 0, 0),
     };
 
-    this.createProjectLog(log, projectID, this.userService.getCurrentUser().password).subscribe(
+    this.createProjectLog(
+      log,
+      projectID,
+      this.userService.getCurrentUser().passwordHash
+    ).subscribe(
       () => console.log('Project update logged successfully'),
       (error) => console.error('Error logging project update:', error)
     );
@@ -251,7 +263,11 @@ export class LogDataService {
       dateTime: new NiceDate(0, 0, 0, 0, 0),
     };
 
-    this.createProjectLog(log, project.projectID,this.userService.getCurrentUser().password).subscribe(
+    this.createProjectLog(
+      log,
+      project.projectID,
+      this.userService.getCurrentUser().passwordHash
+    ).subscribe(
       () => console.log('Project deletion logged successfully'),
       (error) => console.error('Error logging project deletion:', error)
     );
@@ -291,7 +307,11 @@ export class LogDataService {
       dateTime: new NiceDate(0, 0, 0, 0, 0),
     };
 
-    this.createProjectLog(log, project.projectID, this.userService.getCurrentUser().password).subscribe(
+    this.createProjectLog(
+      log,
+      project.projectID,
+      this.userService.getCurrentUser().passwordHash
+    ).subscribe(
       () => console.log('Project deletion logged successfully'),
       (error) => console.error('Error logging project deletion:', error)
     );

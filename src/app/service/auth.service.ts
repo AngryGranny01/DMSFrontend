@@ -32,15 +32,16 @@ export class AuthService {
         if (userData) {
           // User login successful
           this.userService.currentUser = userData;
-          this.userService.currentUser.password = passwordPlain;
-          this.userService.currentUsername.next(userData.username);
+
+          this.userService.currentUsername.next(userData.userName);
 
           this.isAuthenticated = true;
 
           // Log Entry
+          this.router.navigate(['/dashboard']);
           this.logDataService.addLoginLog();
 
-          this.router.navigate(['/dashboard']);
+
         } else {
           // User login failed
           alert('Username or Password is incorrect');
@@ -54,7 +55,6 @@ export class AuthService {
       }
     );
   }
-
 
   isLoggedIn(): boolean {
     return this.isAuthenticated;

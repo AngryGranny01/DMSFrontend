@@ -43,11 +43,9 @@ export class EmailPageComponent {
     }
 
     let salt = this.encryptionService.generateSalt();
-    let passwordHash = this.encryptionService.encryptPBKDF2Key(
-      this.password,
-      salt
-    );
-
+    let passwordHash = this.encryptionService.getPBKDF2Key(this.password, salt);
+    //TODO: encrypt with standard publicKey
+    //TODO: send PublicKey too
     this.userDataService.verifyToken(this.token, passwordHash, salt).subscribe(
       () => {
         // Success response handling
