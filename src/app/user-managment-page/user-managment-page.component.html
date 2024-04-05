@@ -38,10 +38,9 @@
                 <a href="#">{{ user.firstName }} {{ user.lastName }}</a>
               </td>
               <td>
-                <!---{{ user.lastLogin.formatDate() }} <br />{{
-                  user.lastLogin.formatTime()
-                }}--->
-                Uhr
+                {{ (lastLogin$ | async)?.[user.userID] ? niceDate.formatDate((lastLogin$ | async)![user.userID]) : ''}} <br />{{
+                  (lastLogin$ | async)?.[user.userID] ? niceDate.formatTime((lastLogin$ | async)![user.userID]) : ''
+                }} Uhr
               </td>
               <td>{{ user.role }}</td>
               <td>

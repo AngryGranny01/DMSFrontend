@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import CryptoJS, { SHA512 } from 'crypto-js';
 import { Log } from '../models/logInterface';
 import forge from 'node-forge';
+import { User } from '../models/userInterface';
+import { Role } from '../models/role';
 
 @Injectable({
   providedIn: 'root',
@@ -128,7 +130,7 @@ export class EncryptionService {
     return forge.util.encode64(encryptedData);
   }
 
-  
+
   decryptRSA(encryptedData: string, privateKey: string): string {
     // Convert private key from PEM format
     const privateKeyObj = forge.pki.privateKeyFromPem(privateKey);
@@ -180,70 +182,95 @@ export class EncryptionService {
     return { publicKey, privateKey };
   }
 
-  async decryptUserDataRSA(
-    userData: Record<string, string>,
-    privateKey: string
-  ): Promise<Record<string, string>> {
-    const privateKeyObj = forge.pki.privateKeyFromPem(privateKey);
-    const decryptedUserData: Record<string, string> = {};
+  decryptUserData(userData: any, privateKey: string, publicKey: string): User {
+    const decryptedUserID = userData.userID
+    const decryptedUserName = this.decryptRSA(
+      userData.userName,
+      privateKey
+    );
 
-    try {
-      for (const [propertyName, value] of Object.entries(userData)) {
-        // Exclude certain properties from decryption
-        if (
-          propertyName === 'privateKey' ||
-          propertyName === 'salt' ||
-          propertyName === 'userID' ||
-          propertyName === 'publicKey' ||
-          value === '' ||
-          typeof value !== 'string'
-        ) {
-          decryptedUserData[propertyName] = value;
-        } else {
-          // Decrypt the encrypted value using the private key
-          const decryptedValue = privateKeyObj.decrypt(
-            forge.util.decodeUtf8(value)
-          );
-          // Set the decrypted value in the decryptedUserData object
-          decryptedUserData[propertyName] = decryptedValue;
-        }
-      }
-      return decryptedUserData;
-    } catch (error) {
-      console.error('Error decrypting userData:', error);
-      throw error; // Rethrow the error to be handled by the caller
-    }
+    const decryptedFirstName = this.decryptRSA(
+      userData.firstName,
+      privateKey
+    );
+    const decryptedLastName = this.decryptRSA(
+      userData.lastName,
+      privateKey
+    );
+    const decryptedEmail = this.decryptRSA(
+      userData.email,
+      privateKey
+    );
+    const decryptedOrgEinheit = this.decryptRSA(
+      userData.orgEinheit,
+      privateKey
+    );
+    const decryptedRole = this.decryptUserRole(
+      this.decryptRSA(userData.role, privateKey)
+    );
+
+    return new User(
+      decryptedUserID,
+      decryptedUserName,
+      decryptedFirstName,
+      decryptedLastName,
+      privateKey,
+      decryptedRole,
+      decryptedEmail,
+      decryptedOrgEinheit,
+      publicKey
+    );
   }
 
-  async encryptUserDataRSA(
-    userData: Record<string, string>,
-    publicKey: string
-  ): Promise<Record<string, string>> {
-    const publicKeyObj = forge.pki.publicKeyFromPem(publicKey);
-    const encryptedUserData: Record<string, string> = {};
+  encryptUserData(userData: any, publicKey: string): any {
+    const userID = userData.userID
+    const encryptedUserName = this.encryptRSA(
+      userData.userName,
+      publicKey
+    );
 
-    try {
-      for (const [propertyName, value] of Object.entries(userData)) {
-        // Exclude certain properties from encryption
-        if (
-          propertyName === 'privateKey' ||
-          propertyName === 'salt' ||
-          propertyName === 'publicKey' ||
-          propertyName === 'userID' ||
-          value === '' ||
-          typeof value !== 'string'
-        ) {
-          encryptedUserData[propertyName] = value;
-        } else {
-          encryptedUserData[propertyName] = forge.util.encode64(
-            publicKeyObj.encrypt(value, 'RSA-OAEP')
-          );
-        }
-      }
-      return encryptedUserData;
-    } catch (error) {
-      console.error('Error encrypting userData:', error);
-      throw error; // Rethrow the error to be handled by the caller
+    const encryptedFirstName = this.encryptRSA(
+      userData.firstName,
+      publicKey
+    );
+    const encryptedLastName = this.encryptRSA(
+      userData.lastName,
+      publicKey
+    );
+    const encryptedEmail = this.encryptRSA(
+      userData.email,
+      publicKey
+    );
+    const encryptedOrgEinheit = this.encryptRSA(
+      userData.orgEinheit,
+      publicKey
+    );
+    const encryptedRole = this.encryptRSA(
+      userData.role,
+      publicKey
+    );
+
+    const encryptedUser = {
+      userID: userID,
+      username: encryptedUserName,
+      firstName: encryptedFirstName,
+      lastName: encryptedLastName,
+      email: encryptedEmail,
+      orgEinheit: encryptedOrgEinheit,
+      role: encryptedRole,
+      publicKey: publicKey
+    }
+    return encryptedUser
+  }
+
+  decryptUserRole(role: string): Role {
+    switch (role) {
+      case Role.ADMIN:
+        return Role.ADMIN;
+      case Role.MANAGER:
+        return Role.MANAGER;
+      default:
+        return Role.USER;
     }
   }
 }

@@ -5,7 +5,7 @@ import { ApiConfigService } from './api-config.service';
 import { Role } from '../../models/role';
 import { NiceDate } from '../../models/niceDateInterface';
 import { Observable, generate } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { AuthService } from '../auth.service';
 import { EncryptionService } from '../encryption.service';
 import { UserService } from '../user.service';
@@ -33,10 +33,6 @@ export class UserDataService {
         );
         const keys =
           this.encryptionService.generateRSAKeyPairFromHash(hashedPassword);
-        console.log("Public Key:", keys.publicKey)
-        let enc = this.encryptionService.encryptRSA("rojo.dienst@gmail.com", keys.publicKey);
-        console.log('encrpyted: ', enc);
-        console.log('decrypted: ', this.encryptionService.decryptRSA(enc,keys.privateKey));
         return this.http
           .get<any>(
             `${this.apiConfig.baseURL}/users/login?email=${userEmail}&passwordHash=${hashedPassword}`
@@ -48,7 +44,7 @@ export class UserDataService {
                 throw new Error('User data not found');
               }
               console.log(userData);
-              return this.decryptUserData(
+              return this.encryptionService.decryptUserData(
                 userData,
                 keys.privateKey,
                 keys.publicKey
@@ -67,72 +63,36 @@ export class UserDataService {
     );
   }
 
-  decryptUserData(userData: any, privateKey: string, publicKey: string): User {
-    console.log("User ID: ", userData.userID)
-    const decryptedUserID = parseInt(
-      this.encryptionService.decryptRSA(userData.userID, privateKey)
-    );
-    const decryptedUserName = this.encryptionService.decryptRSA(
-      userData.userName,
-      privateKey
-    );
-
-    const decryptedFirstName = this.encryptionService.decryptRSA(
-      userData.firstName,
-      privateKey
-    );
-    const decryptedLastName = this.encryptionService.decryptRSA(
-      userData.lastName,
-      privateKey
-    );
-    const decryptedEmail = this.encryptionService.decryptRSA(
-      userData.email,
-      privateKey
-    );
-    const decryptedOrgEinheit = this.encryptionService.decryptRSA(
-      userData.orgEinheit,
-      privateKey
-    );
-    const decryptedRole = this.decryptUserRole(userData.role, privateKey);
-
-    return new User(
-      decryptedUserID,
-      decryptedUserName,
-      decryptedFirstName,
-      decryptedLastName,
-      privateKey,
-      decryptedRole,
-      decryptedEmail,
-      decryptedOrgEinheit,
-      publicKey
-    );
-  }
-
-  decryptUserRole(role: string, privateKey: string): Role {
-    switch (role) {
-      case Role.ADMIN:
-        return Role.ADMIN;
-      case Role.MANAGER:
-        return Role.MANAGER;
-      default:
-        return Role.USER;
-    }
-  }
-
   //-------------------------------------------- Get-Requests --------------------------------------------------------------//
   getAllUsers(): Observable<User[]> {
+    const sender = this.userService.currentUser;
     return this.http
-      .get<any[]>(`${this.apiConfig.baseURL}/users`)
+      .get<any[]>(`${this.apiConfig.baseURL}/users/${sender.userID}`)
       .pipe(
-        map((response: any[]) => response.map((user) => this.extractUser(user)))
+        map((response: any[]) =>
+          response.map((user) =>
+            this.encryptionService.decryptUserData(
+              user,
+              sender.privateKey,
+              sender.publicKey
+            )
+          )
+        )
       );
   }
 
-  getLastLoginUsers(): Observable<any> {
+  //return a Observable map with key userID and value Date
+  getLastLogins(): Observable<{ [userID: string]: Date }> {
     return this.http
-      .get<any[]>(`${this.apiConfig.baseURL}/users/lastLogin`)
+      .get<any[]>(`${this.apiConfig.baseURL}/user-logs/lastLogins`)
       .pipe(
-        map((response: any[]) => response.map((user) => this.extractUser(user)))
+        map((response: any[]) => {
+          const lastLogins: { [userID: string]: Date } = {};
+          response.forEach(entry => {
+            lastLogins[entry.userID] = new Date(entry.date);
+          });
+          return lastLogins;
+        })
       );
   }
 
@@ -198,7 +158,7 @@ export class UserDataService {
     };
 
     // Encrypt the createUser object using the encryption service
-    const encryptedUser = this.encryptionService.encryptUserDataRSA(
+    const encryptedUser = this.encryptionService.encryptUserData(
       createUser,
       STANDARD_PUBLIC_KEY
     );

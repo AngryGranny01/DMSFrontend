@@ -11,6 +11,7 @@ import { UserDataService } from '../service/api/user-data.service';
 import { ProjectManagerDataService } from '../service/api/project-manager-data.service';
 import { LogService } from '../service/log.service';
 import { LogDataService } from '../service/api/log-data.service';
+import { NiceDateService } from '../service/nice-date.service';
 
 @Component({
   selector: 'app-user-managment-page',
@@ -19,13 +20,15 @@ import { LogDataService } from '../service/api/log-data.service';
 })
 export class UserManagmentPageComponent implements OnInit {
   users$: Observable<User[]> = of([]);
+  lastLogin$: Observable<{ [userID: string]: Date }> = of({});
 
   constructor(
     private userService: UserService,
     private userDataService: UserDataService,
     private managerDataService: ProjectManagerDataService,
     private logService: LogService,
-    private logDataService: LogDataService
+    private logDataService: LogDataService,
+    public niceDate: NiceDateService
   ) {}
 
   ngOnInit(): void {
@@ -48,6 +51,7 @@ export class UserManagmentPageComponent implements OnInit {
 
   loadAllUsers() {
     this.users$ = this.userDataService.getAllUsers();
+    this.lastLogin$ = this.userDataService.getLastLogins();
   }
 
   deleteUser(user: User) {

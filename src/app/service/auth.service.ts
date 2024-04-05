@@ -32,6 +32,7 @@ export class AuthService {
         if (userData) {
           // User login successful
           this.userService.currentUser = userData;
+          console.log(this.userService.currentUser)
 
           this.userService.currentUsername.next(userData.userName);
 
