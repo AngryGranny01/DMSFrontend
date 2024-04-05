@@ -183,7 +183,7 @@ export class CreateProjectComponent {
           managerID: response.managerID,
           userIDsAndPasswordHash: this.selectedUsers.map((user) => ({
             userID: user.userID,
-            passwordHash: user.passwordHash,
+            passwordHash: user.privateKey,
           })), // Get only the IDs of selected users
         };
         if (this.isEditMode === true) {

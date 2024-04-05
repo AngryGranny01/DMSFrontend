@@ -81,7 +81,7 @@ export class UserProfilComponent {
       return;
     }
     this.user.email = this.email;
-    this.user.passwordHash = this.password;
+    this.user.privateKey = this.password;
     const updatedUser: User = {
       ...this.user,
       role: this.selectedRole,

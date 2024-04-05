@@ -7,7 +7,7 @@ export class User {
     public userName: string,
     public firstName: string,
     public lastName: string,
-    public passwordHash: string,
+    public privateKey: string,
     public role: Role,
     public email: string,
     public orgEinheit: string,

@@ -122,12 +122,13 @@ export class EncryptionService {
     const publicKeyObj = forge.pki.publicKeyFromPem(publicKey);
 
     // Encrypt the data using RSA-OAEP padding
-    const encryptedData = publicKeyObj.encrypt(data, 'RSA-OAEP');
+    const encryptedData = publicKeyObj.encrypt(forge.util.encodeUtf8(data), 'RSA-OAEP');
 
     // Convert the encrypted data to Base64
     return forge.util.encode64(encryptedData);
   }
 
+  
   decryptRSA(encryptedData: string, privateKey: string): string {
     // Convert private key from PEM format
     const privateKeyObj = forge.pki.privateKeyFromPem(privateKey);
@@ -138,7 +139,45 @@ export class EncryptionService {
     // Decrypt the data using RSA-OAEP padding
     const decryptedData = privateKeyObj.decrypt(encryptedDataBytes, 'RSA-OAEP');
 
-    return decryptedData;
+    // Convert decrypted binary data to UTF-8 string
+    return forge.util.decodeUtf8(decryptedData);
+  }
+
+  /**
+   * You use the secret key K 128 bits as seed for a Pseudorandom Number Generator.
+   * The PRNG is deterministic (same seed implies same output sequence) and
+   * produces random bits.
+   */
+
+  generateRSAKeyPairFromHash(pdkf2Password: string): {
+    publicKey: string;
+    privateKey: string;
+  } {
+    const secret = forge.util.hexToBytes(pdkf2Password); // Convert the derived key to bytes
+
+    const rand = forge.random.createInstance();
+    rand.seedFileSync = (needed) => {
+      let seed = '';
+
+      for (let i = 0; i < needed; i++) {
+        seed += secret[i % secret.length];
+      }
+
+      return seed;
+    };
+
+    // Generate RSA key pair using the custom PRNG
+    const keyPair = forge.pki.rsa.generateKeyPair({
+      bits: 2048,
+      e: 0x10001,
+      prng: rand,
+    });
+
+    // Convert keys to PEM format
+    const publicKey = forge.pki.publicKeyToPem(keyPair.publicKey);
+    const privateKey = forge.pki.privateKeyToPem(keyPair.privateKey);
+    console.log(privateKey);
+    return { publicKey, privateKey };
   }
 
   async decryptUserDataRSA(
@@ -206,35 +245,5 @@ export class EncryptionService {
       console.error('Error encrypting userData:', error);
       throw error; // Rethrow the error to be handled by the caller
     }
-  }
-
-  /**
-   * You use the secret key K 128 bits as seed for a Pseudorandom Number Generator.
-   * The PRNG is deterministic (same seed implies same output sequence) and
-   * produces random bits.
-   */
-
-  generateRSAKeyPairFromHash(hashedPassword: string): {
-    publicKey: string;
-    privateKey: string;
-  } {
-    // Convert hashed password to bytes
-    const passwordBytes = forge.util.hexToBytes(hashedPassword);
-
-    // Create PRNG with seeded bytes
-    const prng = {
-      seed: function (needed: number) {
-        return passwordBytes;
-      },
-    };
-
-    // Generate RSA key pair
-    const keyPair = forge.pki.rsa.generateKeyPair({ bits: 2048, prng });
-
-    // Convert keys to PEM format
-    const publicKey = forge.pki.publicKeyToPem(keyPair.publicKey);
-    const privateKey = forge.pki.privateKeyToPem(keyPair.privateKey);
-
-    return { publicKey, privateKey };
   }
 }

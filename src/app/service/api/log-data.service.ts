@@ -219,7 +219,7 @@ export class LogDataService {
     return this.createProjectLog(
       log,
       projectID,
-      this.userService.getCurrentUser().passwordHash
+      this.userService.getCurrentUser().privateKey
     );
   }
 
@@ -241,7 +241,7 @@ export class LogDataService {
     this.createProjectLog(
       log,
       projectID,
-      this.userService.getCurrentUser().passwordHash
+      this.userService.getCurrentUser().privateKey
     ).subscribe(
       () => console.log('Project update logged successfully'),
       (error) => console.error('Error logging project update:', error)
@@ -266,7 +266,7 @@ export class LogDataService {
     this.createProjectLog(
       log,
       project.projectID,
-      this.userService.getCurrentUser().passwordHash
+      this.userService.getCurrentUser().privateKey
     ).subscribe(
       () => console.log('Project deletion logged successfully'),
       (error) => console.error('Error logging project deletion:', error)
@@ -310,7 +310,7 @@ export class LogDataService {
     this.createProjectLog(
       log,
       project.projectID,
-      this.userService.getCurrentUser().passwordHash
+      this.userService.getCurrentUser().privateKey
     ).subscribe(
       () => console.log('Project deletion logged successfully'),
       (error) => console.error('Error logging project deletion:', error)

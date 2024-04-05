@@ -15,7 +15,7 @@ export class UserService {
     userName: '',
     firstName: '',
     lastName: '',
-    passwordHash: '',
+    privateKey: '',
     email: '',
     role: Role.USER,
     orgEinheit: '',

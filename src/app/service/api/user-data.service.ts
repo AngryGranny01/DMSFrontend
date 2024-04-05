@@ -5,13 +5,12 @@ import { ApiConfigService } from './api-config.service';
 import { Role } from '../../models/role';
 import { NiceDate } from '../../models/niceDateInterface';
 import { Observable, generate } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { AuthService } from '../auth.service';
 import { EncryptionService } from '../encryption.service';
 import { UserService } from '../user.service';
 import { STANDARD_PRIVATE_KEY, STANDARD_PUBLIC_KEY } from '../../constants/env';
 // Retrieve private and public keys from environment variables
-
 
 @Injectable({
   providedIn: 'root',
@@ -32,39 +31,92 @@ export class UserDataService {
           passwordPlain,
           response.salt
         );
-        let keys = this.encryptionService.generateRSAKeyPairFromHash(hashedPassword);
+        const keys =
+          this.encryptionService.generateRSAKeyPairFromHash(hashedPassword);
+        console.log("Public Key:", keys.publicKey)
+        let enc = this.encryptionService.encryptRSA("rojo.dienst@gmail.com", keys.publicKey);
+        console.log('encrpyted: ', enc);
+        console.log('decrypted: ', this.encryptionService.decryptRSA(enc,keys.privateKey));
         return this.http
           .get<any>(
-            `${this.apiConfig.baseURL}/users/login?email=${userEmail}&passwordHash=${keys.privateKey}`
+            `${this.apiConfig.baseURL}/users/login?email=${userEmail}&passwordHash=${hashedPassword}`
           )
           .pipe(
             map((userData) => {
+              console.log('Decrypted user data received');
               if (!userData) {
                 throw new Error('User data not found');
               }
-              let decryptedData = JSON.parse(
-                this.encryptionService.decryptRSA(
-                  userData,
-                  this.userService.currentUser.passwordHash
-                )
-              );
-
-              let user = new User(
-                userData.userID,
-                decryptedData.userName,
-                decryptedData.firstName,
-                decryptedData.lastName,
-                hashedPassword,
-                decryptedData.role,
-                decryptedData.email,
-                decryptedData.orgEinheit,
+              console.log(userData);
+              return this.decryptUserData(
+                userData,
+                keys.privateKey,
                 keys.publicKey
               );
-              return user;
+            }),
+            catchError((error) => {
+              console.error('Failed to fetch user data:', error);
+              throw new Error('Failed to fetch user data');
             })
           );
+      }),
+      catchError((error) => {
+        console.error('Failed to retrieve salt:', error);
+        throw new Error('Failed to retrieve salt');
       })
     );
+  }
+
+  decryptUserData(userData: any, privateKey: string, publicKey: string): User {
+    console.log("User ID: ", userData.userID)
+    const decryptedUserID = parseInt(
+      this.encryptionService.decryptRSA(userData.userID, privateKey)
+    );
+    const decryptedUserName = this.encryptionService.decryptRSA(
+      userData.userName,
+      privateKey
+    );
+
+    const decryptedFirstName = this.encryptionService.decryptRSA(
+      userData.firstName,
+      privateKey
+    );
+    const decryptedLastName = this.encryptionService.decryptRSA(
+      userData.lastName,
+      privateKey
+    );
+    const decryptedEmail = this.encryptionService.decryptRSA(
+      userData.email,
+      privateKey
+    );
+    const decryptedOrgEinheit = this.encryptionService.decryptRSA(
+      userData.orgEinheit,
+      privateKey
+    );
+    const decryptedRole = this.decryptUserRole(userData.role, privateKey);
+
+    return new User(
+      decryptedUserID,
+      decryptedUserName,
+      decryptedFirstName,
+      decryptedLastName,
+      privateKey,
+      decryptedRole,
+      decryptedEmail,
+      decryptedOrgEinheit,
+      publicKey
+    );
+  }
+
+  decryptUserRole(role: string, privateKey: string): Role {
+    switch (role) {
+      case Role.ADMIN:
+        return Role.ADMIN;
+      case Role.MANAGER:
+        return Role.MANAGER;
+      default:
+        return Role.USER;
+    }
   }
 
   //-------------------------------------------- Get-Requests --------------------------------------------------------------//
@@ -157,7 +209,7 @@ export class UserDataService {
   updateUser(user: User) {
     let salt = this.encryptionService.generateSalt();
     let passwordHash = this.encryptionService.getPBKDF2Key(
-      user.passwordHash,
+      user.privateKey,
       salt
     );
     const updateUser = {
