@@ -42,17 +42,7 @@ export class UserProfilComponent {
       this.selectedRole = this.user.role;
     } else {
       this.isEditMode = false;
-      this.user = new User(
-        0,
-        '',
-        '',
-        '',
-        '',
-        Role.USER,
-        '',
-        '',
-        '',
-      );
+      this.user = new User(0, '', '', '', '', Role.USER, '', '', '');
     }
   }
 
@@ -65,16 +55,18 @@ export class UserProfilComponent {
   }
 
   saveProfile() {
-    if (!this.userService.isPasswordStrong(this.password)) {
-      alert(
-        'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one number'
-      );
-      return;
-    }
+    if (this.isEditMode === true) {
+      if (!this.userService.isPasswordStrong(this.password)) {
+        alert(
+          'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one number'
+        );
+        return;
+      }
 
-    if (this.password !== this.repeatPassword) {
-      alert('Passwords do not match');
-      return;
+      if (this.password !== this.repeatPassword) {
+        alert('Passwords do not match');
+        return;
+      }
     }
     if (!this.userService.checkIfEmailIsValidEmail(this.email)) {
       alert('Email isnt a valid email');

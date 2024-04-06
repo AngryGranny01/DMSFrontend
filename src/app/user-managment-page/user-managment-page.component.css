@@ -1,6 +1,6 @@
 .table-responsive {
   max-height: 600px;
-  min-width:min-content;
+  min-width: min-content;
 }
 
 .table-wrapper {
@@ -8,7 +8,7 @@
   background: #fff;
   padding: 40px 25px;
 
-  box-shadow: 0 1px 1px rgba(0,0,0,.05);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }
 
 /* Make the table header fixed while scrolling */
@@ -17,7 +17,6 @@
   top: 0;
   z-index: 1000; /* Ensure the header stays above other content */
 }
-
 
 .table-title {
   padding-bottom: 15px;
@@ -48,7 +47,8 @@
   float: left;
   margin-top: 2px;
 }
-table.table tr th, table.table tr td {
+table.table tr th,
+table.table tr td {
   border-color: #e9e9e9;
   padding: 12px 15px;
   vertical-align: middle;
@@ -59,7 +59,6 @@ table.table tr th:first-child {
 table.table tr th:last-child {
   width: 100px;
 }
-
 
 table.table th i {
   font-size: 13px;
@@ -82,9 +81,24 @@ table.table td a.settings {
   color: #313437;
 }
 table.table td a.delete {
-  color: #F44336;
+  color: #f44336;
 }
 table.table td a:hover {
-  color: #2196F3;
+  color: #2196f3;
 }
+
+.status-circle {
+  height: 12px;
+  width: 12px;
+  background-color: red;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 25px;
+  border: 1px solid black;
+}
+
+.status-circle.active {
+  background-color: green;
+}
+
 

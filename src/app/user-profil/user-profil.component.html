@@ -19,6 +19,19 @@
               required
             />
           </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="control-label"><b>Org. Einheit</b></label>
+              <input
+                aria-describedby="addon-right addon-left"
+                type="text"
+                placeholder="Org. Einheit"
+                class="form-control"
+                [(ngModel)]="user!.orgEinheit"
+                required
+              />
+            </div>
+          </div>
         </div>
         <div class="row mt-3">
           <div class="col-md-6">
@@ -61,7 +74,7 @@
             />
           </div>
         </div>
-        <div class="row mt-3">
+        <div class="row mt-3" *ngIf="isEditMode">
           <div class="col-md-6">
             <div class="form-group">
               <label class="control-label"><b>Password</b></label>

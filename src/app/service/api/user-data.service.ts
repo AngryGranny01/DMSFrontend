@@ -33,6 +33,7 @@ export class UserDataService {
         );
         const keys =
           this.encryptionService.generateRSAKeyPairFromHash(hashedPassword);
+
         return this.http
           .get<any>(
             `${this.apiConfig.baseURL}/users/login?email=${userEmail}&passwordHash=${hashedPassword}`
@@ -115,8 +116,9 @@ export class UserDataService {
   }
 
   checkIfUserEmailExists(userEmail: string) {
+    const encryptedEmail = encodeURIComponent(this.encryptionService.encryptRSA(userEmail,STANDARD_PUBLIC_KEY))
     return this.http
-      .get(`${this.apiConfig.baseURL}/user/exist/email?email=${userEmail}`)
+      .get(`${this.apiConfig.baseURL}/users/checkEmailExist?email=${encryptedEmail}`)
       .pipe(
         map((response: any) => {
           return response.exist;
@@ -125,8 +127,10 @@ export class UserDataService {
   }
 
   checkIfUserNameExists(userName: string) {
+    const encryptedUsername = encodeURIComponent(this.encryptionService.encryptRSA(userName, STANDARD_PUBLIC_KEY));
+    console.log(encryptedUsername)
     return this.http
-      .get(`${this.apiConfig.baseURL}/user/exist/username?username=${userName}`)
+      .get(`${this.apiConfig.baseURL}/users/checkUsernameExist?username=${encryptedUsername}`)
       .pipe(
         map((response: any) => {
           return response.exist;
@@ -153,8 +157,8 @@ export class UserDataService {
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      isAdmin: isAdmin.toString(),
-      isProjectManager: isProjectManager.toString(),
+      role: user.role,
+      orgEinheit: user.orgEinheit
     };
 
     // Encrypt the createUser object using the encryption service

@@ -27,6 +27,7 @@
               <th scope="col">Name</th>
               <th scope="col">Last Login</th>
               <th scope="col">Role</th>
+              <th scope="col">Activated</th>
               <th scope="col">Logs</th>
               <th scope="col">Function</th>
             </tr>
@@ -35,14 +36,27 @@
             <tr *ngFor="let user of users$ | async">
               <th scope="row">{{ user.userID }}</th>
               <td>
-                <a href="#">{{ user.firstName }} {{ user.lastName }}</a>
+                <a
+                  href="#"
+                  (click)="this.editUser(user)"
+                  routerLink="/profil"
+                  routerLinkActive="active"
+                  >{{ user.firstName }} {{ user.lastName }}</a
+                >
               </td>
               <td>
-                {{ (lastLogin$ | async)?.[user.userID] ? niceDate.formatDate((lastLogin$ | async)![user.userID]) : ''}} <br />{{
-                  (lastLogin$ | async)?.[user.userID] ? niceDate.formatTime((lastLogin$ | async)![user.userID]) : ''
-                }} Uhr
+                {{ (lastLogin$ | async)?.[user.userID] ? niceDate.formatDate((lastLogin$ | async)![user.userID]) : '' }}
+                <br />
+                {{ (lastLogin$ | async)?.[user.userID] ? niceDate.formatTime((lastLogin$ | async)![user.userID]) : '' }}
+                Uhr
               </td>
               <td>{{ user.role }}</td>
+              <td>
+                <div
+                  class="status-circle"
+                  [ngClass]="{ active: isActivated(user) }"
+                ></div>
+              </td>
               <td>
                 <a
                   href="#"

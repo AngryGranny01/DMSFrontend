@@ -218,7 +218,7 @@ export class EncryptionService {
       decryptedRole,
       decryptedEmail,
       decryptedOrgEinheit,
-      publicKey
+      userData.publicKey
     );
   }
 
@@ -252,7 +252,7 @@ export class EncryptionService {
 
     const encryptedUser = {
       userID: userID,
-      username: encryptedUserName,
+      userName: encryptedUserName,
       firstName: encryptedFirstName,
       lastName: encryptedLastName,
       email: encryptedEmail,
