@@ -124,12 +124,14 @@ export class EncryptionService {
     const publicKeyObj = forge.pki.publicKeyFromPem(publicKey);
 
     // Encrypt the data using RSA-OAEP padding
-    const encryptedData = publicKeyObj.encrypt(forge.util.encodeUtf8(data), 'RSA-OAEP');
+    const encryptedData = publicKeyObj.encrypt(
+      forge.util.encodeUtf8(data),
+      'RSA-OAEP'
+    );
 
     // Convert the encrypted data to Base64
     return forge.util.encode64(encryptedData);
   }
-
 
   decryptRSA(encryptedData: string, privateKey: string): string {
     // Convert private key from PEM format
@@ -183,24 +185,12 @@ export class EncryptionService {
   }
 
   decryptUserData(userData: any, privateKey: string, publicKey: string): User {
-    const decryptedUserID = userData.userID
-    const decryptedUserName = this.decryptRSA(
-      userData.userName,
-      privateKey
-    );
+    const decryptedUserID = userData.userID;
+    const decryptedUserName = this.decryptRSA(userData.userName, privateKey);
 
-    const decryptedFirstName = this.decryptRSA(
-      userData.firstName,
-      privateKey
-    );
-    const decryptedLastName = this.decryptRSA(
-      userData.lastName,
-      privateKey
-    );
-    const decryptedEmail = this.decryptRSA(
-      userData.email,
-      privateKey
-    );
+    const decryptedFirstName = this.decryptRSA(userData.firstName, privateKey);
+    const decryptedLastName = this.decryptRSA(userData.lastName, privateKey);
+    const decryptedEmail = this.decryptRSA(userData.email, privateKey);
     const decryptedOrgEinheit = this.decryptRSA(
       userData.orgEinheit,
       privateKey
@@ -223,33 +213,19 @@ export class EncryptionService {
   }
 
   encryptUserData(userData: any, publicKey: string): any {
-    const userID = userData.userID
-    const encryptedUserName = this.encryptRSA(
-      userData.userName,
-      publicKey
-    );
+    const userID = userData.userID;
+    const encryptedUserName = this.encryptRSA(userData.userName, publicKey);
 
-    const encryptedFirstName = this.encryptRSA(
-      userData.firstName,
-      publicKey
-    );
-    const encryptedLastName = this.encryptRSA(
-      userData.lastName,
-      publicKey
-    );
-    const encryptedEmail = this.encryptRSA(
-      userData.email,
-      publicKey
-    );
-    const encryptedOrgEinheit = this.encryptRSA(
-      userData.orgEinheit,
-      publicKey
-    );
-    const encryptedRole = this.encryptRSA(
-      userData.role,
-      publicKey
-    );
+    const encryptedFirstName = this.encryptRSA(userData.firstName, publicKey);
+    const encryptedLastName = this.encryptRSA(userData.lastName, publicKey);
+    const encryptedEmail = this.encryptRSA(userData.email, publicKey);
+    const encryptedOrgEinheit = this.encryptRSA(userData.orgEinheit, publicKey);
+    const encryptedRole = this.encryptRSA(userData.role, publicKey);
 
+    let encryptedPasswordHash = ""
+    if (userData.passwordHash !== '') {
+      encryptedPasswordHash = this.encryptRSA(userData.passwordHash, publicKey);
+    }
     const encryptedUser = {
       userID: userID,
       userName: encryptedUserName,
@@ -258,9 +234,11 @@ export class EncryptionService {
       email: encryptedEmail,
       orgEinheit: encryptedOrgEinheit,
       role: encryptedRole,
-      publicKey: publicKey
-    }
-    return encryptedUser
+      passwordHash: encryptedPasswordHash,
+      salt: userData.salt,
+      publicKey: publicKey,
+    };
+    return encryptedUser;
   }
 
   decryptUserRole(role: string): Role {

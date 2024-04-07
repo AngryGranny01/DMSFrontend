@@ -15,6 +15,6 @@ export class LoginPageComponent {
   onSignIn(form: NgForm) {
     const email = form.value.email;
     const password = form.value.password;
-    this.authService.loginUsers(email, password);
+    this.authService.loginUser(email, password);
   }
 }

@@ -4,12 +4,13 @@ import { User } from '../../models/userInterface';
 import { ApiConfigService } from './api-config.service';
 import { Role } from '../../models/role';
 import { NiceDate } from '../../models/niceDateInterface';
-import { Observable, generate } from 'rxjs';
+import { Observable, generate, throwError } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { AuthService } from '../auth.service';
 import { EncryptionService } from '../encryption.service';
 import { UserService } from '../user.service';
 import { STANDARD_PRIVATE_KEY, STANDARD_PUBLIC_KEY } from '../../constants/env';
+import { decrypt } from 'dotenv';
 // Retrieve private and public keys from environment variables
 
 @Injectable({
@@ -24,7 +25,7 @@ export class UserDataService {
   ) {}
 
   //-------------------------------------------- Login --------------------------------------------------------------//
-  checkLoginData(passwordPlain: string, userEmail: string): Observable<User> {
+  checkPassword(passwordPlain: string, userEmail: string): Observable<any> {
     return this.getSaltByEmail(userEmail).pipe(
       switchMap((response: any) => {
         const hashedPassword = this.encryptionService.getPBKDF2Key(
@@ -33,33 +34,70 @@ export class UserDataService {
         );
         const keys =
           this.encryptionService.generateRSAKeyPairFromHash(hashedPassword);
-
-        return this.http
-          .get<any>(
-            `${this.apiConfig.baseURL}/users/login?email=${userEmail}&passwordHash=${hashedPassword}`
-          )
-          .pipe(
-            map((userData) => {
-              console.log('Decrypted user data received');
-              if (!userData) {
-                throw new Error('User data not found');
+        return this.getPassword(userEmail).pipe(
+          map((response: any) => {
+            let decryptedPassword = this.encryptionService.decryptRSA(
+              response.passwordHash,
+              keys.privateKey
+            );
+            console.log(decryptedPassword)
+            console.log(hashedPassword)
+            if (decryptedPassword === hashedPassword) {
+              console.log("Im Called")
+              const result = {
+                passwordHash: decryptedPassword,
+                userID: response.userID,
+                privateKey: keys.privateKey,
+                publicKey: keys.publicKey,
               }
-              console.log(userData);
-              return this.encryptionService.decryptUserData(
-                userData,
-                keys.privateKey,
-                keys.publicKey
-              );
-            }),
-            catchError((error) => {
-              console.error('Failed to fetch user data:', error);
-              throw new Error('Failed to fetch user data');
-            })
-          );
+              console.log(result)
+              return {
+                passwordHash: decryptedPassword,
+                userID: response.userID,
+                privateKey: keys.privateKey,
+                publicKey: keys.publicKey,
+              };
+            } else {
+              throw new Error('Password mismatch');
+            }
+          }),
+          catchError((error) => {
+            console.error('Failed to retrieve password:', error);
+            throw new Error('Failed to retrieve password');
+          })
+        );
       }),
       catchError((error) => {
         console.error('Failed to retrieve salt:', error);
         throw new Error('Failed to retrieve salt');
+      })
+    );
+  }
+
+  getUser(userID: string, privateKey: string, publicKey: string): Observable<User> {
+    return this.http.get<any>(`${this.apiConfig.baseURL}/users/findOne/${userID}`).pipe(
+      map((userData) => {
+        console.log(userData);
+        if (!userData) {
+          throw new Error('User data not found');
+        }
+        return this.encryptionService.decryptUserData(userData, privateKey, publicKey);
+      }),
+      catchError((error) => {
+        console.error('Failed to fetch user data:', error);
+        throw new Error('Failed to fetch user data');
+      })
+    );
+  }
+
+  getPassword(userEmail: string): Observable<any> {
+    return this.http.get(`${this.apiConfig.baseURL}/users/login?email=${userEmail}`).pipe(
+      map((response: any) => {
+        return response;
+      }),
+      catchError((error) => {
+        console.error('Failed to retrieve password:', error);
+        throw new Error('Failed to retrieve password');
       })
     );
   }
@@ -89,20 +127,12 @@ export class UserDataService {
       .pipe(
         map((response: any[]) => {
           const lastLogins: { [userID: string]: Date } = {};
-          response.forEach(entry => {
+          response.forEach((entry) => {
             lastLogins[entry.userID] = new Date(entry.date);
           });
           return lastLogins;
         })
       );
-  }
-
-  getUser(userID: number): Observable<User> {
-    return this.http.get(`${this.apiConfig.baseURL}/users/${userID}`).pipe(
-      map((response: any) => {
-        return this.extractUser(response);
-      })
-    );
   }
 
   getSaltByEmail(email: string): Observable<string> {
@@ -116,9 +146,13 @@ export class UserDataService {
   }
 
   checkIfUserEmailExists(userEmail: string) {
-    const encryptedEmail = encodeURIComponent(this.encryptionService.encryptRSA(userEmail,STANDARD_PUBLIC_KEY))
+    const encryptedEmail = encodeURIComponent(
+      this.encryptionService.encryptRSA(userEmail, STANDARD_PUBLIC_KEY)
+    );
     return this.http
-      .get(`${this.apiConfig.baseURL}/users/checkEmailExist?email=${encryptedEmail}`)
+      .get(
+        `${this.apiConfig.baseURL}/users/checkEmailExist?email=${encryptedEmail}`
+      )
       .pipe(
         map((response: any) => {
           return response.exist;
@@ -127,10 +161,14 @@ export class UserDataService {
   }
 
   checkIfUserNameExists(userName: string) {
-    const encryptedUsername = encodeURIComponent(this.encryptionService.encryptRSA(userName, STANDARD_PUBLIC_KEY));
-    console.log(encryptedUsername)
+    const encryptedUsername = encodeURIComponent(
+      this.encryptionService.encryptRSA(userName, STANDARD_PUBLIC_KEY)
+    );
+    console.log(encryptedUsername);
     return this.http
-      .get(`${this.apiConfig.baseURL}/users/checkUsernameExist?username=${encryptedUsername}`)
+      .get(
+        `${this.apiConfig.baseURL}/users/checkUsernameExist?username=${encryptedUsername}`
+      )
       .pipe(
         map((response: any) => {
           return response.exist;
@@ -142,23 +180,13 @@ export class UserDataService {
 
   //-------------------------------------------- Post-Requests --------------------------------------------------------------//
   createUser(user: User) {
-    let isAdmin = false;
-    let isProjectManager = false;
-
-    if (user.role === Role.ADMIN) {
-      isAdmin = true;
-    }
-    if (user.role === Role.MANAGER) {
-      isProjectManager = true;
-    }
-
     const createUser = {
       userName: user.userName,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
       role: user.role,
-      orgEinheit: user.orgEinheit
+      orgEinheit: user.orgEinheit,
     };
 
     // Encrypt the createUser object using the encryption service
@@ -176,6 +204,7 @@ export class UserDataService {
       user.privateKey,
       salt
     );
+    let keys = this.encryptionService.generateRSAKeyPairFromHash(passwordHash);
     const updateUser = {
       userID: user.userID,
       userName: user.userName,
@@ -185,15 +214,22 @@ export class UserDataService {
       passwordHash: passwordHash,
       salt: salt,
       role: user.role,
+      orgEinheit: user.orgEinheit,
+      publicKey: keys.publicKey,
     };
-    return this.http.put(`${this.apiConfig.baseURL}/users`, updateUser);
+    // Encrypt the createUser object using the encryption service
+    const encryptedUser = this.encryptionService.encryptUserData(
+      updateUser,
+      STANDARD_PUBLIC_KEY
+    );
+    console.log(passwordHash);
+    console.log(encryptedUser);
+    return this.http.put(`${this.apiConfig.baseURL}/users`, encryptedUser);
   }
 
   //-------------------------------------------- Delete-Requests --------------------------------------------------------------//
   deleteUser(userID: number) {
-    const params = new HttpParams().set('userID', userID.toString());
-
-    return this.http.delete(`${this.apiConfig.baseURL}/users`, { params });
+    return this.http.delete(`${this.apiConfig.baseURL}/users/${userID}`);
   }
 
   verifyToken(
