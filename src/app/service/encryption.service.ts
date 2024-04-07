@@ -180,7 +180,7 @@ export class EncryptionService {
     // Convert keys to PEM format
     const publicKey = forge.pki.publicKeyToPem(keyPair.publicKey);
     const privateKey = forge.pki.privateKeyToPem(keyPair.privateKey);
-    console.log(privateKey);
+   
     return { publicKey, privateKey };
   }
 

@@ -45,10 +45,8 @@
                 >
               </td>
               <td>
-                {{ (lastLogin$ | async)?.[user.userID] ? niceDate.formatDate((lastLogin$ | async)![user.userID]) : '' }}
-                <br />
-                {{ (lastLogin$ | async)?.[user.userID] ? niceDate.formatTime((lastLogin$ | async)![user.userID]) : '' }}
-                Uhr
+                {{ createDateString((lastLogin$ | async)?.[user.userID]) }}<br>
+                {{createTimeString((lastLogin$ | async)?.[user.userID])}}
               </td>
               <td>{{ user.role }}</td>
               <td>

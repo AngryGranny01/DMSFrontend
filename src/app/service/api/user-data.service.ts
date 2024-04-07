@@ -41,14 +41,6 @@ export class UserDataService {
               keys.privateKey
             );
             if (decryptedPassword === hashedPassword) {
-              console.log("Im Called")
-              const result = {
-                passwordHash: decryptedPassword,
-                userID: response.userID,
-                privateKey: keys.privateKey,
-                publicKey: keys.publicKey,
-              }
-              console.log(result)
               return {
                 passwordHash: decryptedPassword,
                 userID: response.userID,
@@ -75,7 +67,6 @@ export class UserDataService {
   getUser(userID: string, privateKey: string, publicKey: string): Observable<User> {
     return this.http.get<any>(`${this.apiConfig.baseURL}/user/${userID}`).pipe(
       map((userData) => {
-        console.log(userData);
         if (!userData) {
           throw new Error('User data not found');
         }
@@ -219,9 +210,7 @@ export class UserDataService {
       orgEinheit: user.orgEinheit,
       publicKey: keys.publicKey,
     };
-    console.log("Keys: ")
-    console.log(keys.privateKey)
-    console.log(keys.publicKey)
+
     // Encrypt the createUser object using the encryption service
     const encryptedUser = this.encryptionService.encryptUserData(
       updateUser,
@@ -247,7 +236,6 @@ export class UserDataService {
       salt: salt,
       publicKey: keys.publicKey
     };
-    console.log("Im Called")
     return this.http.put<string>(`${this.apiConfig.baseURL}/verifyToken`, data);
   }
 

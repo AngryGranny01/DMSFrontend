@@ -55,8 +55,20 @@ export class UserManagmentPageComponent implements OnInit {
     this.lastLogin$ = this.userDataService.getLastLogins();
   }
 
+  createDateString(lastLogin: Date | undefined): string {
+    if (!lastLogin) return ''; // If lastLogin is undefined, return an empty string
+    const date = this.niceDate.formatDate(lastLogin);
+    return `${date}`;
+  }
+
+  createTimeString(lastLogin: Date | undefined): string {
+    if (!lastLogin) return ''; // If lastLogin is undefined, return an empty string
+    const time = this.niceDate.formatTime(lastLogin);
+    return `${time} Uhr`;
+  }
+
+
   isActivated(user: User): boolean {
-    console.log(user.publicKey)
     return user.publicKey !== STANDARD_PUBLIC_KEY;
   }
 
