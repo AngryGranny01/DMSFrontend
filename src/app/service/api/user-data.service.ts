@@ -40,8 +40,6 @@ export class UserDataService {
               response.passwordHash,
               keys.privateKey
             );
-            console.log(decryptedPassword)
-            console.log(hashedPassword)
             if (decryptedPassword === hashedPassword) {
               console.log("Im Called")
               const result = {
@@ -75,7 +73,7 @@ export class UserDataService {
   }
 
   getUser(userID: string, privateKey: string, publicKey: string): Observable<User> {
-    return this.http.get<any>(`${this.apiConfig.baseURL}/users/findOne/${userID}`).pipe(
+    return this.http.get<any>(`${this.apiConfig.baseURL}/user/${userID}`).pipe(
       map((userData) => {
         console.log(userData);
         if (!userData) {
@@ -164,7 +162,6 @@ export class UserDataService {
     const encryptedUsername = encodeURIComponent(
       this.encryptionService.encryptRSA(userName, STANDARD_PUBLIC_KEY)
     );
-    console.log(encryptedUsername);
     return this.http
       .get(
         `${this.apiConfig.baseURL}/users/checkUsernameExist?username=${encryptedUsername}`
@@ -205,6 +202,11 @@ export class UserDataService {
       salt
     );
     let keys = this.encryptionService.generateRSAKeyPairFromHash(passwordHash);
+    if(user.userID === this.userService.currentUser.userID){
+      this.userService.currentUser.publicKey = keys.publicKey
+      this.userService.currentUser.privateKey = keys.privateKey
+    }
+
     const updateUser = {
       userID: user.userID,
       userName: user.userName,
@@ -217,13 +219,15 @@ export class UserDataService {
       orgEinheit: user.orgEinheit,
       publicKey: keys.publicKey,
     };
+    console.log("Keys: ")
+    console.log(keys.privateKey)
+    console.log(keys.publicKey)
     // Encrypt the createUser object using the encryption service
     const encryptedUser = this.encryptionService.encryptUserData(
       updateUser,
       STANDARD_PUBLIC_KEY
     );
-    console.log(passwordHash);
-    console.log(encryptedUser);
+    encryptedUser.publicKey = keys.publicKey
     return this.http.put(`${this.apiConfig.baseURL}/users`, encryptedUser);
   }
 
@@ -232,17 +236,18 @@ export class UserDataService {
     return this.http.delete(`${this.apiConfig.baseURL}/users/${userID}`);
   }
 
-  verifyToken(
-    token: string,
-    passwordHash: string,
-    salt: string
-  ): Observable<string> {
+  verifyToken(token: string, passwordPlain: string): Observable<string> {
+    let salt = this.encryptionService.generateSalt();
+    let passwordHash = this.encryptionService.getPBKDF2Key(passwordPlain, salt);
+    let keys = this.encryptionService.generateRSAKeyPairFromHash(passwordHash)
+
     const data = {
       token: token,
-      passwordHash: passwordHash,
+      passwordHash: this.encryptionService.encryptRSA(passwordHash,STANDARD_PUBLIC_KEY),
       salt: salt,
+      publicKey: keys.publicKey
     };
-
+    console.log("Im Called")
     return this.http.put<string>(`${this.apiConfig.baseURL}/verifyToken`, data);
   }
 

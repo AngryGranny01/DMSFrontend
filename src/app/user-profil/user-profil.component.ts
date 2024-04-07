@@ -161,9 +161,14 @@ export class UserProfilComponent {
   }
 
   updateUserAndNavigate(user: User) {
+    if(user.userID === this.userService.currentUser.userID){
+      this.userService.currentUser = user
+      this.userService.currentUsername.next(user.userName)
+    }
     this.userDataService.updateUser(user).subscribe(
       () => {
         this.logDataService.addUpdateUserLog(user);
+        
         this.router.navigate(['/userManagment']);
       },
       (error) => {

@@ -42,11 +42,7 @@ export class EmailPageComponent {
       return;
     }
 
-    let salt = this.encryptionService.generateSalt();
-    let passwordHash = this.encryptionService.getPBKDF2Key(this.password, salt);
-    //TODO: encrypt with standard publicKey
-    //TODO: send PublicKey too
-    this.userDataService.verifyToken(this.token, passwordHash, salt).subscribe(
+    this.userDataService.verifyToken(this.token, this.password).subscribe(
       () => {
         // Success response handling
         alert('Password updated successfully!'); // You may replace this with your preferred success message
@@ -59,7 +55,7 @@ export class EmailPageComponent {
         } else if (error.status === 404) {
           this.errorMessage = 'User not found';
         } else {
-          this.errorMessage = 'Error updating password';
+          this.errorMessage = error;
         }
         alert(this.errorMessage);
       }
