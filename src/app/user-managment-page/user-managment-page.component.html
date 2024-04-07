@@ -53,9 +53,10 @@
               <td>{{ user.role }}</td>
               <td>
                 <div
-                  class="status-circle"
-                  [ngClass]="{ active: isActivated(user) }"
+                  *ngIf="isActivated(user)"
+                  class="status-circle green"
                 ></div>
+                <div *ngIf="!isActivated(user)" class="status-circle red"></div>
               </td>
               <td>
                 <a

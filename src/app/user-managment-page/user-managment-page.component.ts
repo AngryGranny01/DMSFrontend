@@ -56,7 +56,8 @@ export class UserManagmentPageComponent implements OnInit {
   }
 
   isActivated(user: User): boolean {
-    return user.publicKey === STANDARD_PUBLIC_KEY;
+    console.log(user.publicKey)
+    return user.publicKey !== STANDARD_PUBLIC_KEY;
   }
 
   deleteUser(user: User) {

@@ -24,7 +24,6 @@ export class AuthService {
     private userDataService: UserDataService
   ) {}
 
-  //TODO: update login one for password check and then get userData!
   loginUser(email: string, passwordPlain: string) {
     if (passwordPlain !== '') {
       this.userDataService.checkPassword(passwordPlain, email).subscribe(

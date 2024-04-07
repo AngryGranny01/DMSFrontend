@@ -90,15 +90,21 @@ table.table td a:hover {
 .status-circle {
   height: 12px;
   width: 12px;
-  background-color: red;
   border-radius: 50%;
   display: inline-block;
   margin-left: 25px;
   border: 1px solid black;
 }
 
-.status-circle.active {
-  background-color: green;
+
+/* Additional class for green status circle */
+.green {
+  background-color: green !important;
+}
+
+/* Additional class for red status circle */
+.red {
+  background-color: red !important;
 }
 
 
