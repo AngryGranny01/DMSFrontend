@@ -13,6 +13,7 @@ import { ProjectManagerDataService } from './project-manager-data.service';
 import { UserDataService } from './user-data.service';
 import { UserService } from '../user.service';
 import { EncryptionService } from '../encryption.service';
+import { STANDARD_PUBLIC_KEY } from '../../constants/env';
 
 @Injectable({
   providedIn: 'root',
@@ -50,12 +51,13 @@ export class LogDataService {
   }
 
   //-------------------------------------------- Post-Requests --------------------------------------------------------------//
-  createUserLog(log: Log): Observable<any> {
+  createUserLog(log: any): Observable<any> {
     const data = {
-      userID: log.userId,
-      activityName: log.activityName,
-      activityDescription: log.description,
+      userID: this.encryptionService.encryptRSA(log.userID,STANDARD_PUBLIC_KEY),
+      activityName: this.encryptionService.encryptRSA(log.activityName,STANDARD_PUBLIC_KEY),
+      activityDescription: this.encryptionService.encryptRSA(log.description,STANDARD_PUBLIC_KEY),
     };
+    console.log(data.activityDescription)
     return this.http.post(`${this.apiConfig.baseURL}/user-logs`, data);
   }
 
@@ -98,18 +100,14 @@ export class LogDataService {
   }
 
   addLoginLog() {
-    const log: Log = {
+    const log = {
       description: LogDescriptionValues.createLogDescription(
         ActivityName.LOGIN,
         this.userService.getCurrentUserID(),
         this.userService.getCurrentUsername()
       ),
       activityName: ActivityName.LOGIN,
-      userId: this.userService.getCurrentUserID(),
-      logId: 0,
-      firstName: '',
-      lastName: '',
-      dateTime: new NiceDate(0, 0, 0, 0, 0),
+      userID: this.userService.getCurrentUserID(),
     };
 
     this.createUserLog(log).subscribe(
@@ -119,18 +117,14 @@ export class LogDataService {
   }
 
   addLogoutLog() {
-    const log: Log = {
+    const log = {
       description: LogDescriptionValues.createLogDescription(
         ActivityName.LOGOUT,
         this.userService.getCurrentUserID(),
         this.userService.getCurrentUsername()
       ),
       activityName: ActivityName.LOGOUT,
-      userId: this.userService.getCurrentUserID(),
-      logId: 0,
-      firstName: '',
-      lastName: '',
-      dateTime: new NiceDate(0, 0, 0, 0, 0),
+      userID: this.userService.getCurrentUserID(),
     };
 
     this.createUserLog(log).subscribe(
@@ -140,36 +134,27 @@ export class LogDataService {
   }
 
   addCreateUserLog(userID: number, username: string) {
-    const log: Log = {
+    const log = {
       description: LogDescriptionValues.createLogDescription(
         ActivityName.CREATE_USER,
         userID,
         username
       ),
       activityName: ActivityName.CREATE_USER,
-      userId: userID,
-      logId: 0,
-      firstName: '',
-      lastName: '',
-      dateTime: new NiceDate(0, 0, 0, 0, 0),
+      userID: userID,
     };
-
-    return this.createUserLog(log);
+    return this.createUserLog(log)
   }
 
   addUpdateUserLog(user: User) {
-    const log: Log = {
+    const log = {
       description: LogDescriptionValues.createLogDescription(
         ActivityName.UPDATE_USER,
         user.userID,
         user.userName
       ),
       activityName: ActivityName.UPDATE_USER,
-      userId: this.userService.getCurrentUserID(),
-      logId: 0,
-      firstName: '',
-      lastName: '',
-      dateTime: new NiceDate(0, 0, 0, 0, 0),
+      userID: this.userService.getCurrentUserID(),
     };
 
     this.createUserLog(log).subscribe(
@@ -179,18 +164,14 @@ export class LogDataService {
   }
 
   addDeleteUserLog(user: User) {
-    const log: Log = {
+    const log = {
       description: LogDescriptionValues.createLogDescription(
         ActivityName.DELETE_USER,
         user.userID,
         user.userName
       ),
       activityName: ActivityName.DELETE_USER,
-      userId: this.userService.getCurrentUserID(),
-      logId: 0,
-      firstName: '',
-      lastName: '',
-      dateTime: new NiceDate(0, 0, 0, 0, 0),
+      userID: this.userService.getCurrentUserID(),
     };
 
     this.createUserLog(log).subscribe(
@@ -274,17 +255,13 @@ export class LogDataService {
   }
 
   addErrorUserLog(errorMessage: string) {
-    const log: Log = {
+    const log = {
       description: LogDescriptionValues.createLogDescription(
         ActivityName.DELETE_USER,
         errorMessage
       ),
       activityName: ActivityName.DELETE_USER,
-      userId: this.userService.getCurrentUserID(),
-      logId: 0,
-      firstName: '',
-      lastName: '',
-      dateTime: new NiceDate(0, 0, 0, 0, 0),
+      userID: this.userService.getCurrentUserID(),
     };
 
     this.createUserLog(log).subscribe(
