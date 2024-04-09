@@ -161,14 +161,14 @@ export class UserProfilComponent {
   }
 
   updateUserAndNavigate(user: User) {
-    if(user.userID === this.userService.currentUser.userID){
-      this.userService.currentUser = user
-      this.userService.currentUsername.next(user.userName)
+    if (user.userID === this.userService.currentUser.userID) {
+      this.userService.currentUser = user;
+      this.userService.currentUsername.next(user.userName);
     }
     this.userDataService.updateUser(user).subscribe(
       () => {
         this.logDataService.addUpdateUserLog(user);
-        
+
         this.router.navigate(['/userManagment']);
       },
       (error) => {
@@ -180,16 +180,8 @@ export class UserProfilComponent {
   createNewUser(user: User) {
     this.userDataService.createUser(user).subscribe(
       (response: any) => {
-        this.logDataService
-          .addCreateUserLog(response.userID, user.userName)
-          .subscribe(
-            () => {
-              this.router.navigate(['/userManagment']);
-            },
-            (logError) => {
-              console.error('Error creating log entry:', logError);
-            }
-          );
+        this.logDataService.addCreateUserLog(response.userID, user.userName);
+        this.router.navigate(['/userManagment']);
       },
       (error) => {
         console.error('Error creating user profile:', error);

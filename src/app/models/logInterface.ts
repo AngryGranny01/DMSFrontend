@@ -2,19 +2,19 @@ import { NiceDate } from "./niceDateInterface";
 import { ActivityName } from "./activityName";
 
 export interface Log {
-  logId: number,
-  userId: number,
+  logID: number,
+  userID: number,
   firstName: string,
   lastName: string,
   activityName: ActivityName,
   description: string,
-  dateTime: NiceDate
+  dateTime: Date
 };
 
 export const logDescriptionValues = {
   userID: 0,
   username: "",
-  timeStamp: new NiceDate(0, 0, 0, 0, 0),
+  timeStamp: new Date(),
   projectName: "",
   projectID: 0,
   viewedUserID: 0,

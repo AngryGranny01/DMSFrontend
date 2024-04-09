@@ -52,21 +52,23 @@ export class UserManagmentPageComponent implements OnInit {
 
   loadAllUsers() {
     this.users$ = this.userDataService.getAllUsers();
-    this.lastLogin$ = this.userDataService.getLastLogins();
+    this.lastLogin$ = this.userDataService.getLastLogins(
+      this.userService.currentUser.userID,
+      this.userService.currentUser.privateKey
+    );
   }
 
-  createDateString(lastLogin: Date | undefined): string {
-    if (!lastLogin) return ''; // If lastLogin is undefined, return an empty string
+  createDateString(lastLogin: Date | undefined): Observable<string> {
+    if (!lastLogin) return of(''); // Return an empty string Observable
     const date = this.niceDate.formatDate(lastLogin);
-    return `${date}`;
+    return of(`${date}`);
   }
 
-  createTimeString(lastLogin: Date | undefined): string {
-    if (!lastLogin) return ''; // If lastLogin is undefined, return an empty string
+  createTimeString(lastLogin: Date | undefined): Observable<string> {
+    if (!lastLogin) return of(''); // Return an empty string Observable
     const time = this.niceDate.formatTime(lastLogin);
-    return `${time} Uhr`;
+    return of(`${time} Uhr`);
   }
-
 
   isActivated(user: User): boolean {
     return user.publicKey !== STANDARD_PUBLIC_KEY;

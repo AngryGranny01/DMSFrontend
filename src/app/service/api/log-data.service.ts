@@ -28,16 +28,17 @@ export class LogDataService {
   ) {}
 
   //-------------------------------------------- Get-Requests --------------------------------------------------------------//
-  getUserLogs(userID: number): Observable<Log[]> {
+  getUserLogs(userID: number, privateKey: string): Observable<Log[]> {
     return this.http
-      .get<any[]>(`${this.apiConfig.baseURL}/logs/user?userID=${userID}`)
+      .get<any[]>(`${this.apiConfig.baseURL}/user-logs/${userID}`)
       .pipe(
         map((response: any[]) =>
-          response.map((userLog) => this.extractLog(userLog))
+          response.map((userLog) => this.decryptAndExtractLogs(userLog, privateKey))
         )
       );
   }
 
+  //TODO: ADD Private Key
   getProjectLogs(projectID: number): Observable<Log[]> {
     return this.http
       .get<any[]>(
@@ -45,7 +46,7 @@ export class LogDataService {
       )
       .pipe(
         map((response: any[]) =>
-          response.map((projectLog) => this.extractLog(projectLog))
+          response.map((projectLog) => this.decryptAndExtractLogs(projectLog,""))
         )
       );
   }
@@ -57,7 +58,6 @@ export class LogDataService {
       activityName: this.encryptionService.encryptRSA(log.activityName,STANDARD_PUBLIC_KEY),
       activityDescription: this.encryptionService.encryptRSA(log.description,STANDARD_PUBLIC_KEY),
     };
-    console.log(data.activityDescription)
     return this.http.post(`${this.apiConfig.baseURL}/user-logs`, data);
   }
 
@@ -68,7 +68,7 @@ export class LogDataService {
   ): Observable<any> {
     const data = {
       projectID: projectID,
-      userID: log.userId,
+      userID: log.userID,
       activityName: log.activityName,
       activityDescription: log.description,
     };
@@ -77,24 +77,18 @@ export class LogDataService {
     return this.http.post(`${this.apiConfig.baseURL}/project-logs`, data);
   }
 
-  private extractLog(logData: any): Log {
-    const timeStamp = new NiceDate(
-      logData.timeStamp.year,
-      logData.timeStamp.month,
-      logData.timeStamp.day,
-      logData.timeStamp.hour,
-      logData.timeStamp.minute
-    );
+  private decryptAndExtractLogs(logData: any, privateKey: string): Log {
+    const timeStamp = new Date(this.encryptionService.decryptRSA(logData.timeStamp, privateKey))
 
     return {
-      logId: logData.logID,
-      userId: logData.userID,
-      firstName: logData.firstName,
-      lastName: logData.lastName,
+      logID: parseInt(this.encryptionService.decryptRSA(logData.logID, privateKey)),
+      userID: parseInt(this.encryptionService.decryptRSA(logData.userID, privateKey)),
+      firstName: this.encryptionService.decryptRSA(logData.firstName, privateKey),
+      lastName: this.encryptionService.decryptRSA(logData.lastName, privateKey),
       activityName: this.logService.matchActivityNameWithString(
-        logData.activityName
+        this.encryptionService.decryptRSA(logData.activityName, privateKey)
       ),
-      description: logData.activityDescription,
+      description: this.encryptionService.decryptRSA(logData.activityDescription, privateKey),
       dateTime: timeStamp,
     };
   }
@@ -143,7 +137,10 @@ export class LogDataService {
       activityName: ActivityName.CREATE_USER,
       userID: userID,
     };
-    return this.createUserLog(log)
+    this.createUserLog(log).subscribe(
+      () => console.log('User created logged successfully'),
+      (error) => console.error('Error logging user created:', error)
+    );
   }
 
   addUpdateUserLog(user: User) {
@@ -190,11 +187,11 @@ export class LogDataService {
         projectID
       ),
       activityName: ActivityName.CREATE_PROJECT,
-      userId: this.userService.getCurrentUserID(),
-      logId: 0,
+      userID: this.userService.getCurrentUserID(),
+      logID: 0,
       firstName: '',
       lastName: '',
-      dateTime: new NiceDate(0, 0, 0, 0, 0),
+      dateTime: new Date(),
     };
 
     return this.createProjectLog(
@@ -212,11 +209,11 @@ export class LogDataService {
         projectName
       ),
       activityName: ActivityName.UPDATE_PROJECT,
-      userId: this.userService.getCurrentUserID(),
-      logId: 0,
+      userID: this.userService.getCurrentUserID(),
+      logID: 0,
       firstName: '',
       lastName: '',
-      dateTime: new NiceDate(0, 0, 0, 0, 0),
+      dateTime: new Date(),
     };
 
     this.createProjectLog(
@@ -237,11 +234,11 @@ export class LogDataService {
         project.name
       ),
       activityName: ActivityName.DELETE_PROJECT,
-      userId: this.userService.getCurrentUserID(),
-      logId: 0,
+      userID: this.userService.getCurrentUserID(),
+      logID: 0,
       firstName: '',
       lastName: '',
-      dateTime: new NiceDate(0, 0, 0, 0, 0),
+      dateTime: new Date(),
     };
 
     this.createProjectLog(
@@ -277,11 +274,11 @@ export class LogDataService {
         errorMessage
       ),
       activityName: ActivityName.ERROR,
-      userId: this.userService.getCurrentUserID(),
-      logId: 0,
+      userID: this.userService.getCurrentUserID(),
+      logID: 0,
       firstName: '',
       lastName: '',
-      dateTime: new NiceDate(0, 0, 0, 0, 0),
+      dateTime: new Date(),
     };
 
     this.createProjectLog(

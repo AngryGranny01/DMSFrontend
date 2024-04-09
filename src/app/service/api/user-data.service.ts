@@ -110,14 +110,16 @@ export class UserDataService {
   }
 
   //return a Observable map with key userID and value Date
-  getLastLogins(): Observable<{ [userID: string]: Date }> {
+  getLastLogins(senderID: number, privateKey: string): Observable<{ [userID: string]: Date }> {
     return this.http
-      .get<any[]>(`${this.apiConfig.baseURL}/user-logs/lastLogins`)
+      .get<any[]>(`${this.apiConfig.baseURL}/user-logs/lastLogins/${senderID}`)
       .pipe(
         map((response: any[]) => {
           const lastLogins: { [userID: string]: Date } = {};
           response.forEach((entry) => {
-            lastLogins[entry.userID] = new Date(entry.date);
+            let decryptedDate = new Date(this.encryptionService.decryptRSA(entry.date,privateKey))
+            let decryptedUserID = this.encryptionService.decryptRSA(entry.userID,privateKey)
+            lastLogins[decryptedUserID] = decryptedDate;
           });
           return lastLogins;
         })

@@ -35,10 +35,9 @@
             <tbody>
               <tr *ngFor="let log of filteredLogs$ | async">
                 <th scope="row">
-                  {{ log.dateTime.formatDate() }} <br />{{
-                    log.dateTime.formatTime()
+                  {{ createDateString(log.dateTime) }} <br />{{
+                    createTimeString(log.dateTime)
                   }}
-                  Uhr
                 </th>
                 <td>{{ log.firstName }} {{ log.lastName }}</td>
                 <td>{{ log.activityName }}</td>
