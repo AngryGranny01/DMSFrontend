@@ -13,6 +13,7 @@ export class NiceDateService {
     }
 
     // Extract day, month, and year from the Date object
+   
     const day = date.getDate();
     const month = date.getMonth() + 1; // Month is zero-based, so add 1
     const year = date.getFullYear();

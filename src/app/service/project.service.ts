@@ -13,6 +13,7 @@ export class ProjectService {
   public showAllProjects: boolean = false;
 
   setSelectedProject(project: Project) {
+    console.log("Selected Projects: ", project)
     this.selectedProject = project;
   }
 

@@ -11,7 +11,7 @@ import { DashboardComponent } from '../dashboard/dashboard.component';
 import { ProjectService } from '../service/project.service';
 import { UserDataService } from '../service/api/user-data.service';
 import { Role } from '../models/role';
-import { NiceDate } from '../models/niceDateInterface';
+
 import { UserService } from '../service/user.service';
 import { ProjectManagerDataService } from '../service/api/project-manager-data.service';
 import { Router } from '@angular/router';
@@ -38,12 +38,11 @@ export class CreateProjectComponent {
 
   myDate!: Date; // Property to bind the selected date
   minDate: Date = new Date(); // Property to set the minimum selectable date (today)
-  // Set the maximum selectable date to today's date plus 5 years
   maxDate!: Date;
 
   isEditMode: boolean = false;
   users$: Observable<User[]> = of([]);
-  selectedUsers: User[] = []; // Array to store selected users
+  checkedUsers: User[] = []; // Array to store selected users
   selectedManager: { fullName: string; userID: number } = {
     fullName: '',
     userID: 0,
@@ -81,19 +80,20 @@ export class CreateProjectComponent {
   setInputFieldsForEditProject() {
     // Set Project Name Field
     this.projectName = this.project.name;
-
     // Set Project Manager Field
     this.selectedManager.fullName =
       this.userService.concatenateFirstnameLastname(
         this.project.manager.firstName,
         this.project.manager.lastName
-      );
+      ) +
+      ' (' +
+      this.project.manager.orgEinheit +
+      ')';
 
     this.selectedManager.userID = this.project.manager.userID;
     this.myControl = new FormControl(this.selectedManager.fullName);
 
-    let date = this.project.endDate;
-    this.myDate = new Date(date.year, date.month - 1, date.day);
+    this.myDate = new Date(this.project.endDate);
 
     this.maxDate = new Date(
       this.myDate.getFullYear() + 5,
@@ -102,6 +102,8 @@ export class CreateProjectComponent {
     );
     //set Project Description Field
     this.projectDescription = this.project.description;
+    this.checkedUsers = this.project.users;
+    console.log('Project: ', this.project.users);
   }
 
   setInputFieldsForNewProject() {
@@ -123,7 +125,7 @@ export class CreateProjectComponent {
           (user) => user.role === Role.ADMIN || user.role === Role.MANAGER
         )
         .map((user) => ({
-          fullName: `${user.firstName} ${user.lastName}`,
+          fullName: `${user.firstName} ${user.lastName} (${user.orgEinheit})`,
           userID: user.userID,
         }));
       this.filteredOptions = [...this.options];
@@ -148,12 +150,8 @@ export class CreateProjectComponent {
 
   //TODO:generate Project Key
   saveProject() {
-    // Get the value of the selected option from the FormControl
-    const selectedOption = this.myControl.value;
-    // Find the selected option in the options array
-    const selectedUser = this.options.find(
-      (option) => option.fullName === selectedOption
-    );
+    const selectedUser = this.findSelectedUser();
+    this.addProjectManagerToUsers();
     // If the selected user is not found, display an alert and return
     if (!selectedUser) {
       alert('No Project Manager Selected');
@@ -161,6 +159,7 @@ export class CreateProjectComponent {
     }
     const userID = selectedUser.userID;
 
+    //TODO: Generate Project Key
     // Fetch the managerID and Password and Admin password corresponding to the userID
     this.projectManagerDataService.getManagerAndAdminPassword(userID).subscribe(
       (response: any) => {
@@ -169,23 +168,18 @@ export class CreateProjectComponent {
           response.managerPasswordHash
         );
 
-        const projectEndDate = {
-          year: this.myDate.getFullYear(),
-          month: this.myDate.getMonth() + 1,
-          day: this.myDate.getDay(),
-        };
         const projectData = {
           projectID: 0,
           projectName: this.projectName,
           projectDescription: this.projectDescription,
           projectKey: projectKey,
-          projectEndDate: projectEndDate,
+          projectEndDate: this.myDate,
           managerID: response.managerID,
-          userIDsAndPasswordHash: this.selectedUsers.map((user) => ({
+          userIDs: this.checkedUsers.map((user) => ({
             userID: user.userID,
-            passwordHash: user.privateKey,
           })), // Get only the IDs of selected users
         };
+        console.log('Checked Users: ', this.checkedUsers);
         if (this.isEditMode === true) {
           projectData.projectID = this.project.projectID;
           this.updateProject(projectData);
@@ -200,6 +194,16 @@ export class CreateProjectComponent {
     );
   }
 
+  findSelectedUser(): any {
+    // Get the value of the selected option from the FormControl
+    const selectedOption = this.myControl.value;
+    // Find the selected option in the options array
+    const selectedUser = this.options.find(
+      (option) => option.fullName === selectedOption
+    );
+    return selectedUser;
+  }
+
   createNewProject(data: any) {
     let project = {
       projectName: data.projectName,
@@ -209,29 +213,27 @@ export class CreateProjectComponent {
       managerID: data.managerID,
     };
     // Call the createProject method and wait for its completion
-    this.projectDataService
-      .createProject(project, data.userIDsAndPasswordHash)
-      .subscribe(
-        (response: any) => {
-          // Log Entry
-          this.logDataService
-            .addCreateProjectLog(response.projectID, project.projectName)
-            .subscribe(
-              () => {
-                // After project creation is successful, navigate to the dashboard
-                this.router.navigate(['/dashboard']);
-              },
-              (logError) => {
-                // Handle error creating log entry
-                console.error('Error creating log entry:', logError);
-              }
-            );
-        },
-        (error) => {
-          // Handle error if project creation fails
-          console.error('Error creating project:', error);
-        }
-      );
+    this.projectDataService.createProject(project, data.userIDs).subscribe(
+      (response: any) => {
+        // Log Entry
+        this.logDataService
+          .addCreateProjectLog(response.projectID, project.projectName)
+          .subscribe(
+            () => {
+              // After project creation is successful, navigate to the dashboard
+              this.router.navigate(['/dashboard']);
+            },
+            (logError) => {
+              // Handle error creating log entry
+              console.error('Error creating log entry:', logError);
+            }
+          );
+      },
+      (error) => {
+        // Handle error if project creation fails
+        console.error('Error creating project:', error);
+      }
+    );
   }
   updateProject(data: any) {
     let project = {
@@ -243,24 +245,22 @@ export class CreateProjectComponent {
       managerID: data.managerID,
     };
     // Call the createProject method and wait for its completion
-    this.projectDataService
-      .updateProject(project, data.userIDsAndPasswordHash)
-      .subscribe(
-        () => {
-          // Log Entry
-          this.logDataService.addUpdateProjectLog(
-            project.projectID,
-            project.projectName
-          );
+    this.projectDataService.updateProject(project, data.userIDs).subscribe(
+      () => {
+        // Log Entry
+        this.logDataService.addUpdateProjectLog(
+          project.projectID,
+          project.projectName
+        );
 
-          // After project creation is successful, navigate to the dashboard
-          this.router.navigate(['/dashboard']);
-        },
-        (error) => {
-          // Handle error if project creation fails
-          console.error('Error creating project:', error);
-        }
-      );
+        // After project creation is successful, navigate to the dashboard
+        this.router.navigate(['/dashboard']);
+      },
+      (error) => {
+        // Handle error if project update fails
+        console.error('Error updating project:', error);
+      }
+    );
     this.router.navigate(['/dashboard']);
   }
 
@@ -270,11 +270,25 @@ export class CreateProjectComponent {
   }
 
   toggleUserSelection(user: User) {
-    const index = this.selectedUsers.findIndex((u) => u.userID === user.userID);
-    if (index === -1) {
-      this.selectedUsers.push(user); // Add user to selected users array if not already selected
+    const index = this.checkedUsers.findIndex(
+      (checkedUser) => checkedUser.userID === user.userID
+    );
+
+    if (index !== -1) {
+      // User is already selected, so remove it
+      this.checkedUsers.splice(index, 1);
     } else {
-      this.selectedUsers.splice(index, 1); // Remove user if already selected
+      // User is not selected, so add it
+      this.checkedUsers.push(user);
+    }
+  }
+
+  addProjectManagerToUsers(){
+    let selectedManager = this.findSelectedUser();
+    const managerAlreadySelected = this.checkedUsers.find(user => user.userID === selectedManager.userID);
+
+    if (!managerAlreadySelected) {
+      this.checkedUsers.push(selectedManager);
     }
   }
 }

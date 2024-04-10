@@ -1,4 +1,4 @@
-import { NiceDate } from "./niceDateInterface";
+
 import { ActivityName } from "./activityName";
 
 export interface Log {

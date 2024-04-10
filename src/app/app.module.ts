@@ -44,13 +44,13 @@ import { EmailPageComponent } from './email-page/email-page.component';
     BrowserModule,
     MatIconModule,
     AppRoutingModule,
-    FormsModule, // FormsModule imported once
-    ReactiveFormsModule, // ReactiveFormsModule imported once
+    FormsModule,
+    ReactiveFormsModule,
     BsDatepickerModule.forRoot(),
-    HttpClientModule, // HttpClientModule imported once
+    HttpClientModule,
     MatDatepickerModule,
     MatInputModule,
-    MatNativeDateModule, // MatNativeDateModule imported once
+    MatNativeDateModule, 
     MatAutocompleteModule,
     MatFormFieldModule,
     MatMenuModule,

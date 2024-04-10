@@ -3,7 +3,6 @@ import { User } from '../models/userInterface';
 import { Role } from '../models/role';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, map, of } from 'rxjs';
-import { NiceDate } from '../models/niceDateInterface';
 import { Log } from '../models/logInterface';
 
 @Injectable({

@@ -5,7 +5,6 @@ import { User } from '../models/userInterface';
 import { Log } from '../models/logInterface';
 import { ActivityName } from '../models/activityName';
 import { LogDescriptionValues } from '../models/logDescriptionValues';
-import { NiceDate } from '../models/niceDateInterface';
 import { UserService } from '../service/user.service';
 import { UserDataService } from '../service/api/user-data.service';
 import { ProjectManagerDataService } from '../service/api/project-manager-data.service';

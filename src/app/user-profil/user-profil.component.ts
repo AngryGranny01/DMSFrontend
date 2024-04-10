@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { UserService } from '../service/user.service';
 import { User } from '../models/userInterface';
 import { Role } from '../models/role';
-import { NiceDate } from '../models/niceDateInterface';
 import { UserDataService } from '../service/api/user-data.service';
 import { ProjectManagerDataService } from '../service/api/project-manager-data.service';
 import { LogDataService } from '../service/api/log-data.service';

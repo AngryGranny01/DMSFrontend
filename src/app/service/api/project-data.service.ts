@@ -32,7 +32,7 @@ export class ProjectDataService {
   //All Projects by userID
   getProjectFromUser(userID: number): Observable<Project[]> {
     return this.http
-      .get<any[]>(`${this.apiConfig.baseURL}/projects/user?userID=${userID}`)
+      .get<any[]>(`${this.apiConfig.baseURL}/projects/${userID}`)
       .pipe(
         map((response: any[]) =>
           response.map((project) => this.extractProject(project))
@@ -40,16 +40,6 @@ export class ProjectDataService {
       );
   }
 
-  //specific Project by projectID
-  getProject(projectID: number): Observable<Project> {
-    return this.http
-      .get(`${this.apiConfig.baseURL}/projects/${projectID}`)
-      .pipe(
-        map((response: any) => {
-          return this.extractProject(response);
-        })
-      );
-  }
 
   //-------------------------------------------- Post-Requests --------------------------------------------------------------//
   createProject(
@@ -57,18 +47,18 @@ export class ProjectDataService {
     userIDs: any[]
   ): Observable<any> {
     // Encrypt sensitive project data before sending it to the server
-    const encryptedProject = this.encryptionService.encryptProjectData(
+/*     const encryptedProject = this.encryptionService.encryptProjectData(
       project,
       userIDs,
       project.projectKey
-    );
+    ); */
     const unencryptedProject = {
       projectName: project.projectName,
       projectDescription: project.projectDescription,
       projectKey: project.projectKey,
       projectEndDate: project.projectEndDate,
       managerID: project.managerID,
-      userIDs: this.encryptionService.encryptUserIDs(userIDs, project.projectKey), // Call the method to encrypt user IDs
+      userIDs: userIDs,
     };
     // Send the encrypted project data and user IDs to the server
     return this.http.post(
@@ -86,7 +76,7 @@ export class ProjectDataService {
       projectDescription: project.projectDescription,
       projectKey: project.projectKey,
       projectEndDate: project.projectEndDate,
-      userIDs: this.encryptionService.encryptUserIDs(userIDs, project.projectKey),
+      userIDs: userIDs,
     };
     return this.http.put(`${this.apiConfig.baseURL}/projects`, updateProject);
   }
@@ -98,7 +88,8 @@ export class ProjectDataService {
     );
   }
 
-  extractProject(project: any) {
+  extractProject(project: any): Project {
+
     const users: User[] = [];
     const projectManager = project.manager[0];
     const manager = new User(
@@ -110,7 +101,7 @@ export class ProjectDataService {
       Role.MANAGER,
       '',
       projectManager.orgEinheit,
-      projectManager.publicKey
+      ''
     );
 
     for (const user of project.users) {
@@ -130,20 +121,11 @@ export class ProjectDataService {
           '',
           role,
           '',
-          user.orgEinheit,
-          user.publicKey
+          '',
+          ''
         )
       );
     }
-
-    const endDate = new NiceDate(
-      project.endDate.year,
-      project.endDate.month,
-      project.endDate.day,
-      project.endDate.hour,
-      project.endDate.minutes
-    );
-
     return new Project(
       project.projectID,
       project.projectName,
@@ -152,7 +134,7 @@ export class ProjectDataService {
       users,
       project.description,
       project.key,
-      endDate
+      new Date(project.endDate)
     );
   }
 }

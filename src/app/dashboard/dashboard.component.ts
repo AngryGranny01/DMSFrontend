@@ -9,6 +9,8 @@ import { ProjectDataService } from '../service/api/project-data.service';
 import { Project } from '../models/projectInterface';
 import { ProjectService } from '../service/project.service';
 
+import { NiceDateService } from '../service/nice-date.service';
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -27,7 +29,8 @@ export class DashboardComponent {
     private projectService: ProjectService,
     private managerDataService: ProjectManagerDataService,
     private logDataService: LogDataService,
-    private projectDataService: ProjectDataService
+    private projectDataService: ProjectDataService,
+    private niceDate: NiceDateService
   ) {
     this.showProjects = projectService.showAllProjects;
   }
@@ -102,5 +105,9 @@ export class DashboardComponent {
   openProjectLogs(project: Project) {
     this.logService.setIsProjectLog(true);
     this.projectService.setSelectedProject(project);
+  }
+
+  formateDate(date: Date): string {
+    return this.niceDate.formatDate(date)
   }
 }
