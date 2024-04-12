@@ -2,9 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { Role } from '../models/role';
 import { User } from '../models/userInterface';
-import { Log } from '../models/logInterface';
-import { ActivityName } from '../models/activityName';
-import { LogDescriptionValues } from '../models/logDescriptionValues';
 import { UserService } from '../service/user.service';
 import { UserDataService } from '../service/api/user-data.service';
 import { ProjectManagerDataService } from '../service/api/project-manager-data.service';
@@ -35,45 +32,53 @@ export class UserManagmentPageComponent implements OnInit {
     this.loadAllUsers();
   }
 
-  openUserLogs(user: User) {
+  // Opens user logs for viewing
+  openUserLogs(user: User): void {
     this.logService.setIsProjectLog(false);
     this.userService.setSelectedUser(user);
   }
 
-  setEditModeToNewUser() {
+  // Sets edit mode to create a new user
+  setEditModeToNewUser(): void {
     this.userService.isEditMode = false;
   }
 
-  editUser(user: User) {
+  // Sets edit mode to edit an existing user
+  editUser(user: User): void {
     this.userService.isEditMode = true;
     this.userService.setSelectedUser(user);
   }
 
-  loadAllUsers() {
+  // Loads all users from the server
+  loadAllUsers(): void {
     this.users$ = this.userDataService.getAllUsers();
     this.lastLogin$ = this.userDataService.getLastLogins(
-      this.userService.currentUser.userID,
-      this.userService.currentUser.privateKey
+      this.userService.getCurrentUser().userID,
+      this.userService.getCurrentUser().privateKey
     );
   }
 
+  // Creates a formatted date string from the last login date
   createDateString(lastLogin: Date | undefined): Observable<string> {
-    if (!lastLogin) return of(''); // Return an empty string Observable
+    if (!lastLogin) return of('');
     const date = this.niceDate.formatDate(lastLogin);
     return of(`${date}`);
   }
 
+  // Creates a formatted time string from the last login time
   createTimeString(lastLogin: Date | undefined): Observable<string> {
-    if (!lastLogin) return of(''); // Return an empty string Observable
+    if (!lastLogin) return of('');
     const time = this.niceDate.formatTime(lastLogin);
     return of(`${time} Uhr`);
   }
 
+  // Checks if a user is activated based on their public key
   isActivated(user: User): boolean {
     return user.publicKey !== STANDARD_PUBLIC_KEY;
   }
 
-  deleteUser(user: User) {
+  // Deletes a user from the system
+  deleteUser(user: User): void {
     if (user.role === Role.MANAGER) {
       const confirmDelete = confirm(
         'Wenn Sie diesen Benutzer löschen, werden Sie zum Projektmanager für offene Projekte. Möchten Sie fortfahren?'
@@ -104,7 +109,7 @@ export class UserManagmentPageComponent implements OnInit {
     } else {
       this.userDataService.deleteUser(user.userID).subscribe(
         () => {
-          //Log Entry
+          // Log entry
           this.logDataService.addDeleteUserLog(user);
 
           this.refreshUsers();
@@ -114,7 +119,8 @@ export class UserManagmentPageComponent implements OnInit {
     }
   }
 
-  refreshUsers() {
+  // Refreshes the list of users
+  refreshUsers(): void {
     this.loadAllUsers();
   }
 }

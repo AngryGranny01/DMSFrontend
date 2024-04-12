@@ -1,42 +1,43 @@
 import { Injectable } from '@angular/core';
 import { ActivityName } from '../models/activityName';
-import { User } from '../models/userInterface';
-import { Log } from '../models/logInterface';
-import { UserService } from './user.service';
-import { UserDataService } from './api/user-data.service';
-import { ProjectManagerDataService } from './api/project-manager-data.service';
-import { LogDataService } from './api/log-data.service';
-import { LogDescriptionValues } from '../models/logDescriptionValues';
-import { NiceDate } from '../models/niceDateInterface';
-import { Project } from '../models/projectInterface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class LogService {
-  isProjectLog: boolean = true;
+  // Indicates whether the log service is for project-related logs
+  private isProjectLog: boolean = true;
 
   constructor() {}
 
+  /**
+   * Matches an activity string with an ActivityName enum value.
+   * @param activity The activity string to match.
+   * @returns The corresponding ActivityName enum value if found, otherwise returns UNKNOWN.
+   */
   matchActivityNameWithString(activity: string): ActivityName {
-    // Convert the string to uppercase for case-insensitive comparison
     const activityUpper = activity.toUpperCase();
 
-    // Check if the activity string exists in the ActivityName enum
     if (Object.values(ActivityName).includes(activityUpper as ActivityName)) {
       return activityUpper as ActivityName;
     }
 
-    // If no match found, return "UNKNOWN"
     return ActivityName.UNKNOWN;
   }
 
-  getIsProjectLog() {
+  /**
+   * Gets the value indicating whether the log service is for project-related logs.
+   * @returns True if the log service is for project-related logs, otherwise false.
+   */
+  getIsProjectLog(): boolean {
     return this.isProjectLog;
   }
 
-  setIsProjectLog(isProjectLog: boolean) {
+  /**
+   * Sets the value indicating whether the log service is for project-related logs.
+   * @param isProjectLog True to indicate that the log service is for project-related logs, otherwise false.
+   */
+  setIsProjectLog(isProjectLog: boolean): void {
     this.isProjectLog = isProjectLog;
   }
-
 }

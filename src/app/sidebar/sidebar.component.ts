@@ -11,8 +11,7 @@ import { UserService } from '../service/user.service';
 export class SidebarComponent {
   constructor(
     private authService: AuthService,
-    private userService: UserService,
-    private readonly router: Router
+    private userService: UserService
   ) {}
 
   isLoggedIn(): boolean {

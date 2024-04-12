@@ -1,4 +1,3 @@
-/* Styles for folder box */
 .folder-box {
   margin-top: 60px;
   border: 1px solid #ccc;
@@ -7,7 +6,6 @@
   font-size: 36px;
 }
 
-/* Styles for table */
 .table-responsive {
   max-height: 600px;
   min-width: min-content;
@@ -32,10 +30,10 @@
 .table thead {
   position: sticky;
   top: 0;
-  z-index: 1000; /* Ensure the header stays above other content */
+  z-index: 1000;
 }
 
-.table tbody{
+.table tbody {
   background-color: gray;
 }
 
@@ -44,8 +42,7 @@
   font-size: 24px;
 }
 
-/* Styles for buttons */
-.table-title .btn{
+.table-title .btn {
   color: #566787;
   float: right;
   font-size: 13px;
@@ -62,7 +59,6 @@
   margin-top: 5px;
 }
 
-/* Styles for table rows and cells */
 table.table tr th,
 table.table tr td {
   border-color: #e9e9e9;
@@ -78,7 +74,6 @@ table.table tr th:last-child {
   width: 100px;
 }
 
-/* Styles for icons in table */
 table.table th i {
   font-size: 30px;
   margin: 0 5px;
@@ -91,7 +86,6 @@ table.table td:last-child i {
   margin: 0 5px;
 }
 
-/* Styles for links in table cells */
 table.table td a {
   font-weight: bold;
   color: #566787;
@@ -103,12 +97,10 @@ table.table td a i:hover {
   color: #2196f3;
 }
 
-/* Styles for delete link */
 table.table td a.delete {
   color: #f44336;
 }
 
-/* Styles for settings link */
 table.table td a.settings {
   color: #313437;
 }

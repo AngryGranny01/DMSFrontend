@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UserService } from '../service/user.service';
 import { User } from '../models/userInterface';
 import { Role } from '../models/role';
@@ -12,15 +12,13 @@ import { Router } from '@angular/router';
   templateUrl: './user-profil.component.html',
   styleUrls: ['./user-profil.component.css'],
 })
-
-//TODO: Last Login anschauen
-export class UserProfilComponent {
+export class UserProfilComponent implements OnInit {
   selectedRole: Role = Role.USER;
   user!: User;
-
   email: string = '';
-  password: string = ''; // Property to store the password
-  repeatPassword: string = ''; // Property to store the repeat password
+  password: string = '';
+  repeatPassword: string = '';
+  isEditMode: boolean = false;
 
   constructor(
     private userService: UserService,
@@ -30,9 +28,13 @@ export class UserProfilComponent {
     private router: Router
   ) {}
 
-  isEditMode: boolean = false;
+  ngOnInit(): void {
+    // Initialize user profile based on edit mode
+    this.initializeUser();
+  }
 
-  ngOnInit() {
+  initializeUser(): void {
+    // Check if in edit mode or new user mode, and set initial values accordingly
     if (this.userService.isEditMode) {
       this.isEditMode = true;
       this.user = this.userService.getSelectedUser();
@@ -41,20 +43,34 @@ export class UserProfilComponent {
       this.selectedRole = this.user.role;
     } else {
       this.isEditMode = false;
-      this.user = new User(0, '', '', '', '', Role.USER, '', '', '');
+      this.user = {
+        userID: 0,
+        userName: '',
+        firstName: '',
+        lastName: '',
+        privateKey: '',
+        email: '',
+        role: Role.USER,
+        orgEinheit: '',
+        publicKey: '',
+      };
     }
   }
 
   isAdmin(): boolean {
+    // Check if the current user is an admin
     return this.userService.isAdmin();
   }
 
   selectedUserIsAdmin(): boolean {
+    // Check if the selected user is an admin
     return this.userService.selectedUserIsAdmin();
   }
 
-  saveProfile() {
-    if (this.isEditMode === true) {
+  saveProfile(): void {
+    // Save the user profile based on edit mode
+    if (this.isEditMode) {
+      // Validation for password strength and match
       if (!this.userService.isPasswordStrong(this.password)) {
         alert(
           'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one number'
@@ -67,12 +83,17 @@ export class UserProfilComponent {
         return;
       }
     }
+
+    // Validate email format
     if (!this.userService.checkIfEmailIsValidEmail(this.email)) {
-      alert('Email isnt a valid email');
+      alert('Email is not a valid email');
       return;
     }
+
+    // Update user profile and navigate
     this.user.email = this.email;
     this.user.privateKey = this.password;
+
     const updatedUser: User = {
       ...this.user,
       role: this.selectedRole,
@@ -117,17 +138,20 @@ export class UserProfilComponent {
     );
   }
 
-  updateSelectedUser(user: User) {
+  updateSelectedUser(user: User): void {
+    // Update selected user and navigate
     if (
       user.role === Role.USER &&
       Role.USER !== this.userService.getSelectedUser().role
     ) {
+      // Reset user to USER role confirmation
       const confirmResetToUser = confirm(
         'Wenn Sie den Benutzer auf "User" zurücksetzen, werden Sie zum Projektmanager für die offenen Projekte. Möchten Sie fortfahren?'
       );
       if (!confirmResetToUser) {
         return;
       }
+
       this.managerDataService.getManagerID(user.userID).subscribe(
         (managerID) => {
           this.managerDataService
@@ -159,7 +183,8 @@ export class UserProfilComponent {
     }
   }
 
-  updateUserAndNavigate(user: User) {
+  updateUserAndNavigate(user: User): void {
+    // Update user profile and navigate to user management page
     if (user.userID === this.userService.currentUser.userID) {
       this.userService.currentUser = user;
       this.userService.currentUsername.next(user.userName);
@@ -167,7 +192,6 @@ export class UserProfilComponent {
     this.userDataService.updateUser(user).subscribe(
       () => {
         this.logDataService.addUpdateUserLog(user);
-
         this.router.navigate(['/userManagment']);
       },
       (error) => {
@@ -176,7 +200,8 @@ export class UserProfilComponent {
     );
   }
 
-  createNewUser(user: User) {
+  createNewUser(user: User): void {
+    // Create new user and navigate to user management page
     this.userDataService.createUser(user).subscribe(
       (response: any) => {
         this.logDataService.addCreateUserLog(response.userID, user.userName);

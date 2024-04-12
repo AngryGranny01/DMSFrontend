@@ -1,16 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
+
 import { User } from '../../models/userInterface';
 import { Project } from '../../models/projectInterface';
-import { Observable, map } from 'rxjs';
 import { Log } from '../../models/logInterface';
-import { ApiConfigService } from './api-config.service';
 import { ActivityName } from '../../models/activityName';
-import { NiceDate } from '../../models/niceDateInterface';
-import { LogService } from '../log.service';
 import { LogDescriptionValues } from '../../models/logDescriptionValues';
-import { ProjectManagerDataService } from './project-manager-data.service';
-import { UserDataService } from './user-data.service';
+
+import { ApiConfigService } from './api-config.service';
+import { LogService } from '../log.service';
 import { UserService } from '../user.service';
 import { EncryptionService } from '../encryption.service';
 import { STANDARD_PUBLIC_KEY } from '../../constants/env';
@@ -27,7 +26,12 @@ export class LogDataService {
     private encryptionService: EncryptionService
   ) {}
 
-  //-------------------------------------------- Get-Requests --------------------------------------------------------------//
+  /**
+   * Retrieves user logs for the specified user ID and private key.
+   * @param userID The ID of the user whose logs are to be retrieved.
+   * @param privateKey The private key used for decryption.
+   * @returns An Observable of Log array.
+   */
   getUserLogs(userID: number, privateKey: string): Observable<Log[]> {
     return this.http
       .get<any[]>(`${this.apiConfig.baseURL}/user-logs/${userID}`)
@@ -40,6 +44,12 @@ export class LogDataService {
       );
   }
 
+  /**
+   * Retrieves project logs for the specified project ID and current user.
+   * @param projectID The ID of the project whose logs are to be retrieved.
+   * @param currentUser The current user accessing the logs.
+   * @returns An Observable of Log array.
+   */
   getProjectLogs(projectID: number, currentUser: User): Observable<Log[]> {
     return this.http
       .get<any[]>(
@@ -54,7 +64,11 @@ export class LogDataService {
       );
   }
 
-  //-------------------------------------------- Post-Requests --------------------------------------------------------------//
+  /**
+   * Creates a user log entry.
+   * @param log The log data to be created.
+   * @returns An Observable of the HTTP response.
+   */
   private createUserLog(log: any): Observable<any> {
     const data = {
       userID: log.userID,
@@ -70,6 +84,11 @@ export class LogDataService {
     return this.http.post(`${this.apiConfig.baseURL}/user-logs`, data);
   }
 
+  /**
+   * Creates a project log entry.
+   * @param log The log data to be created.
+   * @returns An Observable of the HTTP response.
+   */
   private createProjectLog(log: any): Observable<any> {
     const data = {
       projectID: log.projectID,
@@ -83,10 +102,15 @@ export class LogDataService {
         STANDARD_PUBLIC_KEY
       ),
     };
-
     return this.http.post(`${this.apiConfig.baseURL}/project-logs`, data);
   }
 
+  /**
+   * Decrypts and extracts log data.
+   * @param logData The encrypted log data to be decrypted.
+   * @param privateKey The private key used for decryption.
+   * @returns A Log object.
+   */
   private decryptAndExtractLogs(logData: any, privateKey: string): Log {
     const timeStamp = new Date(
       this.encryptionService.decryptRSA(logData.timeStamp, privateKey)
@@ -221,8 +245,8 @@ export class LogDataService {
     const log = {
       description: LogDescriptionValues.createLogDescription(
         ActivityName.UPDATE_PROJECT,
-        "",
-        "",
+        '',
+        '',
         projectName,
         projectID
       ),
@@ -241,10 +265,10 @@ export class LogDataService {
     const log = {
       description: LogDescriptionValues.createLogDescription(
         ActivityName.DELETE_PROJECT,
-        "",
-        "",
+        '',
+        '',
         project.name,
-        project.projectID,
+        project.projectID
       ),
       activityName: ActivityName.DELETE_PROJECT,
       userID: this.userService.getCurrentUserID(),

@@ -1,35 +1,36 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { UserService } from '../service/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UserDataService } from '../service/api/user-data.service';
-import { EncryptionService } from '../service/encryption.service';
 
 @Component({
   selector: 'app-email-page',
   templateUrl: './email-page.component.html',
   styleUrls: ['./email-page.component.css'],
 })
-export class EmailPageComponent {
-  password: string = '';
-  confirmPassword: string = '';
-  token: string = '';
-  errorMessage: string = '';
+export class EmailPageComponent implements OnInit {
+  password: string = ''; // Holds the user's new password
+  confirmPassword: string = ''; // Holds the confirmation of the user's new password
+  token: string = ''; // Holds the token received from the query parameters
+  errorMessage: string = ''; // Holds error messages to be displayed
 
   constructor(
     private userService: UserService,
     private userDataService: UserDataService,
-    private encryptionService: EncryptionService,
     private router: Router,
     private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
+    // Retrieves the token from the query parameters
     this.route.queryParams.subscribe((params) => {
       this.token = params['token'];
     });
   }
 
+  // Sets the user's password
   setPassword() {
+    // Checks if the password meets the strength requirements
     if (!this.userService.isPasswordStrong(this.password)) {
       alert(
         'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one number'
@@ -37,11 +38,13 @@ export class EmailPageComponent {
       return;
     }
 
+    // Checks if the passwords match
     if (this.password !== this.confirmPassword) {
       alert('Passwords do not match');
       return;
     }
 
+    // Calls the UserDataService to verify the token and update the password
     this.userDataService.verifyToken(this.token, this.password).subscribe(
       () => {
         // Success response handling

@@ -1,25 +1,24 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  ViewChild,
+  OnDestroy,
+  OnInit,
+} from '@angular/core';
 import { Observable, Subject, of, takeUntil } from 'rxjs';
 import { Project } from '../models/projectInterface';
 import { User } from '../models/userInterface';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AsyncPipe } from '@angular/common';
-import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { DashboardComponent } from '../dashboard/dashboard.component';
+import { FormControl } from '@angular/forms';
+import { Role } from '../models/role';
 import { ProjectService } from '../service/project.service';
 import { UserDataService } from '../service/api/user-data.service';
-import { Role } from '../models/role';
-
 import { UserService } from '../service/user.service';
 import { ProjectManagerDataService } from '../service/api/project-manager-data.service';
 import { Router } from '@angular/router';
 import { ProjectDataService } from '../service/api/project-data.service';
-import { LogService } from '../service/log.service';
 import { LogDataService } from '../service/api/log-data.service';
 import { EncryptionService } from '../service/encryption.service';
-import { MatDatepickerInputEvent } from '@angular/material/datepicker';
+import { DashboardComponent } from '../dashboard/dashboard.component';
 
 @Component({
   selector: 'app-create-project',
@@ -27,22 +26,22 @@ import { MatDatepickerInputEvent } from '@angular/material/datepicker';
   styleUrl: './create-project.component.css',
   providers: [DashboardComponent],
 })
-export class CreateProjectComponent {
+export class CreateProjectComponent implements OnInit, OnDestroy {
   @ViewChild('input') input!: ElementRef<HTMLInputElement>;
   myControl = new FormControl('');
-  options: { fullName: string; userID: number }[] = []; // Initialize as an empty array
+  options: { fullName: string; userID: number }[] = [];
   filteredOptions: { fullName: string; userID: number }[] = [];
 
   startDateControl = new FormControl();
   project!: Project;
 
-  myDate!: Date; // Property to bind the selected date
-  minDate: Date = new Date(); // Property to set the minimum selectable date (today)
+  myDate!: Date;
+  minDate: Date = new Date();
   maxDate!: Date;
 
   isEditMode: boolean = false;
   users$: Observable<User[]> = of([]);
-  checkedUsers: User[] = []; // Array to store selected users
+  checkedUsers: User[] = [];
   selectedManager: { fullName: string; userID: number } = {
     fullName: '',
     userID: 0,
@@ -77,6 +76,7 @@ export class CreateProjectComponent {
     this.loadAllUsers();
   }
 
+  // Sets input fields when editing an existing project
   setInputFieldsForEditProject() {
     // Set Project Name Field
     this.projectName = this.project.name;
@@ -89,25 +89,22 @@ export class CreateProjectComponent {
       ' (' +
       this.project.manager.orgEinheit +
       ')';
-
     this.selectedManager.userID = this.project.manager.userID;
     this.myControl = new FormControl(this.selectedManager.fullName);
 
     this.myDate = new Date(this.project.endDate);
-
     this.maxDate = new Date(
       this.myDate.getFullYear() + 5,
       this.myDate.getMonth(),
       this.myDate.getDate()
     );
-    //set Project Description Field
+    // Set Project Description Field
     this.projectDescription = this.project.description;
     this.checkedUsers = this.project.users;
   }
 
+  // Sets input fields when creating a new project
   setInputFieldsForNewProject() {
-    //set Project Manager Field
-    //set Date Field
     const today = new Date();
     this.maxDate = new Date(
       today.getFullYear() + 5,
@@ -116,6 +113,7 @@ export class CreateProjectComponent {
     );
   }
 
+  // Loads all users from the server
   loadAllUsers() {
     this.users$ = this.userDataService.getAllUsers();
     this.users$.pipe(takeUntil(this.unsubscribe$)).subscribe((users) => {
@@ -131,6 +129,7 @@ export class CreateProjectComponent {
     });
   }
 
+  // Checks if a user exists in the project
   userExistsInProject(user: User): boolean {
     if (this.project === undefined) {
       return false;
@@ -140,6 +139,7 @@ export class CreateProjectComponent {
     );
   }
 
+  // Filters the list of options based on input
   filter(): void {
     const filterValue = this.input.nativeElement.value.toLowerCase();
     this.filteredOptions = this.options.filter((option) => {
@@ -147,19 +147,17 @@ export class CreateProjectComponent {
     });
   }
 
-  //TODO:generate Project Key
+  // Saves the project to the server
   saveProject() {
     const selectedUser = this.findSelectedUser();
     this.addProjectManagerToUsers();
-    // If the selected user is not found, display an alert and return
+
     if (!selectedUser) {
       alert('No Project Manager Selected');
       return;
     }
     const userID = selectedUser.userID;
 
-    //TODO: Generate Project Key
-    // Fetch the managerID and Password and Admin password corresponding to the userID
     this.projectManagerDataService.getManagerAndAdminPassword(userID).subscribe(
       (response: any) => {
         let projectKey: string = this.encryptionService.generateProjectKey(
@@ -176,7 +174,7 @@ export class CreateProjectComponent {
           managerID: response.managerID,
           userIDs: this.checkedUsers.map((user) => ({
             userID: user.userID,
-          })), // Get only the IDs of selected users
+          })),
         };
 
         if (this.isEditMode === true) {
@@ -187,22 +185,21 @@ export class CreateProjectComponent {
         }
       },
       (error) => {
-        // Handle error if the managerID fetching fails
         console.error('Error fetching managerID:', error);
       }
     );
   }
 
+  // Finds the selected user
   findSelectedUser(): any {
-    // Get the value of the selected option from the FormControl
     const selectedOption = this.myControl.value;
-    // Find the selected option in the options array
     const selectedUser = this.options.find(
       (option) => option.fullName === selectedOption
     );
     return selectedUser;
   }
 
+  // Creates a new project
   createNewProject(data: any) {
     let project = {
       projectName: data.projectName,
@@ -211,25 +208,21 @@ export class CreateProjectComponent {
       projectEndDate: data.projectEndDate,
       managerID: data.managerID,
     };
-    // Call the createProject method and wait for its completion
     this.projectDataService.createProject(project, data.userIDs).subscribe(
       (response: any) => {
-        // Log Entry
         this.logDataService.addCreateProjectLog(
           response.projectID,
           project.projectName
         );
-
-        // After project creation is successful, navigate to the dashboard
         this.router.navigate(['/dashboard']);
       },
       (error) => {
-        // Handle error if project creation fails
         console.error('Error creating project:', error);
       }
     );
   }
 
+  // Updates an existing project
   updateProject(data: any) {
     let project = {
       projectID: data.projectID,
@@ -239,45 +232,41 @@ export class CreateProjectComponent {
       projectEndDate: data.projectEndDate,
       managerID: data.managerID,
     };
-    // Call the createProject method and wait for its completion
     this.projectDataService.updateProject(project, data.userIDs).subscribe(
       () => {
-        // Log Entry
         this.logDataService.addUpdateProjectLog(
           project.projectID,
           project.projectName
         );
-
-        // After project creation is successful, navigate to the dashboard
         this.router.navigate(['/dashboard']);
       },
       (error) => {
-        // Handle error if project update fails
         console.error('Error updating project:', error);
       }
     );
     this.router.navigate(['/dashboard']);
   }
 
+  // Unsubscribes from observables to prevent memory leaks
   ngOnDestroy() {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
 
+  // Toggles selection of a user
   toggleUserSelection(user: User) {
     const index = this.checkedUsers.findIndex(
       (checkedUser) => checkedUser.userID === user.userID
     );
 
     if (index !== -1) {
-      // User is already selected, so remove it
       this.checkedUsers.splice(index, 1);
     } else {
-      // User is not selected, so add it
       this.checkedUsers.push(user);
     }
   }
 
+  // Adds project manager to selected users if not already present
   addProjectManagerToUsers() {
     let selectedManager = this.findSelectedUser();
     const managerAlreadySelected = this.checkedUsers.find(

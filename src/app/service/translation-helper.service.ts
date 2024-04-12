@@ -1,9 +1,6 @@
 import { Injectable } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
-import { ActivityName } from '../models/activityName';
-import { logDescriptionValues } from '../models/logInterface';
 import { LogDescriptionValues } from '../models/logDescriptionValues';
-import { transition } from '@angular/animations';
 
 @Injectable({
   providedIn: 'root',
@@ -12,9 +9,13 @@ export class TranslationHelperService {
 
   constructor(private translate: TranslateService) {}
 
-  // Method to get translated log description based on activity name and provided values
-  getTranslatedLogDescription(activity: ActivityName, values: string): LogDescriptionValues {
-    let description = LogDescriptionValues.fromString(values,activity)
+  /**
+   * Retrieves the translated log description based on the provided values.
+   * @param values The string representation of log description values.
+   * @returns The translated log description values.
+   */
+  getTranslatedLogDescription(values: string): LogDescriptionValues {
+    const description = LogDescriptionValues.fromString(values)
     return description;
   }
 }

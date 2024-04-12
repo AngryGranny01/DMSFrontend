@@ -4,7 +4,7 @@ import { TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.css',
 })
 export class AppComponent {
   title = 'DMSFrontend';
@@ -14,6 +14,6 @@ export class AppComponent {
   }
 
   switchLanguage(lang: string) {
-    this.translate.use(lang); // Switch language
+    this.translate.use(lang); 
   }
 }

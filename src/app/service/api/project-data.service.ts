@@ -1,24 +1,24 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { ApiConfigService } from './api-config.service';
 import { Observable, map } from 'rxjs';
+
+import { ApiConfigService } from './api-config.service';
 import { Project } from '../../models/projectInterface';
 import { User } from '../../models/userInterface';
 import { Role } from '../../models/role';
-import { NiceDate } from '../../models/niceDateInterface';
-import { EncryptionService } from '../encryption.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProjectDataService {
-  constructor(
-    private http: HttpClient,
-    private apiConfig: ApiConfigService,
-    private encryptionService: EncryptionService
-  ) {}
+  constructor(private http: HttpClient, private apiConfig: ApiConfigService) {}
 
   //-------------------------------------------- Get-Requests --------------------------------------------------------------//
+
+  /**
+   * Retrieves all projects from the server.
+   * @returns An Observable of an array of Project objects.
+   */
   getAllProjects(): Observable<Project[]> {
     return this.http
       .get<any[]>(`${this.apiConfig.baseURL}/projects`)
@@ -29,7 +29,11 @@ export class ProjectDataService {
       );
   }
 
-  //All Projects by userID
+  /**
+   * Retrieves projects associated with a specific user from the server.
+   * @param userID The ID of the user to retrieve projects for.
+   * @returns An Observable of an array of Project objects.
+   */
   getProjectFromUser(userID: number): Observable<Project[]> {
     return this.http
       .get<any[]>(`${this.apiConfig.baseURL}/projects/${userID}`)
@@ -40,12 +44,15 @@ export class ProjectDataService {
       );
   }
 
-
   //-------------------------------------------- Post-Requests --------------------------------------------------------------//
-  createProject(
-    project: any,
-    userIDs: any[]
-  ): Observable<any> {
+
+  /**
+   * Creates a new project on the server.
+   * @param project The project data to be created.
+   * @param userIDs An array of user IDs associated with the project.
+   * @returns An Observable of the HTTP response.
+   */
+  createProject(project: any, userIDs: any[]): Observable<any> {
     const unencryptedProject = {
       projectName: project.projectName,
       projectDescription: project.projectDescription,
@@ -54,7 +61,7 @@ export class ProjectDataService {
       managerID: project.managerID,
       userIDs: userIDs,
     };
-    // Send the encrypted project data and user IDs to the server
+
     return this.http.post(
       `${this.apiConfig.baseURL}/projects`,
       unencryptedProject
@@ -62,6 +69,13 @@ export class ProjectDataService {
   }
 
   //-------------------------------------------- Put-Requests --------------------------------------------------------------//
+
+  /**
+   * Updates an existing project on the server.
+   * @param project The updated project data.
+   * @param userIDs An array of updated user IDs associated with the project.
+   * @returns An Observable of the HTTP response.
+   */
   updateProject(project: any, userIDs: any[]) {
     const updateProject = {
       projectID: project.projectID,
@@ -76,14 +90,26 @@ export class ProjectDataService {
   }
 
   //-------------------------------------------- Delete-Requests --------------------------------------------------------------//
+
+  /**
+   * Deletes a project from the server.
+   * @param projectID The ID of the project to be deleted.
+   * @returns An Observable of the HTTP response.
+   */
   deleteProject(projectID: number) {
     return this.http.delete(
       `${this.apiConfig.baseURL}/projects?projectID=${projectID}`
     );
   }
 
-  extractProject(project: any): Project {
+  //-------------------------------------------- Helper Functions --------------------------------------------------------------//
 
+  /**
+   * Extracts project details from the response data.
+   * @param project The project data to extract details from.
+   * @returns A Project object.
+   */
+  private extractProject(project: any): Project {
     const users: User[] = [];
     const projectManager = project.manager[0];
     const manager = new User(
@@ -120,6 +146,7 @@ export class ProjectDataService {
         )
       );
     }
+
     return new Project(
       project.projectID,
       project.projectName,

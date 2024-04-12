@@ -1,8 +1,9 @@
-h1{
+h1 {
   text-align: center;
 }
-/* Full-width inputs */
-input[type=text], input[type=password] {
+
+input[type="text"],
+input[type="password"] {
   width: 100%;
   padding: 12px 20px;
   margin: 8px 0;
@@ -11,9 +12,8 @@ input[type=text], input[type=password] {
   box-sizing: border-box;
 }
 
-/* Set a style for all buttons */
 button {
-  background-color: #04AA6D;
+  background-color: #04aa6d;
   color: white;
   padding: 14px 20px;
   margin: 8px 0;
@@ -22,22 +22,23 @@ button {
   width: 100%;
 }
 
-/* Add a hover effect for buttons */
 button:hover {
   opacity: 0.8;
 }
 
-
-/* Add padding to containers */
 .form {
   width: 250px;
   height: 340px;
   color: #fff;
-  background: linear-gradient(to top, rgba(0,0,0,0.8)50%,rgba(0,0,0,0.8)50%);
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.8) 50%,
+    rgba(0, 0, 0, 0.8) 50%
+  );
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%,-50%);
+  transform: translate(-50%, -50%);
   border-radius: 10px;
   padding: 40px 25px;
 }
@@ -45,4 +46,3 @@ button:hover {
 .login {
   background-color: darkgray;
 }
-

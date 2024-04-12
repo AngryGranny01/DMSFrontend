@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { User } from '../../models/userInterface';
 import { ApiConfigService } from './api-config.service';
 import { Observable, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
@@ -12,9 +11,17 @@ export class ProjectManagerDataService {
   constructor(private http: HttpClient, private apiConfig: ApiConfigService) {}
 
   //-------------------------------------------- Get-Requests --------------------------------------------------------------//
+
+  /**
+   * Retrieves the password of the project manager and admin associated with the given user ID.
+   * @param userID The ID of the user.
+   * @returns An Observable of the project manager and admin passwords.
+   */
   getManagerAndAdminPassword(userID: number): Observable<any> {
     return this.http
-      .get(`${this.apiConfig.baseURL}/projectAdminAndManager/passwords/${userID}`)
+      .get(
+        `${this.apiConfig.baseURL}/projectAdminAndManager/passwords/${userID}`
+      )
       .pipe(
         map((response: any) => {
           return response;
@@ -22,16 +29,31 @@ export class ProjectManagerDataService {
       );
   }
 
+  /**
+   * Retrieves the manager ID associated with the given user ID.
+   * @param userID The ID of the user.
+   * @returns An Observable of the manager ID.
+   */
   getManagerID(userID: number): Observable<number> {
     return this.http
-      .get(`${this.apiConfig.baseURL}/projectAdminAndManager/passwords/${userID}`)
+      .get(
+        `${this.apiConfig.baseURL}/projectAdminAndManager/passwords/${userID}`
+      )
       .pipe(
         map((response: any) => {
           return response.managerID;
         })
       );
   }
+
   //-------------------------------------------- Put-Requests --------------------------------------------------------------//
+
+  /**
+   * Updates the manager ID associated with the given user ID.
+   * @param userID The ID of the user.
+   * @param managerID The ID of the manager to be updated.
+   * @returns An Observable of a boolean value indicating the success of the operation.
+   */
   updateManagerID(userID: number, managerID: number): Observable<boolean> {
     const params = new HttpParams()
       .set('userID', userID.toString())
@@ -40,14 +62,20 @@ export class ProjectManagerDataService {
     return this.http
       .put(`${this.apiConfig.baseURL}/projectManager`, null, { params })
       .pipe(
-        map(() => true), // Assuming success if there's no error
+        map(() => true),
         catchError(() => {
-          return of(false); // Return false if an error occurs
+          return of(false);
         })
       );
   }
 
   //-------------------------------------------- Delete-Requests --------------------------------------------------------------//
+
+  /**
+   * Deletes a project manager.
+   * @param managerID The ID of the manager to be deleted.
+   * @returns An Observable representing the HTTP response.
+   */
   deleteProjectManager(managerID: number) {
     const params = new HttpParams().set('managerID', managerID.toString());
 

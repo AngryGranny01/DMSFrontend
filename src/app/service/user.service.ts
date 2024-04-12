@@ -1,14 +1,13 @@
 import { Injectable } from '@angular/core';
 import { User } from '../models/userInterface';
 import { Role } from '../models/role';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, map, of } from 'rxjs';
-import { Log } from '../models/logInterface';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UserService {
+  // Initialize currentUser with default values for properties
   public currentUser: User = {
     userID: 0,
     userName: '',
@@ -19,7 +18,7 @@ export class UserService {
     role: Role.USER,
     orgEinheit: '',
     publicKey: '',
-  }; // Initialize currentUser with default values for properties
+  };
 
   public isEditMode: boolean = true;
   private selectedUser!: User;
@@ -29,59 +28,97 @@ export class UserService {
 
   constructor() {}
 
+  /**
+   * Checks if the current user is an admin.
+   * @returns A boolean indicating if the current user is an admin.
+   */
   isAdmin(): boolean {
-    if (
-      this.currentUser === undefined ||
-      this.currentUser.role !== Role.ADMIN
-    ) {
-      return false;
-    }
-    return true;
+    return (
+      this.currentUser !== undefined && this.currentUser.role === Role.ADMIN
+    );
   }
 
+  /**
+   * Checks if the selected user is an admin.
+   * @returns A boolean indicating if the selected user is an admin.
+   */
   selectedUserIsAdmin(): boolean {
-    if (
-      this.selectedUser === undefined ||
-      this.selectedUser.role !== Role.ADMIN
-    ) {
-      return false;
-    }
-    return true;
+    return (
+      this.selectedUser !== undefined && this.selectedUser.role === Role.ADMIN
+    );
   }
+
+  /**
+   * Concatenates the first name and last name.
+   * @param firstname The first name.
+   * @param lastname The last name.
+   * @returns The concatenated full name.
+   */
   concatenateFirstnameLastname(firstname: string, lastname: string): string {
-    return firstname + ' ' + lastname;
+    return `${firstname} ${lastname}`;
   }
+
+  /**
+   * Retrieves the current user ID.
+   * @returns The current user ID.
+   */
   getCurrentUserID(): number {
     return this.currentUser.userID;
   }
 
+  /**
+   * Retrieves the current username.
+   * @returns The current username.
+   */
   getCurrentUsername(): string {
     return this.currentUser.userName;
   }
 
   //--------------------- Getter and Setter -------------------------------------//
-  setSelectedUser(user: User) {
+
+  /**
+   * Sets the selected user.
+   * @param user The selected user.
+   */
+  setSelectedUser(user: User): void {
     this.selectedUser = user;
   }
 
-  getSelectedUser() {
+  /**
+   * Retrieves the selected user.
+   * @returns The selected user.
+   */
+  getSelectedUser(): User {
     return this.selectedUser;
   }
 
+  /**
+   * Retrieves the current user.
+   * @returns The current user.
+   */
   getCurrentUser(): User {
     return this.currentUser;
   }
 
+  /**
+   * Checks if the password meets the strength requirements.
+   * @param password The password to check.
+   * @returns A boolean indicating if the password is strong.
+   */
   isPasswordStrong(password: string): boolean {
     const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
     return passwordRegex.test(password);
   }
 
+  /**
+   * Checks if the email is in a valid format.
+   * @param email The email to check.
+   * @returns A boolean indicating if the email is valid.
+   */
   checkIfEmailIsValidEmail(email: string): boolean {
     // Regular expression pattern for basic email format validation
     const emailPattern: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    // Test if the email matches the pattern
     return emailPattern.test(email);
   }
 }

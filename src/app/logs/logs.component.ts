@@ -1,9 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import {
   debounceTime,
   distinctUntilChanged,
-  filter,
   map,
   startWith,
   switchMap,
@@ -25,7 +24,7 @@ import { NiceDateService } from '../service/nice-date.service';
   templateUrl: './logs.component.html',
   styleUrls: ['./logs.component.css'],
 })
-export class LogsComponent {
+export class LogsComponent implements OnInit {
   logs$: Observable<Log[]> = of([]);
   filteredLogs$: Observable<Log[]> = of([]);
 
@@ -45,8 +44,11 @@ export class LogsComponent {
   ) {}
 
   ngOnInit() {
+    // Determine whether it's user or project logs being displayed
     this.isUserOrProjectLog = this.logService.getIsProjectLog();
-    if (this.logService.getIsProjectLog()) {
+
+    // Load logs based on the context
+    if (this.isUserOrProjectLog) {
       this.project = this.projectService.getSelectedProject();
       this.loadProjectLogs(this.project);
     } else {
@@ -54,6 +56,7 @@ export class LogsComponent {
       this.loadUserLogs(this.user);
     }
 
+    // Filter logs based on search term
     this.filteredLogs$ = this.searchControl.valueChanges.pipe(
       startWith(''), // Provide an initial value to start the stream
       debounceTime(300), // Debounce time to avoid processing every keystroke
@@ -82,19 +85,22 @@ export class LogsComponent {
     );
   }
 
+  // Load logs associated with a project
   loadProjectLogs(project: Project) {
-    this.logDataService.getProjectLogs(project.projectID, this.userService.currentUser).subscribe(
-      (logs) => {
-        console.log(logs)
-        this.processLogs(logs);
-      },
-      (error) => {
-        console.error('Error loading project logs:', error);
-        // Optionally, notify the user about the error
-      }
-    );
+    this.logDataService
+      .getProjectLogs(project.projectID, this.userService.currentUser)
+      .subscribe(
+        (logs) => {
+          this.processLogs(logs);
+        },
+        (error) => {
+          console.error('Error loading project logs:', error);
+          // Optionally, notify the user about the error
+        }
+      );
   }
 
+  // Load logs associated with a user
   loadUserLogs(user: User) {
     this.logDataService.getUserLogs(user.userID, user.privateKey).subscribe(
       (logs) => {
@@ -107,11 +113,11 @@ export class LogsComponent {
     );
   }
 
+  // Process logs to translate log descriptions and update logs$ observable
   private processLogs(logs: Log[]) {
     for (let log of logs) {
       let activityDescription =
         this.translationHelper.getTranslatedLogDescription(
-          log.activityName,
           log.description
         );
       this.translate
@@ -123,11 +129,13 @@ export class LogsComponent {
     this.logs$ = of(logs);
   }
 
+  // Format date as a string
   createDateString(date: Date) {
     const newDate = this.niceDate.formatDate(date);
     return `${newDate}`;
   }
 
+  // Format time as a string
   createTimeString(date: Date) {
     const newDate = this.niceDate.formatTime(date);
     return `${newDate} Uhr`;

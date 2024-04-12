@@ -11,11 +11,10 @@
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }
 
-/* Make the table header fixed while scrolling */
 .table thead {
   position: sticky;
   top: 0;
-  z-index: 1000; /* Ensure the header stays above other content */
+  z-index: 1000;
 }
 
 .table-title {
@@ -96,15 +95,10 @@ table.table td a:hover {
   border: 1px solid black;
 }
 
-
-/* Additional class for green status circle */
 .green {
   background-color: green !important;
 }
 
-/* Additional class for red status circle */
 .red {
   background-color: red !important;
 }
-
-

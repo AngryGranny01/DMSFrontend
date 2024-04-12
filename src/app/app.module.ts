@@ -38,7 +38,7 @@ import { EmailPageComponent } from './email-page/email-page.component';
     CreateProjectComponent,
     LogsComponent,
     DashboardComponent,
-    EmailPageComponent
+    EmailPageComponent,
   ],
   imports: [
     BrowserModule,
@@ -50,29 +50,24 @@ import { EmailPageComponent } from './email-page/email-page.component';
     HttpClientModule,
     MatDatepickerModule,
     MatInputModule,
-    MatNativeDateModule, 
+    MatNativeDateModule,
     MatAutocompleteModule,
     MatFormFieldModule,
     MatMenuModule,
     MatButtonModule,
-    // ngx-translate and the loader module
     HttpClientModule,
     TranslateModule.forRoot({
-        loader: {
-            provide: TranslateLoader,
-            useFactory: HttpLoaderFactory,
-            deps: [HttpClient]
-        }
-    })
-]
-,
-  providers: [
-    provideAnimationsAsync('noop')
+      loader: {
+        provide: TranslateLoader,
+        useFactory: HttpLoaderFactory,
+        deps: [HttpClient],
+      },
+    }),
   ],
+  providers: [provideAnimationsAsync('noop')],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
-
 
 export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http);

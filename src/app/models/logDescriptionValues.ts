@@ -29,7 +29,7 @@ export class LogDescriptionValues {
   }
 
   // Method to parse a string and convert it into LogDescriptionValues
-  static fromString(str: string, activity: ActivityName): LogDescriptionValues {
+  static fromString(str: string): LogDescriptionValues {
     const obj = JSON.parse(str);
     return new LogDescriptionValues(
       obj.userID,

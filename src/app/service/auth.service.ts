@@ -1,15 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+
 import { UserService } from './user.service';
-import { Log } from '../models/logInterface';
 import { LogDataService } from './api/log-data.service';
-import { ActivityName } from '../models/activityName';
 import { UserDataService } from './api/user-data.service';
-import { TranslateService } from '@ngx-translate/core';
-import { LogDescriptionValues } from '../models/logDescriptionValues';
-import { LogService } from './log.service';
-import CryptoJS from 'crypto-js';
-import { EncryptionService } from './encryption.service';
 
 @Injectable({
   providedIn: 'root',
@@ -24,6 +18,14 @@ export class AuthService {
     private userDataService: UserDataService
   ) {}
 
+  /**
+   * Attempts to login a user with the provided email and password.
+   * If successful, sets the current user, updates authentication status,
+   * navigates to the dashboard, and logs the login action.
+   * If unsuccessful, displays an error message.
+   * @param email The email of the user attempting to login.
+   * @param passwordPlain The plain text password of the user.
+   */
   loginUser(email: string, passwordPlain: string) {
     if (passwordPlain !== '') {
       this.userDataService.checkPassword(passwordPlain, email).subscribe(
@@ -63,19 +65,27 @@ export class AuthService {
         }
       );
     } else {
-      alert("Password field cannot be empty")
+      alert('Password field cannot be empty');
     }
   }
 
+  /**
+   * Checks if the user is currently logged in.
+   * @returns True if the user is authenticated, false otherwise.
+   */
   isLoggedIn(): boolean {
     return this.isAuthenticated;
   }
 
+  /**
+   * Logs the user out by navigating to the login page,
+   * updating authentication status, and logging the logout action.
+   */
   logout(): void {
     this.router.navigate(['/login']);
     this.isAuthenticated = false;
 
-    //Log Entry
+    // Log logout action
     this.logDataService.addLogoutLog();
   }
 }
