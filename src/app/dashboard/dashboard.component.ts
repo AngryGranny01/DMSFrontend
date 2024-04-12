@@ -10,6 +10,7 @@ import { Project } from '../models/projectInterface';
 import { ProjectService } from '../service/project.service';
 
 import { NiceDateService } from '../service/nice-date.service';
+import { Role } from '../models/role';
 
 @Component({
   selector: 'app-dashboard',
@@ -74,6 +75,10 @@ export class DashboardComponent {
     return this.userService.isAdmin();
   }
 
+  isNotUser(): boolean{
+    return this.userService.currentUser.role !== Role.USER
+  }
+
   deleteProject(project: Project) {
     this.projectDataService.deleteProject(project.projectID).subscribe(
       () => {
@@ -109,5 +114,13 @@ export class DashboardComponent {
 
   formateDate(date: Date): string {
     return this.niceDate.formatDate(date)
+  }
+
+  isAdminOrProjectManager(project: Project): any {
+    const currentUser = this.userService.currentUser
+    if(currentUser.role === Role.ADMIN || project.manager.userID === currentUser.userID){
+      return true
+    }
+    return false;
   }
 }

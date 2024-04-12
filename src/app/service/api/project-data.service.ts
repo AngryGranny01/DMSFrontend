@@ -46,12 +46,6 @@ export class ProjectDataService {
     project: any,
     userIDs: any[]
   ): Observable<any> {
-    // Encrypt sensitive project data before sending it to the server
-/*     const encryptedProject = this.encryptionService.encryptProjectData(
-      project,
-      userIDs,
-      project.projectKey
-    ); */
     const unencryptedProject = {
       projectName: project.projectName,
       projectDescription: project.projectDescription,

@@ -83,8 +83,9 @@ export class LogsComponent {
   }
 
   loadProjectLogs(project: Project) {
-    this.logDataService.getProjectLogs(project.projectID).subscribe(
+    this.logDataService.getProjectLogs(project.projectID, this.userService.currentUser).subscribe(
       (logs) => {
+        console.log(logs)
         this.processLogs(logs);
       },
       (error) => {

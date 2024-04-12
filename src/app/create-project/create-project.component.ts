@@ -103,7 +103,6 @@ export class CreateProjectComponent {
     //set Project Description Field
     this.projectDescription = this.project.description;
     this.checkedUsers = this.project.users;
-    console.log('Project: ', this.project.users);
   }
 
   setInputFieldsForNewProject() {
@@ -179,7 +178,7 @@ export class CreateProjectComponent {
             userID: user.userID,
           })), // Get only the IDs of selected users
         };
-        console.log('Checked Users: ', this.checkedUsers);
+
         if (this.isEditMode === true) {
           projectData.projectID = this.project.projectID;
           this.updateProject(projectData);
@@ -216,18 +215,13 @@ export class CreateProjectComponent {
     this.projectDataService.createProject(project, data.userIDs).subscribe(
       (response: any) => {
         // Log Entry
-        this.logDataService
-          .addCreateProjectLog(response.projectID, project.projectName)
-          .subscribe(
-            () => {
-              // After project creation is successful, navigate to the dashboard
-              this.router.navigate(['/dashboard']);
-            },
-            (logError) => {
-              // Handle error creating log entry
-              console.error('Error creating log entry:', logError);
-            }
-          );
+        this.logDataService.addCreateProjectLog(
+          response.projectID,
+          project.projectName
+        );
+
+        // After project creation is successful, navigate to the dashboard
+        this.router.navigate(['/dashboard']);
       },
       (error) => {
         // Handle error if project creation fails
@@ -235,6 +229,7 @@ export class CreateProjectComponent {
       }
     );
   }
+
   updateProject(data: any) {
     let project = {
       projectID: data.projectID,
@@ -283,9 +278,11 @@ export class CreateProjectComponent {
     }
   }
 
-  addProjectManagerToUsers(){
+  addProjectManagerToUsers() {
     let selectedManager = this.findSelectedUser();
-    const managerAlreadySelected = this.checkedUsers.find(user => user.userID === selectedManager.userID);
+    const managerAlreadySelected = this.checkedUsers.find(
+      (user) => user.userID === selectedManager.userID
+    );
 
     if (!managerAlreadySelected) {
       this.checkedUsers.push(selectedManager);

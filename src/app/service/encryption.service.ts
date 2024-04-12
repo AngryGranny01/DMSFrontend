@@ -62,20 +62,8 @@ export class EncryptionService {
     return this.getPBKDF2Key(combinedHash, ''); // Empty salt as we're not using salt for key generation
   }
 
-  //--------------------------- Log Encryption ------------------------//
-  encryptLogData(log: any, userProjectKey: string) {
-    const encryptedLog = {
-      projectID: this.encryptUsingAES256(log.projectID, userProjectKey),
-      userID: this.encryptUsingAES256(log.userID, userProjectKey),
-      activityName: this.encryptUsingAES256(log.activityName, userProjectKey),
-      activityDescription: this.encryptUsingAES256(
-        log.activityDescription,
-        userProjectKey
-      ),
-      userProjectKey: userProjectKey,
-    };
-    return encryptedLog;
-  }
+
+
   //--------------------------- Encryption ---------------------------------//
   //PDKF2
   getPBKDF2Key(password: string, salt: string): string {
@@ -180,7 +168,7 @@ export class EncryptionService {
     // Convert keys to PEM format
     const publicKey = forge.pki.publicKeyToPem(keyPair.publicKey);
     const privateKey = forge.pki.privateKeyToPem(keyPair.privateKey);
-   
+
     return { publicKey, privateKey };
   }
 

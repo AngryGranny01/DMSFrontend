@@ -35,6 +35,10 @@
   z-index: 1000; /* Ensure the header stays above other content */
 }
 
+.table tbody{
+  background-color: gray;
+}
+
 .table-title h2 {
   margin: 5px 0 0;
   font-size: 24px;

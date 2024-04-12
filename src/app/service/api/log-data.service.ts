@@ -33,66 +33,85 @@ export class LogDataService {
       .get<any[]>(`${this.apiConfig.baseURL}/user-logs/${userID}`)
       .pipe(
         map((response: any[]) =>
-          response.map((userLog) => this.decryptAndExtractLogs(userLog, privateKey))
+          response.map((userLog) =>
+            this.decryptAndExtractLogs(userLog, privateKey)
+          )
         )
       );
   }
 
-  //TODO: ADD Private Key
-  getProjectLogs(projectID: number): Observable<Log[]> {
+  getProjectLogs(projectID: number, currentUser: User): Observable<Log[]> {
     return this.http
       .get<any[]>(
-        `${this.apiConfig.baseURL}/logs/project?projectID=${projectID}`
+        `${this.apiConfig.baseURL}/project-logs?projectID=${projectID}&userID=${currentUser.userID}`
       )
       .pipe(
         map((response: any[]) =>
-          response.map((projectLog) => this.decryptAndExtractLogs(projectLog,""))
+          response.map((projectLog) =>
+            this.decryptAndExtractLogs(projectLog, currentUser.privateKey)
+          )
         )
       );
   }
 
   //-------------------------------------------- Post-Requests --------------------------------------------------------------//
-  createUserLog(log: any): Observable<any> {
+  private createUserLog(log: any): Observable<any> {
     const data = {
-      userID: this.encryptionService.encryptRSA(log.userID,STANDARD_PUBLIC_KEY),
-      activityName: this.encryptionService.encryptRSA(log.activityName,STANDARD_PUBLIC_KEY),
-      activityDescription: this.encryptionService.encryptRSA(log.description,STANDARD_PUBLIC_KEY),
+      userID: log.userID,
+      activityName: this.encryptionService.encryptRSA(
+        log.activityName,
+        STANDARD_PUBLIC_KEY
+      ),
+      activityDescription: this.encryptionService.encryptRSA(
+        log.description,
+        STANDARD_PUBLIC_KEY
+      ),
     };
     return this.http.post(`${this.apiConfig.baseURL}/user-logs`, data);
   }
 
-  createProjectLog(
-    log: Log,
-    projectID: number,
-    userKey: string
-  ): Observable<any> {
+  private createProjectLog(log: any): Observable<any> {
     const data = {
-      projectID: projectID,
+      projectID: log.projectID,
       userID: log.userID,
-      activityName: log.activityName,
-      activityDescription: log.description,
+      activityName: this.encryptionService.encryptRSA(
+        log.activityName,
+        STANDARD_PUBLIC_KEY
+      ),
+      activityDescription: this.encryptionService.encryptRSA(
+        log.description,
+        STANDARD_PUBLIC_KEY
+      ),
     };
-    let encryptedData = this.encryptionService.encryptLogData(data, userKey);
 
     return this.http.post(`${this.apiConfig.baseURL}/project-logs`, data);
   }
 
   private decryptAndExtractLogs(logData: any, privateKey: string): Log {
-    const timeStamp = new Date(this.encryptionService.decryptRSA(logData.timeStamp, privateKey))
+    const timeStamp = new Date(
+      this.encryptionService.decryptRSA(logData.timeStamp, privateKey)
+    );
 
     return {
-      logID: parseInt(this.encryptionService.decryptRSA(logData.logID, privateKey)),
-      userID: parseInt(this.encryptionService.decryptRSA(logData.userID, privateKey)),
-      firstName: this.encryptionService.decryptRSA(logData.firstName, privateKey),
+      logID: parseInt(logData.logID),
+      userID: parseInt(logData.userID),
+      firstName: this.encryptionService.decryptRSA(
+        logData.firstName,
+        privateKey
+      ),
       lastName: this.encryptionService.decryptRSA(logData.lastName, privateKey),
       activityName: this.logService.matchActivityNameWithString(
         this.encryptionService.decryptRSA(logData.activityName, privateKey)
       ),
-      description: this.encryptionService.decryptRSA(logData.activityDescription, privateKey),
+      description: this.encryptionService.decryptRSA(
+        logData.activityDescription,
+        privateKey
+      ),
       dateTime: timeStamp,
     };
   }
 
+  //-------------------------------------------- User Logs --------------------------------------------------------------//
   addLoginLog() {
     const log = {
       description: LogDescriptionValues.createLogDescription(
@@ -177,8 +196,9 @@ export class LogDataService {
     );
   }
 
+  //-------------------------------------------- Project Logs --------------------------------------------------------------//
   addCreateProjectLog(projectID: number, projectName: string) {
-    const log: Log = {
+    const log = {
       description: LogDescriptionValues.createLogDescription(
         ActivityName.CREATE_PROJECT,
         '',
@@ -188,69 +208,56 @@ export class LogDataService {
       ),
       activityName: ActivityName.CREATE_PROJECT,
       userID: this.userService.getCurrentUserID(),
-      logID: 0,
-      firstName: '',
-      lastName: '',
-      dateTime: new Date(),
+      projectID: projectID,
     };
 
-    return this.createProjectLog(
-      log,
-      projectID,
-      this.userService.getCurrentUser().privateKey
+    this.createProjectLog(log).subscribe(
+      () => console.log('Project created logged successfully'),
+      (error) => console.error('Error logging Project created:', error)
     );
   }
 
   addUpdateProjectLog(projectID: number, projectName: string) {
-    const log: Log = {
+    const log = {
       description: LogDescriptionValues.createLogDescription(
         ActivityName.UPDATE_PROJECT,
-        projectID,
-        projectName
+        "",
+        "",
+        projectName,
+        projectID
       ),
       activityName: ActivityName.UPDATE_PROJECT,
       userID: this.userService.getCurrentUserID(),
-      logID: 0,
-      firstName: '',
-      lastName: '',
-      dateTime: new Date(),
+      projectID: projectID,
     };
 
-    this.createProjectLog(
-      log,
-      projectID,
-      this.userService.getCurrentUser().privateKey
-    ).subscribe(
+    this.createProjectLog(log).subscribe(
       () => console.log('Project update logged successfully'),
       (error) => console.error('Error logging project update:', error)
     );
   }
 
   addDeleteProjectLog(project: Project) {
-    const log: Log = {
+    const log = {
       description: LogDescriptionValues.createLogDescription(
         ActivityName.DELETE_PROJECT,
+        "",
+        "",
+        project.name,
         project.projectID,
-        project.name
       ),
       activityName: ActivityName.DELETE_PROJECT,
       userID: this.userService.getCurrentUserID(),
-      logID: 0,
-      firstName: '',
-      lastName: '',
-      dateTime: new Date(),
+      projectID: project.projectID,
     };
 
-    this.createProjectLog(
-      log,
-      project.projectID,
-      this.userService.getCurrentUser().privateKey
-    ).subscribe(
+    this.createProjectLog(log).subscribe(
       () => console.log('Project deletion logged successfully'),
       (error) => console.error('Error logging project deletion:', error)
     );
   }
 
+  //-------------------------------------------- Error Logs --------------------------------------------------------------//
   addErrorUserLog(errorMessage: string) {
     const log = {
       description: LogDescriptionValues.createLogDescription(
@@ -268,24 +275,17 @@ export class LogDataService {
   }
 
   addErrorProjectLog(project: Project, errorMessage: string) {
-    const log: Log = {
+    const log = {
       description: LogDescriptionValues.createLogDescription(
         ActivityName.ERROR,
         errorMessage
       ),
       activityName: ActivityName.ERROR,
       userID: this.userService.getCurrentUserID(),
-      logID: 0,
-      firstName: '',
-      lastName: '',
-      dateTime: new Date(),
+      projectID: project.projectID,
     };
 
-    this.createProjectLog(
-      log,
-      project.projectID,
-      this.userService.getCurrentUser().privateKey
-    ).subscribe(
+    this.createProjectLog(log).subscribe(
       () => console.log('Project deletion logged successfully'),
       (error) => console.error('Error logging project deletion:', error)
     );

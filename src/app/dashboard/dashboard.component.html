@@ -13,6 +13,7 @@
               routerLink="/createProject"
               routerLinkActive="active"
               (click)="this.createProject()"
+              *ngIf="this.isNotUser()"
             >
               <span>Add New Project</span></a
             >
@@ -93,6 +94,7 @@
                   (click)="this.editProject(project)"
                   routerLink="/createProject"
                   routerLinkActive="active"
+                  *ngIf="this.isAdminOrProjectManager(project)"
                   ><i class="material-icons">&#xE8B8;</i></a
                 >
                 <a
@@ -102,6 +104,7 @@
                   (click)="this.deleteProject(project)"
                   routerLink="/dashboard"
                   routerLinkActive="active"
+                  *ngIf="this.isAdminOrProjectManager(project)"
                   ><i class="material-icons">&#xE5C9;</i>
                 </a>
               </td>
