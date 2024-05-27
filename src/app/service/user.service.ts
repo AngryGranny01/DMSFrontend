@@ -13,11 +13,10 @@ export class UserService {
     userName: '',
     firstName: '',
     lastName: '',
-    privateKey: '',
+    passwordHash: '',
     email: '',
     role: Role.USER,
     orgEinheit: '',
-    publicKey: '',
   };
 
   public isEditMode: boolean = true;

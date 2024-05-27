@@ -119,9 +119,8 @@ export class ProjectDataService {
       projectManager.lastName,
       '',
       Role.MANAGER,
-      '',
-      projectManager.orgEinheit,
-      ''
+      projectManager.email,
+      projectManager.orgEinheit
     );
 
     for (const user of project.users) {
@@ -140,9 +139,8 @@ export class ProjectDataService {
           user.lastName,
           '',
           role,
+          user.email,
           '',
-          '',
-          ''
         )
       );
     }

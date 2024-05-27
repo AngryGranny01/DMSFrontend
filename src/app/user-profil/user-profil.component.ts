@@ -48,11 +48,10 @@ export class UserProfilComponent implements OnInit {
         userName: '',
         firstName: '',
         lastName: '',
-        privateKey: '',
+        passwordHash: '',
         email: '',
         role: Role.USER,
         orgEinheit: '',
-        publicKey: '',
       };
     }
   }
@@ -92,7 +91,7 @@ export class UserProfilComponent implements OnInit {
 
     // Update user profile and navigate
     this.user.email = this.email;
-    this.user.privateKey = this.password;
+    this.user.passwordHash = this.password;
 
     const updatedUser: User = {
       ...this.user,

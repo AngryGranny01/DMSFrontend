@@ -8,7 +8,6 @@ import { ApiConfigService } from './api-config.service';
 import { Role } from '../../models/role';
 import { EncryptionService } from '../encryption.service';
 import { UserService } from '../user.service';
-import { STANDARD_PUBLIC_KEY } from '../../constants/env';
 
 @Injectable({
   providedIn: 'root',
@@ -32,24 +31,19 @@ export class UserDataService {
   checkPassword(passwordPlain: string, userEmail: string): Observable<any> {
     return this.getSaltByEmail(userEmail).pipe(
       switchMap((response: any) => {
+        console.log(response.salt)
         const hashedPassword = this.encryptionService.getPBKDF2Key(
           passwordPlain,
           response.salt
         );
-        const keys =
-          this.encryptionService.generateRSAKeyPairFromHash(hashedPassword);
+
         return this.getPassword(userEmail).pipe(
           map((response: any) => {
-            let decryptedPassword = this.encryptionService.decryptRSA(
-              response.passwordHash,
-              keys.privateKey
-            );
-            if (decryptedPassword === hashedPassword) {
+
+            if (response.passwordHash === hashedPassword) {
               return {
-                passwordHash: decryptedPassword,
+                passwordHash: response.passwordHash,
                 userID: response.userID,
-                privateKey: keys.privateKey,
-                publicKey: keys.publicKey,
               };
             } else {
               throw new Error('Password mismatch');
@@ -71,25 +65,17 @@ export class UserDataService {
   /**
    * Retrieves user details by user ID.
    * @param userID The ID of the user.
-   * @param privateKey The private key for decryption.
-   * @param publicKey The public key for encryption.
    * @returns An Observable containing the user details.
    */
   getUser(
-    userID: string,
-    privateKey: string,
-    publicKey: string
+    userID: string
   ): Observable<User> {
     return this.http.get<any>(`${this.apiConfig.baseURL}/user/${userID}`).pipe(
       map((userData) => {
         if (!userData) {
           throw new Error('User data not found');
         }
-        return this.encryptionService.decryptUserData(
-          userData,
-          privateKey,
-          publicKey
-        );
+        return userData
       }),
       catchError((error) => {
         console.error('Failed to fetch user data:', error);
@@ -130,11 +116,7 @@ export class UserDataService {
       .pipe(
         map((response: any[]) =>
           response.map((user) =>
-            this.encryptionService.decryptUserData(
-              user,
-              sender.privateKey,
-              sender.publicKey
-            )
+            user
           )
         )
       );
@@ -143,12 +125,10 @@ export class UserDataService {
   /**
    * Retrieves the last logins for each user.
    * @param senderID The ID of the sender.
-   * @param privateKey The private key for decryption.
    * @returns An Observable containing the last logins data.
    */
   getLastLogins(
-    senderID: number,
-    privateKey: string
+    senderID: number
   ): Observable<{ [userID: string]: Date }> {
     return this.http
       .get<any[]>(`${this.apiConfig.baseURL}/user-logs/lastLogins/${senderID}`)
@@ -156,14 +136,7 @@ export class UserDataService {
         map((response: any[]) => {
           const lastLogins: { [userID: string]: Date } = {};
           response.forEach((entry) => {
-            let decryptedDate = new Date(
-              this.encryptionService.decryptRSA(entry.date, privateKey)
-            );
-            let decryptedUserID = this.encryptionService.decryptRSA(
-              entry.userID,
-              privateKey
-            );
-            lastLogins[decryptedUserID] = decryptedDate;
+            lastLogins[entry.userID] = new Date(entry.date)
           });
           return lastLogins;
         })
@@ -191,12 +164,9 @@ export class UserDataService {
    * @returns An Observable indicating whether the user email exists.
    */
   checkIfUserEmailExists(userEmail: string) {
-    const encryptedEmail = encodeURIComponent(
-      this.encryptionService.encryptRSA(userEmail, STANDARD_PUBLIC_KEY)
-    );
     return this.http
       .get(
-        `${this.apiConfig.baseURL}/users/checkEmailExist?email=${encryptedEmail}`
+        `${this.apiConfig.baseURL}/users/checkEmailExist?email=${userEmail}`
       )
       .pipe(
         map((response: any) => {
@@ -211,12 +181,9 @@ export class UserDataService {
    * @returns An Observable indicating whether the username exists.
    */
   checkIfUserNameExists(userName: string) {
-    const encryptedUsername = encodeURIComponent(
-      this.encryptionService.encryptRSA(userName, STANDARD_PUBLIC_KEY)
-    );
     return this.http
       .get(
-        `${this.apiConfig.baseURL}/users/checkUsernameExist?username=${encryptedUsername}`
+        `${this.apiConfig.baseURL}/users/checkUsernameExist?username=${userName}`
       )
       .pipe(
         map((response: any) => {
@@ -241,12 +208,7 @@ export class UserDataService {
       role: user.role,
       orgEinheit: user.orgEinheit,
     };
-
-    const encryptedUser = this.encryptionService.encryptUserData(
-      createUser,
-      STANDARD_PUBLIC_KEY
-    );
-    return this.http.post(`${this.apiConfig.baseURL}/users`, encryptedUser);
+    return this.http.post(`${this.apiConfig.baseURL}/users`, createUser);
   }
 
   //-------------------------------------------- Put-Requests --------------------------------------------------------------//
@@ -259,14 +221,9 @@ export class UserDataService {
   updateUser(user: User) {
     let salt = this.encryptionService.generateSalt();
     let passwordHash = this.encryptionService.getPBKDF2Key(
-      user.privateKey,
+      user.passwordHash,
       salt
     );
-    let keys = this.encryptionService.generateRSAKeyPairFromHash(passwordHash);
-    if (user.userID === this.userService.currentUser.userID) {
-      this.userService.currentUser.publicKey = keys.publicKey;
-      this.userService.currentUser.privateKey = keys.privateKey;
-    }
 
     const updateUser = {
       userID: user.userID,
@@ -277,16 +234,10 @@ export class UserDataService {
       passwordHash: passwordHash,
       salt: salt,
       role: user.role,
-      orgEinheit: user.orgEinheit,
-      publicKey: keys.publicKey,
+      orgEinheit: user.orgEinheit
     };
 
-    const encryptedUser = this.encryptionService.encryptUserData(
-      updateUser,
-      STANDARD_PUBLIC_KEY
-    );
-    encryptedUser.publicKey = keys.publicKey;
-    return this.http.put(`${this.apiConfig.baseURL}/users`, encryptedUser);
+    return this.http.put(`${this.apiConfig.baseURL}/users`, updateUser);
   }
 
   //-------------------------------------------- Delete-Requests --------------------------------------------------------------//
@@ -309,16 +260,11 @@ export class UserDataService {
   verifyToken(token: string, passwordPlain: string): Observable<string> {
     let salt = this.encryptionService.generateSalt();
     let passwordHash = this.encryptionService.getPBKDF2Key(passwordPlain, salt);
-    let keys = this.encryptionService.generateRSAKeyPairFromHash(passwordHash);
 
     const data = {
       token: token,
-      passwordHash: this.encryptionService.encryptRSA(
-        passwordHash,
-        STANDARD_PUBLIC_KEY
-      ),
-      salt: salt,
-      publicKey: keys.publicKey,
+      passwordHash: passwordHash,
+      salt: salt
     };
     return this.http.put<string>(`${this.apiConfig.baseURL}/verifyToken`, data);
   }
@@ -346,8 +292,7 @@ export class UserDataService {
       response.passwordHash,
       role,
       response.email,
-      response.orgEinheit,
-      response.publicKey
+      response.orgEinheit
     );
   }
 }

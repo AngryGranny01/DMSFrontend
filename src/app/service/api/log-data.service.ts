@@ -11,8 +11,6 @@ import { LogDescriptionValues } from '../../models/logDescriptionValues';
 import { ApiConfigService } from './api-config.service';
 import { LogService } from '../log.service';
 import { UserService } from '../user.service';
-import { EncryptionService } from '../encryption.service';
-import { STANDARD_PUBLIC_KEY } from '../../constants/env';
 
 @Injectable({
   providedIn: 'root',
@@ -22,23 +20,21 @@ export class LogDataService {
     private http: HttpClient,
     private apiConfig: ApiConfigService,
     private logService: LogService,
-    private userService: UserService,
-    private encryptionService: EncryptionService
+    private userService: UserService
   ) {}
 
   /**
-   * Retrieves user logs for the specified user ID and private key.
+   * Retrieves user logs for the specified user ID.
    * @param userID The ID of the user whose logs are to be retrieved.
-   * @param privateKey The private key used for decryption.
    * @returns An Observable of Log array.
    */
-  getUserLogs(userID: number, privateKey: string): Observable<Log[]> {
+  getUserLogs(userID: number): Observable<Log[]> {
     return this.http
       .get<any[]>(`${this.apiConfig.baseURL}/user-logs/${userID}`)
       .pipe(
         map((response: any[]) =>
           response.map((userLog) =>
-            this.decryptAndExtractLogs(userLog, privateKey)
+            this.extractLogs(userLog)
           )
         )
       );
@@ -58,7 +54,7 @@ export class LogDataService {
       .pipe(
         map((response: any[]) =>
           response.map((projectLog) =>
-            this.decryptAndExtractLogs(projectLog, currentUser.privateKey)
+            this.extractLogs(projectLog)
           )
         )
       );
@@ -72,14 +68,8 @@ export class LogDataService {
   private createUserLog(log: any): Observable<any> {
     const data = {
       userID: log.userID,
-      activityName: this.encryptionService.encryptRSA(
-        log.activityName,
-        STANDARD_PUBLIC_KEY
-      ),
-      activityDescription: this.encryptionService.encryptRSA(
-        log.description,
-        STANDARD_PUBLIC_KEY
-      ),
+      activityName: log.activityName,
+      activityDescription:log.description,
     };
     return this.http.post(`${this.apiConfig.baseURL}/user-logs`, data);
   }
@@ -93,44 +83,27 @@ export class LogDataService {
     const data = {
       projectID: log.projectID,
       userID: log.userID,
-      activityName: this.encryptionService.encryptRSA(
-        log.activityName,
-        STANDARD_PUBLIC_KEY
-      ),
-      activityDescription: this.encryptionService.encryptRSA(
-        log.description,
-        STANDARD_PUBLIC_KEY
-      ),
+      activityName: log.activityName,
+      activityDescription: log.description,
     };
     return this.http.post(`${this.apiConfig.baseURL}/project-logs`, data);
   }
 
   /**
-   * Decrypts and extracts log data.
+   * Extracts log data.
    * @param logData The encrypted log data to be decrypted.
-   * @param privateKey The private key used for decryption.
    * @returns A Log object.
    */
-  private decryptAndExtractLogs(logData: any, privateKey: string): Log {
-    const timeStamp = new Date(
-      this.encryptionService.decryptRSA(logData.timeStamp, privateKey)
-    );
+  private extractLogs(logData: any): Log {
+    const timeStamp = new Date(logData.timeStamp);
 
     return {
       logID: parseInt(logData.logID),
       userID: parseInt(logData.userID),
-      firstName: this.encryptionService.decryptRSA(
-        logData.firstName,
-        privateKey
-      ),
-      lastName: this.encryptionService.decryptRSA(logData.lastName, privateKey),
-      activityName: this.logService.matchActivityNameWithString(
-        this.encryptionService.decryptRSA(logData.activityName, privateKey)
-      ),
-      description: this.encryptionService.decryptRSA(
-        logData.activityDescription,
-        privateKey
-      ),
+      firstName: logData.firstName,
+      lastName: logData.lastName,
+      activityName: this.logService.matchActivityNameWithString(logData.activityName),
+      description: logData.activityDescription,
       dateTime: timeStamp,
     };
   }

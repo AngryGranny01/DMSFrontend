@@ -102,7 +102,7 @@ export class LogsComponent implements OnInit {
 
   // Load logs associated with a user
   loadUserLogs(user: User) {
-    this.logDataService.getUserLogs(user.userID, user.privateKey).subscribe(
+    this.logDataService.getUserLogs(user.userID).subscribe(
       (logs) => {
         this.processLogs(logs);
       },
@@ -117,9 +117,7 @@ export class LogsComponent implements OnInit {
   private processLogs(logs: Log[]) {
     for (let log of logs) {
       let activityDescription =
-        this.translationHelper.getTranslatedLogDescription(
-          log.description
-        );
+        this.translationHelper.getTranslatedLogDescription(log.description);
       this.translate
         .get(log.activityName, activityDescription)
         .subscribe((translations) => {

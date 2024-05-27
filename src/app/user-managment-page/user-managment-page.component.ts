@@ -8,7 +8,6 @@ import { ProjectManagerDataService } from '../service/api/project-manager-data.s
 import { LogService } from '../service/log.service';
 import { LogDataService } from '../service/api/log-data.service';
 import { NiceDateService } from '../service/nice-date.service';
-import { STANDARD_PUBLIC_KEY } from '../constants/env';
 
 @Component({
   selector: 'app-user-managment-page',
@@ -52,9 +51,9 @@ export class UserManagmentPageComponent implements OnInit {
   // Loads all users from the server
   loadAllUsers(): void {
     this.users$ = this.userDataService.getAllUsers();
+    console.log(this.users$)
     this.lastLogin$ = this.userDataService.getLastLogins(
-      this.userService.getCurrentUser().userID,
-      this.userService.getCurrentUser().privateKey
+      this.userService.getCurrentUser().userID
     );
   }
 
@@ -74,7 +73,7 @@ export class UserManagmentPageComponent implements OnInit {
 
   // Checks if a user is activated based on their public key
   isActivated(user: User): boolean {
-    return user.publicKey !== STANDARD_PUBLIC_KEY;
+    return user.passwordHash !== "";
   }
 
   // Deletes a user from the system

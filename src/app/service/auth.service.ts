@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { UserService } from './user.service';
 import { LogDataService } from './api/log-data.service';
 import { UserDataService } from './api/user-data.service';
+import { EncryptionService } from './encryption.service';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +16,8 @@ export class AuthService {
     private readonly router: Router,
     private userService: UserService,
     private logDataService: LogDataService,
-    private userDataService: UserDataService
+    private userDataService: UserDataService,
+    private encryptionService: EncryptionService
   ) {}
 
   /**
@@ -27,14 +29,15 @@ export class AuthService {
    * @param passwordPlain The plain text password of the user.
    */
   loginUser(email: string, passwordPlain: string) {
+    let salt  = this.encryptionService.generateSalt()
+    console.log("Salt: ", salt)
+    console.log(this.encryptionService.getPBKDF2Key(passwordPlain,salt))
     if (passwordPlain !== '') {
       this.userDataService.checkPassword(passwordPlain, email).subscribe(
         (passwordData) => {
           this.userDataService
             .getUser(
-              passwordData.userID,
-              passwordData.privateKey,
-              passwordData.publicKey
+              passwordData.userID
             )
             .subscribe(
               (userData) => {
