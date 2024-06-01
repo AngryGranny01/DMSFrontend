@@ -88,7 +88,7 @@ export class LogsComponent implements OnInit {
   // Load logs associated with a project
   loadProjectLogs(project: Project) {
     this.logDataService
-      .getProjectLogs(project.projectID, this.userService.currentUser)
+      .getProjectLogs(project.projectID)
       .subscribe(
         (logs) => {
           this.processLogs(logs);

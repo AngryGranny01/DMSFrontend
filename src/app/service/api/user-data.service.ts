@@ -110,16 +110,12 @@ export class UserDataService {
    * @returns An Observable containing the list of users.
    */
   getAllUsers(): Observable<User[]> {
-    const sender = this.userService.currentUser;
-    return this.http
-      .get<any[]>(`${this.apiConfig.baseURL}/users/${sender.userID}`)
-      .pipe(
-        map((response: any[]) =>
-          response.map((user) =>
-            user
-          )
-        )
-      );
+    return this.http.get<User[]>(`${this.apiConfig.baseURL}/users`).pipe(
+      map((users: User[]) => {
+        // Process each user within the map operator
+        return users.map(user => this.extractUser(user));
+      })
+    );
   }
 
   /**
@@ -236,6 +232,11 @@ export class UserDataService {
       role: user.role,
       orgEinheit: user.orgEinheit
     };
+
+    if(user.passwordHash === ""){
+      updateUser.passwordHash = ""
+      updateUser.salt = ""
+    }
 
     return this.http.put(`${this.apiConfig.baseURL}/users`, updateUser);
   }

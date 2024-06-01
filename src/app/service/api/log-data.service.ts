@@ -46,10 +46,10 @@ export class LogDataService {
    * @param currentUser The current user accessing the logs.
    * @returns An Observable of Log array.
    */
-  getProjectLogs(projectID: number, currentUser: User): Observable<Log[]> {
+  getProjectLogs(projectID: number): Observable<Log[]> {
     return this.http
       .get<any[]>(
-        `${this.apiConfig.baseURL}/project-logs?projectID=${projectID}&userID=${currentUser.userID}`
+        `${this.apiConfig.baseURL}/project-logs/${projectID}`
       )
       .pipe(
         map((response: any[]) =>
@@ -248,7 +248,7 @@ export class LogDataService {
       projectID: project.projectID,
     };
 
-    this.createProjectLog(log).subscribe(
+    this.createUserLog(log).subscribe(
       () => console.log('Project deletion logged successfully'),
       (error) => console.error('Error logging project deletion:', error)
     );

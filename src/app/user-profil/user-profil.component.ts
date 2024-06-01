@@ -70,7 +70,7 @@ export class UserProfilComponent implements OnInit {
     // Save the user profile based on edit mode
     if (this.isEditMode) {
       // Validation for password strength and match
-      if (!this.userService.isPasswordStrong(this.password)) {
+      if (!this.userService.isPasswordStrong(this.password) && this.password !== "") {
         alert(
           'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one number'
         );
