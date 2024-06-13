@@ -4,18 +4,5 @@ import { Injectable } from '@angular/core';
   providedIn: 'root',
 })
 export class ApiConfigService {
-  baseURL = 'https://localhost:8080/DMSSystem';
-
-  encodeQueryString(params: any) {
-    const keys = Object.keys(params);
-    return keys.length
-      ? '?' +
-          keys
-            .map(
-              (key) =>
-                encodeURIComponent(key) + '=' + encodeURIComponent(params[key])
-            )
-            .join('&')
-      : '';
-  }
+  baseURL = 'https://localhost:8080/DMSSystemAPI';
 }

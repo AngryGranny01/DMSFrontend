@@ -13,7 +13,7 @@ export class UserService {
     userName: '',
     firstName: '',
     lastName: '',
-    passwordHash: '',
+    salt: '',
     email: '',
     role: Role.USER,
     orgEinheit: '',

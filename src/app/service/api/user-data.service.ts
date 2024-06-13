@@ -17,50 +17,10 @@ export class UserDataService {
     private http: HttpClient,
     private apiConfig: ApiConfigService,
     private encryptionService: EncryptionService,
-    private userService: UserService
   ) {}
 
   //-------------------------------------------- Login --------------------------------------------------------------//
 
-  /**
-   * Checks the validity of the password for the given user email.
-   * @param passwordPlain The plain text password.
-   * @param userEmail The email of the user.
-   * @returns An Observable containing the password data if successful.
-   */
-  checkPassword(passwordPlain: string, userEmail: string): Observable<any> {
-    return this.getSaltByEmail(userEmail).pipe(
-      switchMap((response: any) => {
-        console.log(response.salt)
-        const hashedPassword = this.encryptionService.getPBKDF2Key(
-          passwordPlain,
-          response.salt
-        );
-
-        return this.getPassword(userEmail).pipe(
-          map((response: any) => {
-
-            if (response.passwordHash === hashedPassword) {
-              return {
-                passwordHash: response.passwordHash,
-                userID: response.userID,
-              };
-            } else {
-              throw new Error('Password mismatch');
-            }
-          }),
-          catchError((error) => {
-            console.error('Failed to retrieve password:', error);
-            throw new Error('Failed to retrieve password');
-          })
-        );
-      }),
-      catchError((error) => {
-        console.error('Failed to retrieve salt:', error);
-        throw new Error('Failed to retrieve salt');
-      })
-    );
-  }
 
   /**
    * Retrieves user details by user ID.
@@ -82,25 +42,6 @@ export class UserDataService {
         throw new Error('Failed to fetch user data');
       })
     );
-  }
-
-  /**
-   * Retrieves the password data by user email.
-   * @param userEmail The email of the user.
-   * @returns An Observable containing the password data.
-   */
-  getPassword(userEmail: string): Observable<any> {
-    return this.http
-      .get(`${this.apiConfig.baseURL}/users/login?email=${userEmail}`)
-      .pipe(
-        map((response: any) => {
-          return response;
-        }),
-        catchError((error) => {
-          console.error('Failed to retrieve password:', error);
-          throw new Error('Failed to retrieve password');
-        })
-      );
   }
 
   //-------------------------------------------- Get-Requests --------------------------------------------------------------//
@@ -139,20 +80,6 @@ export class UserDataService {
       );
   }
 
-  /**
-   * Retrieves the salt by user email.
-   * @param email The email of the user.
-   * @returns An Observable containing the salt.
-   */
-  getSaltByEmail(email: string): Observable<string> {
-    return this.http
-      .get(`${this.apiConfig.baseURL}/users/findSalt?email=${email}`)
-      .pipe(
-        map((response: any) => {
-          return response;
-        })
-      );
-  }
 
   /**
    * Checks if the given user email exists.
@@ -214,10 +141,10 @@ export class UserDataService {
    * @param user The user data to be updated.
    * @returns An Observable representing the HTTP response.
    */
-  updateUser(user: User) {
+  updateUser(user: User, passwordPlain: string) {
     let salt = this.encryptionService.generateSalt();
     let passwordHash = this.encryptionService.getPBKDF2Key(
-      user.passwordHash,
+      passwordPlain,
       salt
     );
 
@@ -233,7 +160,7 @@ export class UserDataService {
       orgEinheit: user.orgEinheit
     };
 
-    if(user.passwordHash === ""){
+    if(passwordPlain === ""){
       updateUser.passwordHash = ""
       updateUser.salt = ""
     }
@@ -290,7 +217,7 @@ export class UserDataService {
       response.userName,
       response.firstName,
       response.lastName,
-      response.passwordHash,
+      response.salt,
       role,
       response.email,
       response.orgEinheit

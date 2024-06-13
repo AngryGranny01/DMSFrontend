@@ -73,7 +73,7 @@ export class UserManagmentPageComponent implements OnInit {
 
   // Checks if a user is activated based on their public key
   isActivated(user: User): boolean {
-    return user.passwordHash !== "";
+    return user.salt !== "";
   }
 
   // Deletes a user from the system

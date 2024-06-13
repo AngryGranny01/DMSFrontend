@@ -48,8 +48,8 @@ export class UserProfilComponent implements OnInit {
         userName: '',
         firstName: '',
         lastName: '',
-        passwordHash: '',
         email: '',
+        salt: '',
         role: Role.USER,
         orgEinheit: '',
       };
@@ -91,7 +91,6 @@ export class UserProfilComponent implements OnInit {
 
     // Update user profile and navigate
     this.user.email = this.email;
-    this.user.passwordHash = this.password;
 
     const updatedUser: User = {
       ...this.user,
@@ -188,7 +187,7 @@ export class UserProfilComponent implements OnInit {
       this.userService.currentUser = user;
       this.userService.currentUsername.next(user.userName);
     }
-    this.userDataService.updateUser(user).subscribe(
+    this.userDataService.updateUser(user, this.password).subscribe(
       () => {
         this.logDataService.addUpdateUserLog(user);
         this.router.navigate(['/userManagment']);

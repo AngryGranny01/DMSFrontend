@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-
+import { HttpClient } from '@angular/common/http';
+import { catchError, map } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 import { UserService } from './user.service';
 import { LogDataService } from './api/log-data.service';
-import { UserDataService } from './api/user-data.service';
-import { EncryptionService } from './encryption.service';
+import { ApiConfigService } from './api/api-config.service';
 
 @Injectable({
   providedIn: 'root',
@@ -16,8 +17,8 @@ export class AuthService {
     private readonly router: Router,
     private userService: UserService,
     private logDataService: LogDataService,
-    private userDataService: UserDataService,
-    private encryptionService: EncryptionService
+    private http: HttpClient,
+    private apiConfig: ApiConfigService,
   ) {}
 
   /**
@@ -29,47 +30,29 @@ export class AuthService {
    * @param passwordPlain The plain text password of the user.
    */
   loginUser(email: string, passwordPlain: string) {
-    let salt  = this.encryptionService.generateSalt()
-    console.log("Salt: ", salt)
-    console.log(this.encryptionService.getPBKDF2Key(passwordPlain,salt))
-    if (passwordPlain !== '') {
-      this.userDataService.checkPassword(passwordPlain, email).subscribe(
-        (passwordData) => {
-          this.userDataService
-            .getUser(
-              passwordData.userID
-            )
-            .subscribe(
-              (userData) => {
-                if (userData) {
-                  // User login successful
-                  this.userService.currentUser = userData;
-                  this.userService.currentUsername.next(userData.userName);
-                  console.log(this.userService.currentUser);
-                  this.isAuthenticated = true;
-                  this.router.navigate(['/dashboard']);
-                  this.logDataService.addLoginLog();
-                } else {
-                  // User login failed
-                  alert('Username or Password is incorrect');
-                }
-              },
-              (error) => {
-                // Handle login data retrieval error
-                console.error('Error retrieving user data:', error);
-                alert('Failed to retrieve user data. Please try again later.');
-              }
-            );
-        },
-        (error) => {
-          // Handle password check error
-          console.error('Error checking password:', error);
-          alert('Failed to login. Please try again later.');
-        }
-      );
-    } else {
+    if (passwordPlain.trim() === '') {
       alert('Password field cannot be empty');
+      return;
     }
+    const data = {
+      email: email,
+      passwordPlain: passwordPlain,
+    }
+    return this.http.post(`${this.apiConfig.baseURL}/login`, data)
+      .pipe(
+        map((response: any) => {
+          this.isAuthenticated = true;
+          this.userService.currentUser = response.user;
+          console.log(this.userService.currentUser)
+          this.userService.currentUsername.next(response.user.userName);
+          this.router.navigate(['/dashboard']);
+          this.logDataService.addLoginLog();
+        }),
+        catchError((error) => {
+          console.error('Login error:', error);
+          return throwError(error);
+        })
+      );
   }
 
   /**
@@ -87,8 +70,6 @@ export class AuthService {
   logout(): void {
     this.router.navigate(['/login']);
     this.isAuthenticated = false;
-
-    // Log logout action
     this.logDataService.addLogoutLog();
   }
 }
