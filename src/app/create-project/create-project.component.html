@@ -7,6 +7,7 @@
         </h3>
       </div>
       <div class="card-body">
+        <!-- Project Name Input -->
         <div class="row">
           <div class="col-md-3">
             <label for="projectName"><b>Projektname</b></label>
@@ -19,6 +20,8 @@
             />
           </div>
         </div>
+
+        <!-- Project Manager Selection -->
         <div class="row mt-3">
           <div class="col-md-3">
             <label for="projectManager"><b>Projektmanager</b></label>
@@ -32,24 +35,25 @@
                   matInput
                   [formControl]="myControl"
                   [matAutocomplete]="auto"
-                  (input)="filter()"
-                  (focus)="filter()"
+                  (input)="filterOptions()"
+                  (focus)="filterOptions()"
                 />
                 <mat-autocomplete requireSelection #auto="matAutocomplete">
-                  @for (option of filteredOptions; track option) {
-                  <mat-option [value]="option.fullName">{{
-                    option.fullName
-                  }}</mat-option>
-                  }
+                  <mat-option
+                    *ngFor="let option of filteredOptions"
+                    [value]="option.fullName"
+                    >{{ option.fullName }}</mat-option
+                  >
                 </mat-autocomplete>
               </mat-form-field>
             </form>
           </div>
         </div>
 
+        <!-- Project End Date Input -->
         <div class="row">
           <div class="col-md-3">
-            <label for="projectManager"><b>Projektende</b></label>
+            <label for="projectEndDate"><b>Projektende</b></label>
             <form class="example-form">
               <mat-form-field appearance="outline">
                 <input
@@ -67,16 +71,17 @@
                   matSuffix
                   [for]="releasedAtPicker"
                   [disabled]="false"
-                >
-                  <mat-datepicker
-                    #releasedAtPicker
-                    [disabled]="false"
-                  ></mat-datepicker
                 ></mat-datepicker-toggle>
+                <mat-datepicker
+                  #releasedAtPicker
+                  [disabled]="false"
+                ></mat-datepicker>
               </mat-form-field>
             </form>
           </div>
         </div>
+
+        <!-- Users Selection Table -->
         <div class="row">
           <div class="col-md-9">
             <label for="addUser"><b>Users</b></label>
@@ -118,6 +123,8 @@
             </div>
           </div>
         </div>
+
+        <!-- Project Description Input -->
         <div class="row mt-3">
           <div class="col-md-9">
             <div class="form-group">
@@ -132,6 +139,8 @@
             </div>
           </div>
         </div>
+
+        <!-- Action Buttons -->
         <div class="row">
           <div class="col-md-9">
             <button
@@ -144,9 +153,7 @@
             <button
               type="reset"
               class="btn btn-secondary float-end"
-              routerLink="/createProject"
               routerLink="/dashboard"
-              routerLinkActive="active"
             >
               Verwerfen
             </button>

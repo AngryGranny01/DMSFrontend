@@ -9,7 +9,6 @@ export class Project {
     public manager: User,
     public users: User[],
     public description: string,
-    public key: string,
     public endDate: Date
   ) {}
 }

@@ -1,20 +1,17 @@
-import {
-  Component,
-  ElementRef,
-  ViewChild,
-  OnDestroy,
-  OnInit,
-} from '@angular/core';
-import { Observable, Subject, of, takeUntil } from 'rxjs';
+import { Component, ElementRef, ViewChild, OnDestroy, OnInit } from '@angular/core';
+import { Observable, Subject, of } from 'rxjs';
+import { takeUntil, map } from 'rxjs/operators';
+import { FormControl } from '@angular/forms';
+import { Router } from '@angular/router';
+
 import { Project } from '../models/projectInterface';
 import { User } from '../models/userInterface';
-import { FormControl } from '@angular/forms';
 import { Role } from '../models/role';
+
 import { ProjectService } from '../service/project.service';
 import { UserDataService } from '../service/api/user-data.service';
 import { UserService } from '../service/user.service';
 import { ProjectManagerDataService } from '../service/api/project-manager-data.service';
-import { Router } from '@angular/router';
 import { ProjectDataService } from '../service/api/project-data.service';
 import { LogDataService } from '../service/api/log-data.service';
 import { EncryptionService } from '../service/encryption.service';
@@ -23,7 +20,7 @@ import { DashboardComponent } from '../dashboard/dashboard.component';
 @Component({
   selector: 'app-create-project',
   templateUrl: './create-project.component.html',
-  styleUrl: './create-project.component.css',
+  styleUrls: ['./create-project.component.css'],
   providers: [DashboardComponent],
 })
 export class CreateProjectComponent implements OnInit, OnDestroy {
@@ -32,23 +29,18 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
   options: { fullName: string; userID: number }[] = [];
   filteredOptions: { fullName: string; userID: number }[] = [];
 
-  startDateControl = new FormControl();
-  project!: Project;
-
-  myDate!: Date;
+  projectName: string = '';
+  projectDescription: string = '';
+  myDate: Date = new Date();
   minDate: Date = new Date();
-  maxDate!: Date;
+  maxDate: Date = new Date(new Date().getFullYear() + 5, new Date().getMonth(), new Date().getDate());
 
   isEditMode: boolean = false;
+  project!: Project;
   users$: Observable<User[]> = of([]);
   checkedUsers: User[] = [];
-  selectedManager: { fullName: string; userID: number } = {
-    fullName: '',
-    userID: 0,
-  };
+  selectedManager: { fullName: string; userID: number } = { fullName: '', userID: 0 };
 
-  projectName: any;
-  projectDescription: any;
   private unsubscribe$ = new Subject<void>();
 
   constructor(
@@ -60,68 +52,46 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     private logDataService: LogDataService,
     private encryptionService: EncryptionService,
     private router: Router
-  ) {
-    this.filteredOptions = this.options.slice();
-  }
+  ) {}
 
   ngOnInit() {
-    if (this.projectService.isProjectEditMode) {
-      this.isEditMode = true;
-      this.project = this.projectService.getSelectedProject();
-      this.setInputFieldsForEditProject();
-    } else {
-      this.isEditMode = false;
-      this.setInputFieldsForNewProject();
-    }
+    this.isEditMode = this.projectService.isProjectEditMode;
+    this.isEditMode ? this.initializeEditProject() : this.initializeNewProject();
     this.loadAllUsers();
   }
 
-  // Sets input fields when editing an existing project
-  setInputFieldsForEditProject() {
-    // Set Project Name Field
+  ngOnDestroy() {
+    this.unsubscribe$.next();
+    this.unsubscribe$.complete();
+  }
+
+  private initializeEditProject() {
+    this.project = this.projectService.getSelectedProject();
     this.projectName = this.project.name;
-    // Set Project Manager Field
-    this.selectedManager.fullName =
-      this.userService.concatenateFirstnameLastname(
+    this.projectDescription = this.project.description;
+    this.myDate = new Date(this.project.endDate);
+    this.maxDate = new Date(this.myDate.getFullYear() + 5, this.myDate.getMonth(), this.myDate.getDate());
+    this.selectedManager = {
+      fullName: this.userService.concatenateFirstnameLastname(
         this.project.manager.firstName,
         this.project.manager.lastName
-      ) +
-      ' (' +
-      this.project.manager.orgEinheit +
-      ')';
-    this.selectedManager.userID = this.project.manager.userID;
-    this.myControl = new FormControl(this.selectedManager.fullName);
-
-    this.myDate = new Date(this.project.endDate);
-    this.maxDate = new Date(
-      this.myDate.getFullYear() + 5,
-      this.myDate.getMonth(),
-      this.myDate.getDate()
-    );
-    // Set Project Description Field
-    this.projectDescription = this.project.description;
+      ) + ' (' + this.project.manager.orgEinheit + ')',
+      userID: this.project.manager.userID
+    };
+    this.myControl.setValue(this.selectedManager.fullName);
     this.checkedUsers = this.project.users;
   }
 
-  // Sets input fields when creating a new project
-  setInputFieldsForNewProject() {
-    const today = new Date();
-    this.maxDate = new Date(
-      today.getFullYear() + 5,
-      today.getMonth(),
-      today.getDate()
-    );
+  private initializeNewProject() {
+    this.maxDate = new Date(new Date().getFullYear() + 5, new Date().getMonth(), new Date().getDate());
   }
 
-  // Loads all users from the server
-  loadAllUsers() {
+  private loadAllUsers() {
     this.users$ = this.userDataService.getAllUsers();
-    this.users$.pipe(takeUntil(this.unsubscribe$)).subscribe((users) => {
+    this.users$.pipe(takeUntil(this.unsubscribe$)).subscribe(users => {
       this.options = users
-        .filter(
-          (user) => user.role === Role.ADMIN || user.role === Role.MANAGER
-        )
-        .map((user) => ({
+        .filter(user => user.role === Role.ADMIN || user.role === Role.MANAGER)
+        .map(user => ({
           fullName: `${user.firstName} ${user.lastName} (${user.orgEinheit})`,
           userID: user.userID,
         }));
@@ -129,102 +99,36 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Checks if a user exists in the project
-  userExistsInProject(user: User): boolean {
-    if (this.project === undefined) {
-      return false;
-    }
-    return !!this.project.users.find(
-      (projectUser) => projectUser.userID === user.userID
-    );
+  private findSelectedUser() {
+    const selectedOption = this.myControl.value;
+    return this.options.find(option => option.fullName === selectedOption);
   }
 
-  // Filters the list of options based on input
-  filter(): void {
-    const filterValue = this.input.nativeElement.value.toLowerCase();
-    this.filteredOptions = this.options.filter((option) => {
-      return option.fullName.toLowerCase().includes(filterValue);
+  private createProjectData(managerID: number, projectKey: string) {
+    return {
+      projectID: this.isEditMode ? this.project.projectID : 0,
+      projectName: this.projectName,
+      projectDescription: this.projectDescription,
+      projectKey: projectKey,
+      projectEndDate: this.myDate,
+      managerID: managerID,
+      userIDs: this.checkedUsers.map(user => user.userID)
+    };
+  }
+
+  private addProjectManagerToCheckedUsers(manager: { fullName: string; userID: number }) {
+    this.users$.pipe(
+      takeUntil(this.unsubscribe$),
+      map(users => users.find(user => user.userID === manager.userID))
+    ).subscribe((selectedManagerUser: User | undefined) => {
+      if (selectedManagerUser && !this.checkedUsers.some(user => user.userID === manager.userID)) {
+        this.checkedUsers.push(selectedManagerUser);
+      }
     });
   }
 
-  // Saves the project to the server
-  saveProject() {
-    const selectedUser = this.findSelectedUser();
-    this.addProjectManagerToUsers();
-
-    if (!selectedUser) {
-      alert('No Project Manager Selected');
-      return;
-    }
-    const userID = selectedUser.userID;
-
-    this.projectManagerDataService.getManagerAndAdminPassword(userID).subscribe(
-      (response: any) => {
-        let projectKey: string = this.encryptionService.generateProjectKey(
-          response.adminPasswordHash,
-          response.managerPasswordHash
-        );
-
-        const projectData = {
-          projectID: 0,
-          projectName: this.projectName,
-          projectDescription: this.projectDescription,
-          projectKey: projectKey,
-          projectEndDate: this.myDate,
-          managerID: response.managerID,
-          userIDs: this.checkedUsers.map((user) => ({
-            userID: user.userID,
-          })),
-        };
-
-        if (this.isEditMode === true) {
-          projectData.projectID = this.project.projectID;
-          this.updateProject(projectData);
-        } else {
-          this.createNewProject(projectData);
-        }
-      },
-      (error) => {
-        console.error('Error fetching managerID:', error);
-      }
-    );
-  }
-
-  // Finds the selected user
-  findSelectedUser(): any {
-    const selectedOption = this.myControl.value;
-    const selectedUser = this.options.find(
-      (option) => option.fullName === selectedOption
-    );
-    return selectedUser;
-  }
-
-  // Creates a new project
-  createNewProject(data: any) {
-    let project = {
-      projectName: data.projectName,
-      projectDescription: data.projectDescription,
-      projectKey: data.projectKey,
-      projectEndDate: data.projectEndDate,
-      managerID: data.managerID,
-    };
-    this.projectDataService.createProject(project, data.userIDs).subscribe(
-      (response: any) => {
-        this.logDataService.addCreateProjectLog(
-          response.projectID,
-          project.projectName
-        );
-        this.router.navigate(['/dashboard']);
-      },
-      (error) => {
-        console.error('Error creating project:', error);
-      }
-    );
-  }
-
-  // Updates an existing project
-  updateProject(data: any) {
-    let project = {
+  private mapToProject(data: any) {
+    return {
       projectID: data.projectID,
       projectName: data.projectName,
       projectDescription: data.projectDescription,
@@ -232,49 +136,70 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
       projectEndDate: data.projectEndDate,
       managerID: data.managerID,
     };
-    this.projectDataService.updateProject(project, data.userIDs).subscribe(
-      () => {
-        this.logDataService.addUpdateProjectLog(
-          project.projectID,
-          project.projectName
-        );
+  }
+
+  filterOptions() {
+    const filterValue = this.input.nativeElement.value.toLowerCase();
+    this.filteredOptions = this.options.filter(option => option.fullName.toLowerCase().includes(filterValue));
+  }
+
+  saveProject() {
+    const selectedManager = this.findSelectedUser();
+    if (!selectedManager) {
+      alert('No Project Manager Selected');
+      return;
+    }
+
+    this.addProjectManagerToCheckedUsers(selectedManager);
+
+    this.projectManagerDataService.getManagerAndAdminPassword(selectedManager.userID).subscribe(
+      response => {
+        const projectKey = this.encryptionService.generateProjectKey(response.adminPasswordHash, response.managerPasswordHash);
+        const projectData = this.createProjectData(response.managerID, projectKey);
+
+        this.isEditMode ? this.updateProject(projectData) : this.createNewProject(projectData);
+      },
+      error => {
+        console.error('Error fetching managerID:', error);
+      }
+    );
+  }
+
+  private createNewProject(data: any) {
+    const project = this.mapToProject(data);
+    this.projectDataService.createProject(project, data.userIDs).subscribe(
+      response => {
+        this.logDataService.addCreateProjectLog(response.projectID, project.projectName);
         this.router.navigate(['/dashboard']);
       },
-      (error) => {
+      error => {
+        console.error('Error creating project:', error);
+      }
+    );
+  }
+
+  private updateProject(data: any) {
+    const project = this.mapToProject(data);
+    this.projectDataService.updateProject(project, data.userIDs).subscribe(
+      () => {
+        this.logDataService.addUpdateProjectLog(project.projectID, project.projectName);
+        this.router.navigate(['/dashboard']);
+      },
+      error => {
         console.error('Error updating project:', error);
       }
     );
-    this.router.navigate(['/dashboard']);
   }
 
-  // Unsubscribes from observables to prevent memory leaks
-  ngOnDestroy() {
-    this.unsubscribe$.next();
-    this.unsubscribe$.complete();
-  }
-
-  // Toggles selection of a user
   toggleUserSelection(user: User) {
-    const index = this.checkedUsers.findIndex(
-      (checkedUser) => checkedUser.userID === user.userID
-    );
-
-    if (index !== -1) {
-      this.checkedUsers.splice(index, 1);
-    } else {
-      this.checkedUsers.push(user);
-    }
+    const index = this.checkedUsers.findIndex(checkedUser => checkedUser.userID === user.userID);
+    index !== -1 ? this.checkedUsers.splice(index, 1) : this.checkedUsers.push(user);
   }
 
-  // Adds project manager to selected users if not already present
-  addProjectManagerToUsers() {
-    let selectedManager = this.findSelectedUser();
-    const managerAlreadySelected = this.checkedUsers.find(
-      (user) => user.userID === selectedManager.userID
-    );
-
-    if (!managerAlreadySelected) {
-      this.checkedUsers.push(selectedManager);
+  userExistsInProject(user: User): boolean {
+    if (this.project === undefined) {
+      return false;
     }
+    return !!this.project.users.find(projectUser => projectUser.userID === user.userID);
   }
 }

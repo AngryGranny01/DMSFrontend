@@ -9,7 +9,7 @@ export class ProjectService {
 
   private selectedProject!: Project;
   public isProjectEditMode: boolean = true;
-  public showAllProjects: boolean = false;
+  public showAllProjects: boolean = true;
 
   /**
    * Sets the currently selected project.
