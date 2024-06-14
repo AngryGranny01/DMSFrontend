@@ -12,7 +12,11 @@ import { LoginPageComponent } from './login-page/login-page.component';
 import { UserManagmentPageComponent } from './user-managment-page/user-managment-page.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { NavbarComponent } from './navbar/navbar.component';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import {
+  HTTP_INTERCEPTORS,
+  HttpClient,
+  HttpClientModule,
+} from '@angular/common/http';
 import { UserProfilComponent } from './user-profil/user-profil.component';
 import { CreateProjectComponent } from './create-project/create-project.component';
 import { LogsComponent } from './logs/logs.component';
@@ -26,6 +30,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { EmailPageComponent } from './email-page/email-page.component';
+import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { ForbiddenComponent } from './forbidden/forbidden.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +45,7 @@ import { EmailPageComponent } from './email-page/email-page.component';
     LogsComponent,
     DashboardComponent,
     EmailPageComponent,
+    ForbiddenComponent,
   ],
   imports: [
     BrowserModule,
@@ -64,7 +71,10 @@ import { EmailPageComponent } from './email-page/email-page.component';
       },
     }),
   ],
-  providers: [provideAnimationsAsync('noop')],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    provideAnimationsAsync('noop'),
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

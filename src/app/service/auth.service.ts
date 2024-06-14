@@ -43,6 +43,7 @@ export class AuthService {
         map((response: any) => {
           this.isAuthenticated = true;
           this.userService.currentUser = response.user;
+          this.setToken(response.token); // Store the token
           console.log(this.userService.currentUser)
           this.userService.currentUsername.next(response.user.userName);
           this.router.navigate(['/dashboard']);
@@ -50,7 +51,6 @@ export class AuthService {
         }),
         catchError((error) => {
           console.error('Login error:', error);
-          this.logDataService.addErrorUserLog(`Login error`);
           throw new Error(error);
         })
       );
@@ -72,5 +72,22 @@ export class AuthService {
     this.router.navigate(['/login']);
     this.isAuthenticated = false;
     this.logDataService.addLogoutLog();
+    this.removeToken(); // Remove the token
+  }
+
+  setToken(token: string) {
+    localStorage.setItem('authToken', token);
+  }
+
+  getToken(): string {
+    return localStorage.getItem('authToken') || '';
+  }
+
+  removeToken() {
+    localStorage.removeItem('authToken');
+  }
+
+  setAuthenticated(authenticated: boolean){
+    this.isAuthenticated = authenticated
   }
 }
