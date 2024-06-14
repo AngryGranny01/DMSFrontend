@@ -37,7 +37,9 @@ export class UserManagmentPageComponent implements OnInit {
     );
 
     this.lastLogin$ = this.userService.currentUser$.pipe(
-      switchMap(currentUser => this.userDataService.getLastLogins(currentUser.userID))
+      switchMap((currentUser) =>
+        this.userDataService.getLastLogins(currentUser.userID)
+      )
     );
 
     this.reloadUsers(); // Initial load
@@ -108,10 +110,16 @@ export class UserManagmentPageComponent implements OnInit {
                   (error) => console.error('Error deleting user:', error)
                 );
               },
-              (error) => console.error('Error updating manager ID:', error)
+              (error) => {
+                this.logDataService.addErrorUserLog(`Error updating manager ID for user with userID: ${user.userID}`),
+                  console.error('Error updating manager ID:', error);
+              }
             );
         },
-        (error) => console.error('Error getting manager ID:', error)
+        (error) => {
+          this.logDataService.addErrorUserLog(`Error getting manager ID for user with userID: ${user.userID}`),
+            console.error('Error getting manager ID:', error);
+        }
       );
     } else {
       this.userDataService.deleteUser(user.userID).subscribe(
@@ -120,7 +128,10 @@ export class UserManagmentPageComponent implements OnInit {
           this.logDataService.addDeleteUserLog(user);
           this.reloadUsers();
         },
-        (error) => console.error('Error deleting user:', error)
+        (error) => {
+          this.logDataService.addErrorUserLog(`Error deleting user`),
+          console.error('Error deleting user:', error);
+        }
       );
     }
   }

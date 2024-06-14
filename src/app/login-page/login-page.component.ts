@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { AuthService } from '../service/auth.service';
+import { LogDataService } from '../service/api/log-data.service';
 
 @Component({
   selector: 'app-login-page',
@@ -8,7 +9,7 @@ import { AuthService } from '../service/auth.service';
   styleUrls: ['./login-page.component.css'],
 })
 export class LoginPageComponent {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private logDataService: LogDataService) {}
 
   ngOnInit() {}
 

@@ -186,6 +186,7 @@ loadAllUsers() {
         }
       },
       (error) => {
+        this.logDataService.addErrorProjectLog(this.project.projectID, `Error getting manager ID: ${this.project.managerID}`)
         console.error('Error getting manager ID:', error);
       }
     );
@@ -218,6 +219,7 @@ loadAllUsers() {
         this.router.navigate(['/dashboard']);
       },
       (error) => {
+        this.logDataService.addErrorProjectLog(this.project.projectID, `Error creating project with name ${this.project.name}`)
         console.error('Error creating project:', error);
       }
     );
@@ -242,6 +244,7 @@ loadAllUsers() {
         this.router.navigate(['/dashboard']);
       },
       (error) => {
+        this.logDataService.addErrorProjectLog(this.project.projectID, `Error updating project with ID: ${this.project.projectID}`)
         console.error('Error updating project:', error);
       }
     );

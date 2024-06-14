@@ -91,9 +91,9 @@ export class DashboardComponent implements OnInit {
         this.refreshProjects();
       },
       (error) => {
-        // Handle error deleting Project
         console.error('Error deleting Project:', error);
-        // Optionally, notify the user about the error
+        this.logDataService.addErrorProjectLog(project.projectID,`Failed to update project with ID: ${project.projectID}`)
+        throw new Error(`Failed to update project`)
       }
     );
   }

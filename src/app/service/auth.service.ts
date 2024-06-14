@@ -50,7 +50,8 @@ export class AuthService {
         }),
         catchError((error) => {
           console.error('Login error:', error);
-          return throwError(error);
+          this.logDataService.addErrorUserLog(`Login error`);
+          throw new Error(error);
         })
       );
   }

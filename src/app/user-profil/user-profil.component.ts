@@ -126,11 +126,13 @@ export class UserProfilComponent implements OnInit {
                 : this.createNewUser(updatedUser);
             },
             (emailError) => {
+              this.logDataService.addErrorUserLog(`Error checking if email: ${updatedUser.email} exists`),
               console.error('Error checking if email exists:', emailError);
             }
           );
       },
       (usernameError) => {
+        this.logDataService.addErrorUserLog(`Error checking if username: ${updatedUser.userName} exists`),
         console.error('Error checking if username exists:', usernameError);
       }
     );
@@ -159,16 +161,19 @@ export class UserProfilComponent implements OnInit {
                   this.updateUserAndNavigate(user);
                 },
                 error => {
+                  this.logDataService.addErrorUserLog(`Error deleting Project Manager with id: ${managerID}`),
                   console.error('Error deleting Project Manager:', error);
                 }
               );
             },
             error => {
+              this.logDataService.addErrorUserLog(`Error updating Project Manager with ID: ${managerID}`),
               console.error('Error updating manager ID:', error);
             }
           );
         },
         error => {
+          this.logDataService.addErrorUserLog(`${error.message}`),
           console.error('Error getting manager ID:', error);
         }
       );
@@ -189,6 +194,7 @@ export class UserProfilComponent implements OnInit {
         this.router.navigate(['/userManagment']);
       },
       (error) => {
+        this.logDataService.addErrorUserLog(`Error updating user profile with userID: ${user.userID}`),
         console.error('Error updating user profile:', error);
       }
     );
@@ -202,6 +208,7 @@ export class UserProfilComponent implements OnInit {
         this.router.navigate(['/userManagment']);
       },
       (error) => {
+        this.logDataService.addErrorUserLog(`Error creating user profile`),
         console.error('Error creating user profile:', error);
       }
     );

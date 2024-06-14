@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
 import { User } from '../../models/userInterface';
 import { ApiConfigService } from './api-config.service';
 import { Role } from '../../models/role';
 import { EncryptionService } from '../encryption.service';
-import { UserService } from '../user.service';
+import { LogDataService } from './log-data.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,32 +17,9 @@ export class UserDataService {
     private http: HttpClient,
     private apiConfig: ApiConfigService,
     private encryptionService: EncryptionService,
+    private logDataService: LogDataService
   ) {}
 
-  //-------------------------------------------- Login --------------------------------------------------------------//
-
-
-  /**
-   * Retrieves user details by user ID.
-   * @param userID The ID of the user.
-   * @returns An Observable containing the user details.
-   */
-  getUser(
-    userID: string
-  ): Observable<User> {
-    return this.http.get<any>(`${this.apiConfig.baseURL}/user/${userID}`).pipe(
-      map((userData) => {
-        if (!userData) {
-          throw new Error('User data not found');
-        }
-        return userData
-      }),
-      catchError((error) => {
-        console.error('Failed to fetch user data:', error);
-        throw new Error('Failed to fetch user data');
-      })
-    );
-  }
 
   //-------------------------------------------- Get-Requests --------------------------------------------------------------//
 
@@ -51,11 +28,14 @@ export class UserDataService {
    * @returns An Observable containing the list of users.
    */
   getAllUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiConfig.baseURL}/users`).pipe(
-      map((users: User[]) => {
-        return users.map(user => this.extractUser(user));
-      })
-    );
+    return this.http.get<User[]>(`${this.apiConfig.baseURL}/users`)
+      .pipe(
+        catchError((error) => {
+          console.error('Failed to fetch users:', error);
+          this.logDataService.addErrorUserLog(`Failed to fetch all users`);
+          throw new Error(('Failed to fetch users'));
+        })
+      );
   }
 
   /**
@@ -63,18 +43,20 @@ export class UserDataService {
    * @param senderID The ID of the sender.
    * @returns An Observable containing the last logins data.
    */
-  getLastLogins(
-    senderID: number
-  ): Observable<{ [userID: string]: Date }> {
-    return this.http
-      .get<any[]>(`${this.apiConfig.baseURL}/user-logs/lastLogins/${senderID}`)
+  getLastLogins(senderID: number): Observable<{ [userID: string]: Date }> {
+    return this.http.get<any[]>(`${this.apiConfig.baseURL}/user-logs/lastLogins/${senderID}`)
       .pipe(
         map((response: any[]) => {
           const lastLogins: { [userID: string]: Date } = {};
-          response.forEach((entry) => {
-            lastLogins[entry.userID] = new Date(entry.date)
+          response.forEach(entry => {
+            lastLogins[entry.userID] = new Date(entry.date);
           });
           return lastLogins;
+        }),
+        catchError((error) => {
+          console.error('Failed to fetch last logins:', error);
+          this.logDataService.addErrorUserLog(`Failed to fetch last logins of users`);
+          throw new Error('Failed to fetch last logins');
         })
       );
   }
@@ -85,14 +67,13 @@ export class UserDataService {
    * @param userEmail The email of the user.
    * @returns An Observable indicating whether the user email exists.
    */
-  checkIfUserEmailExists(userEmail: string) {
-    return this.http
-      .get(
-        `${this.apiConfig.baseURL}/users/checkEmailExist?email=${userEmail}`
-      )
+  checkIfUserEmailExists(userEmail: string): Observable<boolean> {
+    return this.http.get<any>(`${this.apiConfig.baseURL}/users/checkEmailExist?email=${userEmail}`)
       .pipe(
-        map((response: any) => {
-          return response.exist;
+        map(response => response.exist),
+        catchError((error) => {
+          console.error('Failed to check email existence:', error);
+          throw new Error('Failed to check email existence');
         })
       );
   }
@@ -102,14 +83,13 @@ export class UserDataService {
    * @param userName The username to check.
    * @returns An Observable indicating whether the username exists.
    */
-  checkIfUserNameExists(userName: string) {
-    return this.http
-      .get(
-        `${this.apiConfig.baseURL}/users/checkUsernameExist?username=${userName}`
-      )
+  checkIfUserNameExists(userName: string): Observable<boolean> {
+    return this.http.get<any>(`${this.apiConfig.baseURL}/users/checkUsernameExist?username=${userName}`)
       .pipe(
-        map((response: any) => {
-          return response.exist;
+        map(response => response.exist),
+        catchError((error) => {
+          console.error('Failed to check username existence:', error);
+          throw new Error('Failed to check username existence');
         })
       );
   }
@@ -121,7 +101,7 @@ export class UserDataService {
    * @param user The user data to be created.
    * @returns An Observable representing the HTTP response.
    */
-  createUser(user: User) {
+  createUser(user: User): Observable<User> {
     const createUser = {
       userName: user.userName,
       firstName: user.firstName,
@@ -130,7 +110,13 @@ export class UserDataService {
       role: user.role,
       orgEinheit: user.orgEinheit,
     };
-    return this.http.post(`${this.apiConfig.baseURL}/users`, createUser);
+    return this.http.post<User>(`${this.apiConfig.baseURL}/users`, createUser)
+      .pipe(
+        catchError((error) => {
+          console.error('Failed to create user:', error);
+          throw new Error('Failed to create user');
+        })
+      );
   }
 
   //-------------------------------------------- Put-Requests --------------------------------------------------------------//
@@ -164,7 +150,13 @@ export class UserDataService {
       updateUser.salt = ""
     }
 
-    return this.http.put(`${this.apiConfig.baseURL}/users`, updateUser);
+    return this.http.put<User>(`${this.apiConfig.baseURL}/users`, updateUser)
+    .pipe(
+      catchError((error) => {
+        console.error('Failed to update user:', error);
+        throw new Error('Failed to update user');
+      })
+    );
   }
 
   //-------------------------------------------- Delete-Requests --------------------------------------------------------------//
@@ -174,8 +166,14 @@ export class UserDataService {
    * @param userID The ID of the user to be deleted.
    * @returns An Observable representing the HTTP response.
    */
-  deleteUser(userID: number) {
-    return this.http.delete(`${this.apiConfig.baseURL}/users/${userID}`);
+  deleteUser(userID: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiConfig.baseURL}/users/${userID}`)
+      .pipe(
+        catchError((error) => {
+          console.error('Failed to delete user:', error);
+          throw new Error('Failed to delete user');
+        })
+      );
   }
 
   /**
@@ -185,15 +183,16 @@ export class UserDataService {
    * @returns An Observable containing the verification status.
    */
   verifyToken(token: string, passwordPlain: string): Observable<string> {
-    let salt = this.encryptionService.generateSalt();
-    let passwordHash = this.encryptionService.getPBKDF2Key(passwordPlain, salt);
-
-    const data = {
-      token: token,
-      passwordHash: passwordHash,
-      salt: salt
-    };
-    return this.http.put<string>(`${this.apiConfig.baseURL}/verifyToken`, data);
+    const salt = this.encryptionService.generateSalt();
+    const passwordHash = this.encryptionService.getPBKDF2Key(passwordPlain, salt);
+    const data = { token, passwordHash, salt };
+    return this.http.put<string>(`${this.apiConfig.baseURL}/verifyToken`, data)
+      .pipe(
+        catchError((error) => {
+          console.error('Failed to verify token:', error);
+          throw new Error('Failed to verify token');
+        })
+      );
   }
 
   //-------------------------------------------- Helper Functions --------------------------------------------------------------//

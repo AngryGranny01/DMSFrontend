@@ -1,9 +1,5 @@
 import { Injectable } from '@angular/core';
 import CryptoJS from 'crypto-js';
-import forge from 'node-forge';
-
-import { User } from '../models/userInterface';
-import { Role } from '../models/role';
 
 @Injectable({
   providedIn: 'root',

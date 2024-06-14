@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, catchError, map } from 'rxjs';
 
 import { User } from '../../models/userInterface';
 import { Project } from '../../models/projectInterface';
@@ -29,14 +29,13 @@ export class LogDataService {
    * @returns An Observable of Log array.
    */
   getUserLogs(userID: number): Observable<Log[]> {
-    return this.http
-      .get<any[]>(`${this.apiConfig.baseURL}/user-logs/${userID}`)
+    return this.http.get<any[]>(`${this.apiConfig.baseURL}/user-logs/${userID}`)
       .pipe(
-        map((response: any[]) =>
-          response.map((userLog) =>
-            this.extractLogs(userLog)
-          )
-        )
+        map(response => response.map(log => this.extractLogs(log))),
+        catchError((error) => {
+          console.error('Failed to fetch user logs:', error);
+          throw new Error('Failed to fetch user logs');
+        })
       );
   }
 
@@ -47,16 +46,13 @@ export class LogDataService {
    * @returns An Observable of Log array.
    */
   getProjectLogs(projectID: number): Observable<Log[]> {
-    return this.http
-      .get<any[]>(
-        `${this.apiConfig.baseURL}/project-logs/${projectID}`
-      )
+    return this.http.get<any[]>(`${this.apiConfig.baseURL}/project-logs/${projectID}`)
       .pipe(
-        map((response: any[]) =>
-          response.map((projectLog) =>
-            this.extractLogs(projectLog)
-          )
-        )
+        map(response => response.map(log => this.extractLogs(log))),
+        catchError((error) => {
+          console.error('Failed to fetch project logs:', error);
+          throw new Error('Failed to fetch project logs');
+        })
       );
   }
 
@@ -69,11 +65,16 @@ export class LogDataService {
     const data = {
       userID: log.userID,
       activityName: log.activityName,
-      activityDescription:log.description,
+      activityDescription: log.description,
     };
-    return this.http.post(`${this.apiConfig.baseURL}/user-logs`, data);
+    return this.http.post(`${this.apiConfig.baseURL}/user-logs`, data)
+      .pipe(
+        catchError((error) => {
+          console.error('Failed to create user log:', error);
+          throw new Error('Failed to create user log');
+        })
+      );
   }
-
   /**
    * Creates a project log entry.
    * @param log The log data to be created.
@@ -86,7 +87,13 @@ export class LogDataService {
       activityName: log.activityName,
       activityDescription: log.description,
     };
-    return this.http.post(`${this.apiConfig.baseURL}/project-logs`, data);
+    return this.http.post(`${this.apiConfig.baseURL}/project-logs`, data)
+      .pipe(
+        catchError((error) => {
+          console.error('Failed to create project log:', error);
+          throw new Error('Failed to create project log');
+        })
+      );
   }
 
   /**
@@ -258,20 +265,20 @@ export class LogDataService {
   addErrorUserLog(errorMessage: string) {
     const log = {
       description: LogDescriptionValues.createLogDescription(
-        ActivityName.DELETE_USER,
+        ActivityName.ERROR,
         errorMessage
       ),
-      activityName: ActivityName.DELETE_USER,
+      activityName: ActivityName.ERROR,
       userID: this.userService.getCurrentUserID(),
     };
 
     this.createUserLog(log).subscribe(
-      () => console.log('User deletion logged successfully'),
-      (error) => console.error('Error logging user deletion:', error)
+      () => console.log('User Error logged successfully'),
+      (error) => console.error('Error logging user error:', error)
     );
   }
 
-  addErrorProjectLog(project: Project, errorMessage: string) {
+  addErrorProjectLog(projectID: number, errorMessage: string) {
     const log = {
       description: LogDescriptionValues.createLogDescription(
         ActivityName.ERROR,
@@ -279,12 +286,12 @@ export class LogDataService {
       ),
       activityName: ActivityName.ERROR,
       userID: this.userService.getCurrentUserID(),
-      projectID: project.projectID,
+      projectID: projectID,
     };
 
     this.createProjectLog(log).subscribe(
-      () => console.log('Project deletion logged successfully'),
-      (error) => console.error('Error logging project deletion:', error)
+      () => console.log('Project Error logged successfully'),
+      (error) => console.error('Error logging project error:', error)
     );
   }
 }
