@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable, of, BehaviorSubject } from 'rxjs';
+import { switchMap, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { Role } from '../models/role';
 import { User } from '../models/userInterface';
 import { UserService } from '../service/user.service';
@@ -17,6 +18,7 @@ import { NiceDateService } from '../service/nice-date.service';
 export class UserManagmentPageComponent implements OnInit {
   users$: Observable<User[]> = of([]);
   lastLogin$: Observable<{ [userID: string]: Date }> = of({});
+  private reloadUsers$ = new BehaviorSubject<void>(undefined);
 
   constructor(
     private userService: UserService,
@@ -28,7 +30,17 @@ export class UserManagmentPageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadAllUsers();
+    this.users$ = this.reloadUsers$.pipe(
+      debounceTime(300), // Debounce to avoid rapid successive calls
+      distinctUntilChanged(), // Ensure distinct reload triggers
+      switchMap(() => this.userDataService.getAllUsers())
+    );
+
+    this.lastLogin$ = this.userService.currentUser$.pipe(
+      switchMap(currentUser => this.userDataService.getLastLogins(currentUser.userID))
+    );
+
+    this.reloadUsers(); // Initial load
   }
 
   // Opens user logs for viewing
@@ -48,13 +60,9 @@ export class UserManagmentPageComponent implements OnInit {
     this.userService.setSelectedUser(user);
   }
 
-  // Loads all users from the server
-  loadAllUsers(): void {
-    this.users$ = this.userDataService.getAllUsers();
-    console.log(this.users$)
-    this.lastLogin$ = this.userDataService.getLastLogins(
-      this.userService.getCurrentUser().userID
-    );
+  // Triggers reloading of all users
+  reloadUsers(): void {
+    this.reloadUsers$.next();
   }
 
   // Creates a formatted date string from the last login date
@@ -73,7 +81,7 @@ export class UserManagmentPageComponent implements OnInit {
 
   // Checks if a user is activated based on their public key
   isActivated(user: User): boolean {
-    return user.salt !== "";
+    return user.salt !== '';
   }
 
   // Deletes a user from the system
@@ -94,7 +102,7 @@ export class UserManagmentPageComponent implements OnInit {
               () => {
                 this.userDataService.deleteUser(user.userID).subscribe(
                   () => {
-                    this.refreshUsers();
+                    this.reloadUsers();
                     this.logDataService.addDeleteUserLog(user);
                   },
                   (error) => console.error('Error deleting user:', error)
@@ -110,16 +118,10 @@ export class UserManagmentPageComponent implements OnInit {
         () => {
           // Log entry
           this.logDataService.addDeleteUserLog(user);
-
-          this.refreshUsers();
+          this.reloadUsers();
         },
         (error) => console.error('Error deleting user:', error)
       );
     }
-  }
-
-  // Refreshes the list of users
-  refreshUsers(): void {
-    this.loadAllUsers();
   }
 }

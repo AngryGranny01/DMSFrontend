@@ -13,23 +13,6 @@ export class ProjectManagerDataService {
   //-------------------------------------------- Get-Requests --------------------------------------------------------------//
 
   /**
-   * Retrieves the password of the project manager and admin associated with the given user ID.
-   * @param userID The ID of the user.
-   * @returns An Observable of the project manager and admin passwords.
-   */
-  getManagerAndAdminPassword(userID: number): Observable<any> {
-    return this.http
-      .get(
-        `${this.apiConfig.baseURL}/projectAdminAndManager/passwords/${userID}`
-      )
-      .pipe(
-        map((response: any) => {
-          return response;
-        })
-      );
-  }
-
-  /**
    * Retrieves the manager ID associated with the given user ID.
    * @param userID The ID of the user.
    * @returns An Observable of the manager ID.
@@ -37,7 +20,7 @@ export class ProjectManagerDataService {
   getManagerID(userID: number): Observable<number> {
     return this.http
       .get(
-        `${this.apiConfig.baseURL}/projectAdminAndManager/passwords/${userID}`
+        `${this.apiConfig.baseURL}/projectManager/${userID}`
       )
       .pipe(
         map((response: any) => {

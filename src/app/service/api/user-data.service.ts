@@ -53,7 +53,6 @@ export class UserDataService {
   getAllUsers(): Observable<User[]> {
     return this.http.get<User[]>(`${this.apiConfig.baseURL}/users`).pipe(
       map((users: User[]) => {
-        // Process each user within the map operator
         return users.map(user => this.extractUser(user));
       })
     );

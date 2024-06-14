@@ -24,6 +24,7 @@ export class UserService {
   public currentUsername: BehaviorSubject<string> = new BehaviorSubject<string>(
     ''
   );
+  public currentUser$: BehaviorSubject<User> = new BehaviorSubject<User>(this.currentUser)
 
   constructor() {}
 
@@ -115,9 +116,7 @@ export class UserService {
    * @returns A boolean indicating if the email is valid.
    */
   checkIfEmailIsValidEmail(email: string): boolean {
-    // Regular expression pattern for basic email format validation
     const emailPattern: RegExp = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
     return emailPattern.test(email);
   }
 }

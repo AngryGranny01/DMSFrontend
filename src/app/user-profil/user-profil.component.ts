@@ -151,28 +151,24 @@ export class UserProfilComponent implements OnInit {
       }
 
       this.managerDataService.getManagerID(user.userID).subscribe(
-        (managerID) => {
-          this.managerDataService
-            .updateManagerID(this.userService.getCurrentUserID(), managerID)
-            .subscribe(
-              () => {
-                this.managerDataService
-                  .deleteProjectManager(managerID)
-                  .subscribe(
-                    () => {
-                      this.updateUserAndNavigate(user);
-                    },
-                    (error) => {
-                      console.error('Error deleting Project Manager:', error);
-                    }
-                  );
-              },
-              (error) => {
-                console.error('Error updating manager ID:', error);
-              }
-            );
+        managerID => {
+          this.managerDataService.updateManagerID(this.userService.getCurrentUserID(), managerID).subscribe(
+            () => {
+              this.managerDataService.deleteProjectManager(managerID).subscribe(
+                () => {
+                  this.updateUserAndNavigate(user);
+                },
+                error => {
+                  console.error('Error deleting Project Manager:', error);
+                }
+              );
+            },
+            error => {
+              console.error('Error updating manager ID:', error);
+            }
+          );
         },
-        (error) => {
+        error => {
           console.error('Error getting manager ID:', error);
         }
       );

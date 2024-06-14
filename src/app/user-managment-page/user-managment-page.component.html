@@ -45,8 +45,8 @@
                 >
               </td>
               <td>
-                {{ (createDateString((lastLogin$ | async)?.[user.userID]) | async) || 'Loading...' }}<br>
-                {{ (createTimeString((lastLogin$ | async)?.[user.userID]) | async) || 'Loading...' }}
+                {{ (createDateString((lastLogin$ | async)?.[user.userID]) | async) || '' }}<br>
+                {{ (createTimeString((lastLogin$ | async)?.[user.userID]) | async) || '' }}
               </td>
               <td>{{ user.role }}</td>
               <td>
