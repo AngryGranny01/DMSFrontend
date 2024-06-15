@@ -8,21 +8,6 @@ export class EncryptionService {
   private readonly keySizePBKDF2 = 256;
   private readonly iterationsPBKDF2 = 10000;
 
-  //--------------------------- Project Encryption ------------------------//
-  /**
-   * Generates a project key based on admin and project manager password hashes.
-   * @param adminPasswordHash The admin's password hash.
-   * @param projectManagerPasswordHash The project manager's password hash.
-   * @returns The generated project key.
-   */
-  generateProjectKey(
-    adminPasswordHash: string,
-    projectManagerPasswordHash: string
-  ): string {
-    const combinedHash = adminPasswordHash + projectManagerPasswordHash;
-    return this.getPBKDF2Key(combinedHash, '');
-  }
-
   //--------------------------- PDKF2 ---------------------------------//
 
   /**

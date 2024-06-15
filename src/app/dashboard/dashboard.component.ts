@@ -17,7 +17,7 @@ import { Role } from '../models/role';
 export class DashboardComponent implements OnInit {
   projects$: Observable<Project[]> = of([]); // Initialize with an empty observable array
   showProjects: boolean;
-  selectedOption: string = 'All Projects';
+  selectedOption: string = 'My Projects';
 
   constructor(
     private userService: UserService,
@@ -31,11 +31,7 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.showProjects === true) {
-      this.loadAllProjects();
-    } else {
-      this.loadUserProjects();
-    }
+    this.loadUserProjects();
   }
 
   // Loads all projects

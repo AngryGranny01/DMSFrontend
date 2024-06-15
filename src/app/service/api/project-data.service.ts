@@ -47,11 +47,11 @@ export class ProjectDataService {
     const newProject = {
       projectName: project.projectName,
       projectDescription: project.projectDescription,
-      projectKey: project.projectKey,
       projectEndDate: project.projectEndDate,
       managerID: project.managerID,
       userIDs: userIDs,
     };
+    console.log("created Project", newProject)
     return this.http.post(`${this.apiConfig.baseURL}/projects`, newProject);
   }
 
@@ -62,10 +62,10 @@ export class ProjectDataService {
       managerID: project.managerID,
       projectName: project.projectName,
       projectDescription: project.projectDescription,
-      projectKey: project.projectKey,
       projectEndDate: project.projectEndDate,
       userIDs: userIDs,
     };
+    console.log("updated Project", updatedProject)
     return this.http.put(`${this.apiConfig.baseURL}/projects`, updatedProject);
   }
 

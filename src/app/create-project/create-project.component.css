@@ -71,3 +71,12 @@ table.table td a.delete {
   background-color: #c82333;
   border-color: #bd2130;
 }
+
+.is-invalid .form-control,
+.is-invalid .mat-form-field-underline {
+  border-color: red !important;
+}
+
+.is-invalid .mat-form-field-outline {
+  border-color: red !important;
+}

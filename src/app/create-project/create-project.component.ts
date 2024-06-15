@@ -19,6 +19,7 @@ import { ProjectDataService } from '../service/api/project-data.service';
 import { LogDataService } from '../service/api/log-data.service';
 import { EncryptionService } from '../service/encryption.service';
 import { DashboardComponent } from '../dashboard/dashboard.component';
+import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-create-project',
@@ -112,31 +113,31 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     );
   }
 
-// Loads all users from the server
-loadAllUsers() {
-  this.users$ = this.userDataService.getAllUsers();
+  // Loads all users from the server
+  loadAllUsers() {
+    this.users$ = this.userDataService.getAllUsers();
 
-  this.users$.pipe(takeUntil(this.unsubscribe$)).subscribe((users) => {
-    if (this.userService.currentUser.role === Role.MANAGER) {
-      // Only load the current user into filter options if they are a Project Manager
-      const currentUser = this.userService.currentUser;
-      this.options = [{
-        fullName: `${currentUser.firstName} ${currentUser.lastName} (${currentUser.orgEinheit})`,
-        userID: currentUser.userID,
-      }];
-      console.log(this.options)
-    } else {
-      // Load all Project Managers or Admins into the options
-      this.options = users
-        .filter((user) => user.role === Role.ADMIN || user.role === Role.MANAGER)
-        .map((user) => ({
-          fullName: `${user.firstName} ${user.lastName} (${user.orgEinheit})`,
-          userID: user.userID,
-        }));
-    }
-    this.filteredOptions = [...this.options];
-  });
-}
+    this.users$.pipe(takeUntil(this.unsubscribe$)).subscribe((users) => {
+      if (this.userService.currentUser.role === Role.MANAGER) {
+        // Only load the current user into filter options if they are a Project Manager
+        const currentUser = this.userService.currentUser;
+        this.options = [{
+          fullName: `${currentUser.firstName} ${currentUser.lastName} (${currentUser.orgEinheit})`,
+          userID: currentUser.userID,
+        }];
+        console.log(this.options)
+      } else {
+        // Load all Project Managers or Admins into the options
+        this.options = users
+          .filter((user) => user.role === Role.ADMIN || user.role === Role.MANAGER)
+          .map((user) => ({
+            fullName: `${user.firstName} ${user.lastName} (${user.orgEinheit})`,
+            userID: user.userID,
+          }));
+      }
+      this.filteredOptions = [...this.options];
+    });
+  }
 
   // Checks if a user exists in the project
   userExistsInProject(user: User): boolean {
@@ -157,14 +158,19 @@ loadAllUsers() {
   }
 
   // Saves the project to the server
-  saveProject() {
+  saveProject(form: NgForm) {
+    if (!form.valid) {
+      alert('Please fill out all required fields.');
+      return;
+    }
+
+    if(this.projectDescription === undefined){
+      this.projectDescription = ""
+    }
+    
     const selectedUser = this.findSelectedUser();
     this.addProjectManagerToUsers();
 
-    if (!selectedUser) {
-      alert('No Project Manager Selected');
-      return;
-    }
     this.projectManagerDataService.getManagerID(selectedUser.userID).subscribe(
       (managerID) => {
         const projectData = {
@@ -186,8 +192,8 @@ loadAllUsers() {
         }
       },
       (error) => {
-        this.logDataService.addErrorProjectLog(this.project.projectID, `Error getting manager ID: ${this.project.managerID}`)
         console.error('Error getting manager ID:', error);
+        alert('An error occurred while retrieving the manager ID.');
       }
     );
   }
@@ -206,21 +212,17 @@ loadAllUsers() {
     let project = {
       projectName: data.projectName,
       projectDescription: data.projectDescription,
-      projectKey: data.projectKey,
       projectEndDate: data.projectEndDate,
       managerID: data.managerID,
     };
+
     this.projectDataService.createProject(project, data.userIDs).subscribe(
       (response: any) => {
-        this.logDataService.addCreateProjectLog(
-          response.projectID,
-          project.projectName
-        );
         this.router.navigate(['/dashboard']);
       },
       (error) => {
-        this.logDataService.addErrorProjectLog(this.project.projectID, `Error creating project with name ${this.project.name}`)
         console.error('Error creating project:', error);
+        alert('An error occurred while creating the project.');
       }
     );
   }
@@ -231,21 +233,16 @@ loadAllUsers() {
       projectID: data.projectID,
       projectName: data.projectName,
       projectDescription: data.projectDescription,
-      projectKey: data.projectKey,
       projectEndDate: data.projectEndDate,
       managerID: data.managerID,
     };
     this.projectDataService.updateProject(project, data.userIDs).subscribe(
       () => {
-        this.logDataService.addUpdateProjectLog(
-          project.projectID,
-          project.projectName
-        );
         this.router.navigate(['/dashboard']);
       },
       (error) => {
-        this.logDataService.addErrorProjectLog(this.project.projectID, `Error updating project with ID: ${this.project.projectID}`)
         console.error('Error updating project:', error);
+        alert('An error occurred while updating the project.');
       }
     );
     this.router.navigate(['/dashboard']);
