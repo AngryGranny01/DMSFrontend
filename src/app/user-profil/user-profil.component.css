@@ -2,3 +2,22 @@
   padding-top: 10px;
 }
 
+.btn-primary {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.btn-primary:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
+
+.btn-secondary {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-secondary:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
+}

@@ -1,3 +1,4 @@
+/* Existing styles remain unchanged */
 .folder-box {
   margin-top: 60px;
   border: 1px solid #ccc;
@@ -42,19 +43,29 @@
   font-size: 24px;
 }
 
-.table-title .btn {
+.table-title .btn, .project-button, .projectMenu {
   color: #566787;
-  float: right;
   font-size: 13px;
+  font-family: sans-serif;
   background: #fff;
   border: none;
-  min-width: 50px;
-  border-radius: 2px;
+  padding: 10px 20px;
+  border-radius: 4px;
   outline: none !important;
-  margin-left: 10px;
+  margin-left: 4px;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%; /* Set a fixed width */
+
 }
 
-.table-title .btn span {
+.table-title .btn:hover, .project-button:hover {
+  background-color: lightgrey !important;
+  color: black !important;
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.project-button span {
   float: left;
   margin-top: 5px;
 }
@@ -103,4 +114,12 @@ table.table td a.delete {
 
 table.table td a.settings {
   color: #313437;
+}
+
+table.table td a:hover {
+  color: #2196f3;
+}
+
+mat-menu {
+  margin-top: 10px;
 }

@@ -1,4 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  FormControl,
+} from '@angular/forms';
 import { UserService } from '../service/user.service';
 import { User } from '../models/userInterface';
 import { Role } from '../models/role';
@@ -13,34 +19,50 @@ import { Router } from '@angular/router';
   styleUrls: ['./user-profil.component.css'],
 })
 export class UserProfilComponent implements OnInit {
-  selectedRole: Role = Role.USER;
+  profileForm: FormGroup;
   user!: User;
-  email: string = '';
-  password: string = '';
-  repeatPassword: string = '';
   isEditMode: boolean = false;
 
   constructor(
+    private fb: FormBuilder,
     private userService: UserService,
     private userDataService: UserDataService,
     private managerDataService: ProjectManagerDataService,
     private logDataService: LogDataService,
     private router: Router
-  ) {}
+  ) {
+    this.profileForm = this.fb.group({
+      userName: ['', Validators.required],
+      orgEinheit: ['', Validators.required],
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.minLength(8)],
+      repeatPassword: ['', Validators.minLength(8)],
+      role: new FormControl(
+        { value: '', disabled: false },
+        Validators.required
+      ),
+    });
+  }
 
   ngOnInit(): void {
-    // Initialize user profile based on edit mode
     this.initializeUser();
   }
 
   initializeUser(): void {
-    // Check if in edit mode or new user mode, and set initial values accordingly
     if (this.userService.isEditMode) {
       this.isEditMode = true;
       this.user = this.userService.getSelectedUser();
-      this.password = '';
-      this.email = this.user.email;
-      this.selectedRole = this.user.role;
+      this.profileForm.patchValue({
+        userName: this.user.userName,
+        orgEinheit: this.user.orgEinheit,
+        firstName: this.user.firstName,
+        lastName: this.user.lastName,
+        email: this.user.email,
+        role: this.user.role,
+      });
+      this.profileForm.get('role')?.setValue(this.user.role); // Default role
     } else {
       this.isEditMode = false;
       this.user = {
@@ -53,48 +75,61 @@ export class UserProfilComponent implements OnInit {
         role: Role.USER,
         orgEinheit: '',
       };
+      this.profileForm.get('role')?.setValue(Role.USER); // Default role
+
+      this.profileForm.reset();
+    }
+
+    if (this.profileForm.get('role')?.value === Role.ADMIN && this.isAdmin() || !this.isAdmin()) {
+      this.profileForm.get('role')?.disable();
+    }
+    if (this.isAdmin() && this.profileForm.get('role')?.value !== Role.ADMIN) {
+      const adminRadio = document.getElementById('ADMIN') as HTMLInputElement;
+      if (adminRadio) {
+        adminRadio.disabled = true;
+      }
     }
   }
 
   isAdmin(): boolean {
-    // Check if the current user is an admin
     return this.userService.isAdmin();
   }
 
   selectedUserIsAdmin(): boolean {
-    // Check if the selected user is an admin
     return this.userService.selectedUserIsAdmin();
   }
 
   saveProfile(): void {
-    // Save the user profile based on edit mode
     if (this.isEditMode) {
-      // Validation for password strength and match
-      if (!this.userService.isPasswordStrong(this.password) && this.password !== "") {
+      if (
+        !this.userService.isPasswordStrong(this.profileForm.value.password) &&
+        this.profileForm.value.password !== ''
+      ) {
         alert(
           'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one number'
         );
         return;
       }
 
-      if (this.password !== this.repeatPassword) {
+      if (
+        this.profileForm.value.password !==
+        this.profileForm.value.repeatPassword
+      ) {
         alert('Passwords do not match');
         return;
       }
     }
 
-    // Validate email format
-    if (!this.userService.checkIfEmailIsValidEmail(this.email)) {
+    if (
+      !this.userService.checkIfEmailIsValidEmail(this.profileForm.value.email)
+    ) {
       alert('Email is not a valid email');
       return;
     }
 
-    // Update user profile and navigate
-    this.user.email = this.email;
-
     const updatedUser: User = {
       ...this.user,
-      role: this.selectedRole,
+      ...this.profileForm.value,
     };
 
     if (
@@ -126,25 +161,27 @@ export class UserProfilComponent implements OnInit {
                 : this.createNewUser(updatedUser);
             },
             (emailError) => {
-              this.logDataService.addErrorUserLog(`Error checking if email: ${updatedUser.email} exists`),
-              console.error('Error checking if email exists:', emailError);
+              this.logDataService.addErrorUserLog(
+                `Error checking if email: ${updatedUser.email} exists`
+              ),
+                console.error('Error checking if email exists:', emailError);
             }
           );
       },
       (usernameError) => {
-        this.logDataService.addErrorUserLog(`Error checking if username: ${updatedUser.userName} exists`),
-        console.error('Error checking if username exists:', usernameError);
+        this.logDataService.addErrorUserLog(
+          `Error checking if username: ${updatedUser.userName} exists`
+        ),
+          console.error('Error checking if username exists:', usernameError);
       }
     );
   }
 
   updateSelectedUser(user: User): void {
-    // Update selected user and navigate
     if (
       user.role === Role.USER &&
       Role.USER !== this.userService.getSelectedUser().role
     ) {
-      // Reset user to USER role confirmation
       const confirmResetToUser = confirm(
         'Wenn Sie den Benutzer auf "User" zurücksetzen, werden Sie zum Projektmanager für die offenen Projekte. Möchten Sie fortfahren?'
       );
@@ -153,28 +190,36 @@ export class UserProfilComponent implements OnInit {
       }
 
       this.managerDataService.getManagerID(user.userID).subscribe(
-        managerID => {
-          this.managerDataService.updateManagerID(this.userService.getCurrentUserID(), managerID).subscribe(
-            () => {
-              this.managerDataService.deleteProjectManager(managerID).subscribe(
-                () => {
-                  this.updateUserAndNavigate(user);
-                },
-                error => {
-                  this.logDataService.addErrorUserLog(`Error deleting Project Manager with id: ${managerID}`),
-                  console.error('Error deleting Project Manager:', error);
-                }
-              );
-            },
-            error => {
-              this.logDataService.addErrorUserLog(`Error updating Project Manager with ID: ${managerID}`),
-              console.error('Error updating manager ID:', error);
-            }
-          );
+        (managerID) => {
+          this.managerDataService
+            .updateManagerID(this.userService.getCurrentUserID(), managerID)
+            .subscribe(
+              () => {
+                this.managerDataService
+                  .deleteProjectManager(managerID)
+                  .subscribe(
+                    () => {
+                      this.updateUserAndNavigate(user);
+                    },
+                    (error) => {
+                      this.logDataService.addErrorUserLog(
+                        `Error deleting Project Manager with id: ${managerID}`
+                      ),
+                        console.error('Error deleting Project Manager:', error);
+                    }
+                  );
+              },
+              (error) => {
+                this.logDataService.addErrorUserLog(
+                  `Error updating Project Manager with ID: ${managerID}`
+                ),
+                  console.error('Error updating manager ID:', error);
+              }
+            );
         },
-        error => {
+        (error) => {
           this.logDataService.addErrorUserLog(`${error.message}`),
-          console.error('Error getting manager ID:', error);
+            console.error('Error getting manager ID:', error);
         }
       );
     } else {
@@ -183,25 +228,27 @@ export class UserProfilComponent implements OnInit {
   }
 
   updateUserAndNavigate(user: User): void {
-    // Update user profile and navigate to user management page
     if (user.userID === this.userService.currentUser.userID) {
       this.userService.currentUser = user;
       this.userService.currentUsername.next(user.userName);
     }
-    this.userDataService.updateUser(user, this.password).subscribe(
-      () => {
-        this.logDataService.addUpdateUserLog(user);
-        this.router.navigate(['/userManagment']);
-      },
-      (error) => {
-        this.logDataService.addErrorUserLog(`Error updating user profile with userID: ${user.userID}`),
-        console.error('Error updating user profile:', error);
-      }
-    );
+    this.userDataService
+      .updateUser(user, this.profileForm.value.password)
+      .subscribe(
+        () => {
+          this.logDataService.addUpdateUserLog(user);
+          this.router.navigate(['/userManagment']);
+        },
+        (error) => {
+          this.logDataService.addErrorUserLog(
+            `Error updating user profile with userID: ${user.userID}`
+          ),
+            console.error('Error updating user profile:', error);
+        }
+      );
   }
 
   createNewUser(user: User): void {
-    // Create new user and navigate to user management page
     this.userDataService.createUser(user).subscribe(
       (response: any) => {
         this.logDataService.addCreateUserLog(response.userID, user.userName);
@@ -209,8 +256,12 @@ export class UserProfilComponent implements OnInit {
       },
       (error) => {
         this.logDataService.addErrorUserLog(`Error creating user profile`),
-        console.error('Error creating user profile:', error);
+          console.error('Error creating user profile:', error);
       }
     );
+  }
+
+  cancel(): void {
+    this.router.navigate(['/userManagment']);
   }
 }
