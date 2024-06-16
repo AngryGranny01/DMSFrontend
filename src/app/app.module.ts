@@ -25,13 +25,14 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatInputModule } from '@angular/material/input';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatNativeDateModule } from '@angular/material/core'; // Import MatNativeDateModule
+import { MatNativeDateModule } from '@angular/material/core';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { EmailPageComponent } from './email-page/email-page.component';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { ForbiddenComponent } from './forbidden/forbidden.component';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 
 @NgModule({
   declarations: [
@@ -46,6 +47,7 @@ import { ForbiddenComponent } from './forbidden/forbidden.component';
     DashboardComponent,
     EmailPageComponent,
     ForbiddenComponent,
+    PageNotFoundComponent,
   ],
   imports: [
     BrowserModule,

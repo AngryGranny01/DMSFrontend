@@ -9,7 +9,9 @@ import { LogDataService } from '../service/api/log-data.service';
   styleUrls: ['./login-page.component.css'],
 })
 export class LoginPageComponent {
-  constructor(private authService: AuthService, private logDataService: LogDataService) {}
+  constructor(
+    private authService: AuthService,
+  ) {}
 
   ngOnInit() {}
 
@@ -33,15 +35,18 @@ export class LoginPageComponent {
       },
       (error) => {
         // Handle login error
+        let errorMessage = 'Failed to login. Please try again later.';
+
         if (error.status === 401) {
-          alert('Invalid Login Data. Please try again.');
+          errorMessage = 'Invalid Login Data. Please try again.';
         } else if (error.status === 404) {
-          alert('User not found.');
+          errorMessage = 'User not found.';
         } else if (error.status === 500) {
-          alert('Internal server error. Please try again later.');
-        } else {
-          alert('Failed to login. Please try again later.');
+          errorMessage = 'Internal server error. Please try again later.';
         }
+        console.log("Error:",errorMessage)
+
+        alert(errorMessage);
         console.error('Login error:', error);
       }
     );

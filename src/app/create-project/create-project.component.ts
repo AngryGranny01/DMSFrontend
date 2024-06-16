@@ -167,7 +167,7 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     if(this.projectDescription === undefined){
       this.projectDescription = ""
     }
-    
+
     const selectedUser = this.findSelectedUser();
     this.addProjectManagerToUsers();
 
@@ -218,6 +218,8 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
 
     this.projectDataService.createProject(project, data.userIDs).subscribe(
       (response: any) => {
+        console.log("Project", response)
+        this.logDataService.addCreateProjectLog(response.projectID,project.projectName)
         this.router.navigate(['/dashboard']);
       },
       (error) => {
@@ -238,6 +240,7 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     };
     this.projectDataService.updateProject(project, data.userIDs).subscribe(
       () => {
+        this.logDataService.addUpdateProjectLog(project.projectID,project.projectName)
         this.router.navigate(['/dashboard']);
       },
       (error) => {

@@ -23,16 +23,16 @@ export class AuthService {
     private encryptionService: EncryptionService
   ) {}
 
- /**
-   * Attempts to login a user with the provided email and password.
-   * If successful, sets the current user, updates authentication status,
-   * navigates to the dashboard, and logs the login action.
-   * If unsuccessful, displays an error message.
-   * @param email The email of the user attempting to login.
-   * @param passwordPlain The plain text password of the user.
-   * @returns Observable of the login response
-   */
- loginUser(email: string, passwordPlain: string): Observable<any> {
+/**
+ * Attempts to login a user with the provided email and password.
+ * If successful, sets the current user, updates authentication status,
+ * navigates to the dashboard, and logs the login action.
+ * If unsuccessful, displays an error message.
+ * @param email The email of the user attempting to login.
+ * @param passwordPlain The plain text password of the user.
+ * @returns Observable of the login response
+ */
+loginUser(email: string, passwordPlain: string): Observable<any> {
   if (passwordPlain.trim() === '') {
     alert('Password field cannot be empty');
     return of(null);
@@ -65,8 +65,7 @@ export class AuthService {
     }),
     catchError((error) => {
       console.error('Login error:', error);
-      alert('Login failed, please try again.');
-      return of(null);
+      return throwError(error);
     })
   );
 }
@@ -102,7 +101,7 @@ export class AuthService {
     localStorage.removeItem('authToken');
   }
 
-  setAuthenticated(authenticated: boolean){
-    this.isAuthenticated = authenticated
+  setAuthenticated(authenticated: boolean) {
+    this.isAuthenticated = authenticated;
   }
 }

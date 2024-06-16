@@ -24,7 +24,6 @@ export class AuthInterceptor implements HttpInterceptor {
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
           // Handle unauthorized access
-          alert('Unauthorized access. Please log in.');
           this.router.navigate(['/login'], { queryParams: { returnUrl: request.url } });
         } else if (error.status === 403) {
           // Handle forbidden access

@@ -9,6 +9,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { AuthGuard } from './guard/auth.guard';
 import { EmailPageComponent } from './email-page/email-page.component';
 import { ForbiddenComponent } from './forbidden/forbidden.component';
+import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 
 const routes: Routes = [
   {path: 'login', component: LoginPageComponent},
@@ -19,7 +20,9 @@ const routes: Routes = [
   {path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard]},
   { path: 'setPassword', component: EmailPageComponent},
   { path: 'forbidden', component: ForbiddenComponent },
-  { path: '', redirectTo: '/login', pathMatch: 'full' } // Default redirect to login
+  { path: '', redirectTo: '/login', pathMatch: 'full' }, // Default redirect to login
+  { path: '**', component: PageNotFoundComponent } // Wildcard route for 404 page
+
 ];
 
 @NgModule({
