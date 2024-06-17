@@ -5,7 +5,7 @@
 
 .table-wrapper {
   min-width: 1000px;
-  background: #fff;
+  background: var(--white);;
   padding: 40px 25px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }
@@ -18,8 +18,8 @@
 
 .table-title {
   padding-bottom: 15px;
-  background: #299be4;
-  color: #fff;
+  background: var(--highlight);
+  color: var(--white);
   padding: 16px 30px;
   margin: -20px -25px 10px;
   border-radius: 3px 3px 0 0;
@@ -31,10 +31,10 @@
 }
 
 .table-title .btn {
-  color: #566787;
+  color: var(--main-content);
   float: right;
   font-size: 13px;
-  background: #fff;
+  background: var(--white);
   border: none;
   min-width: 50px;
   border-radius: 4px;
@@ -44,12 +44,12 @@
 }
 
 .table-title .btn:hover {
-  color: #566787;
+  color: var(--main-content);
 }
 
 .btn-secondary {
-  background-color: #6c757d;
-  color: white;
+  background-color: var(--btn-secondary-bg);
+  color: var(--white);
   border: none;
   padding: 10px 20px;
   font-size: 16px;
@@ -59,8 +59,8 @@
 }
 
 .btn-secondary:hover {
-  background-color: lightgray !important;
-  color: black !important;
+  background-color: var(--btn-secondary-hover-bg) !important;
+  color: var(--main-content) !important;
   transform: scale(1.05);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
@@ -99,21 +99,21 @@ table.table td:last-child i {
 
 table.table td a {
   font-weight: bold;
-  color: #566787;
+  color: var(--main-content);
   display: inline-block;
   text-decoration: none;
 }
 
 table.table td a.settings {
-  color: #313437;
+  color: var(--settings);
 }
 
 table.table td a.delete {
-  color: #f44336;
+  color: var(--danger);
 }
 
 table.table td a:hover {
-  color: #2196f3;
+  color: var(--highlight);
 }
 
 .status-circle {
@@ -126,9 +126,9 @@ table.table td a:hover {
 }
 
 .green {
-  background-color: green !important;
+  background-color: var(--success) !important;
 }
 
 .red {
-  background-color: red !important;
+  background-color: var(--danger) !important;
 }

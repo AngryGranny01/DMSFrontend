@@ -4,6 +4,8 @@
   bottom: 0;
   left: 0;
   height: 60px;
+  font-weight: bold;
+  background-color: var(--dark-gray);
 }
 
 .navbarText {

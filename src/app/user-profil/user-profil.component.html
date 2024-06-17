@@ -7,7 +7,7 @@
         </h4>
       </div>
       <div class="card-body">
-        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
           <div class="row">
             <div class="col-md-5">
               <div class="form-group">
@@ -19,6 +19,9 @@
                   formControlName="userName"
                   required
                 />
+                <div *ngIf="profileForm.controls['userName'].invalid && (profileForm.controls['userName'].dirty || profileForm.controls['userName'].touched)" class="alert alert-danger">
+                  Username is required.
+                </div>
               </div>
             </div>
             <div class="col-md-6 offset-md-1">
@@ -31,6 +34,9 @@
                   formControlName="orgEinheit"
                   required
                 />
+                <div *ngIf="profileForm.controls['orgEinheit'].invalid && (profileForm.controls['orgEinheit'].dirty || profileForm.controls['orgEinheit'].touched)" class="alert alert-danger">
+                  Organizational Unit is required.
+                </div>
               </div>
             </div>
           </div>
@@ -45,6 +51,9 @@
                   formControlName="firstName"
                   required
                 />
+                <div *ngIf="profileForm.controls['firstName'].invalid && (profileForm.controls['firstName'].dirty || profileForm.controls['firstName'].touched)" class="alert alert-danger">
+                  First Name is required.
+                </div>
               </div>
             </div>
             <div class="col-md-6">
@@ -57,6 +66,9 @@
                   formControlName="lastName"
                   required
                 />
+                <div *ngIf="profileForm.controls['lastName'].invalid && (profileForm.controls['lastName'].dirty || profileForm.controls['lastName'].touched)" class="alert alert-danger">
+                  Last Name is required.
+                </div>
               </div>
             </div>
           </div>
@@ -71,6 +83,9 @@
                   formControlName="email"
                   required
                 />
+                <div *ngIf="profileForm.controls['email'].invalid && (profileForm.controls['email'].dirty || profileForm.controls['email'].touched)" class="alert alert-danger">
+                  Valid email is required.
+                </div>
               </div>
             </div>
           </div>
@@ -85,6 +100,9 @@
                   formControlName="password"
                   minlength="8"
                 />
+                <div *ngIf="profileForm.controls['password'].invalid && (profileForm.controls['password'].dirty || profileForm.controls['password'].touched)" class="alert alert-danger">
+                  Password must be at least 8 characters long.
+                </div>
               </div>
             </div>
             <div class="col-md-6">
@@ -97,6 +115,9 @@
                   formControlName="repeatPassword"
                   minlength="8"
                 />
+                <div *ngIf="profileForm.controls['repeatPassword'].invalid && (profileForm.controls['repeatPassword'].dirty || profileForm.controls['repeatPassword'].touched)" class="alert alert-danger">
+                  Passwords must match.
+                </div>
               </div>
             </div>
           </div>

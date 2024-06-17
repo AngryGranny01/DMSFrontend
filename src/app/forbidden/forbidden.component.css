@@ -5,15 +5,16 @@
 
 .forbidden-container h1 {
   font-size: 3em;
-  color: #ff0000;
+  color: var(--danger);
 }
 
 .forbidden-container p {
   font-size: 1.5em;
+  color: var(--main-content);
 }
 
 .forbidden-container a {
   text-decoration: none;
-  color: #007bff;
+  color: var(--highlight);
   font-weight: bold;
 }

@@ -2,11 +2,32 @@
 
 :root {
   /* Backgrounds */
-  --dark_gray: rgb(51, 54, 63);
+  --dark-gray: rgb(51, 54, 63);
   --blue: rgb(62, 83, 121);
+  --light-gray: #f5f5f5;
+  --gray: gray;
+  --white: #ffffff;
 
   /* Font colors */
-  --main_headline: cornflowerblue;
+  --main-headline: cornflowerblue;
+  --main-content: #566787;
+  --highlight: #2196f3;
+  --danger: #f44336;
+  --success: #28a745;
+  --warning: #ffc107;
+  --info: #17a2b8;
+  --settings: #313437;
+
+  /* Button colors */
+  --btn-primary-bg: #28a745;
+  --btn-primary-border: #28a745;
+  --btn-primary-hover-bg: #218838;
+  --btn-primary-hover-border: #1e7e34;
+
+  --btn-secondary-bg: #dc3545;
+  --btn-secondary-border: #dc3545;
+  --btn-secondary-hover-bg: #c82333;
+  --btn-secondary-hover-border: #bd2130;
 }
 
 .mother {
@@ -24,12 +45,12 @@
 }
 
 #sidebarMenu {
-  background-color: var(--dark_gray);
-  color: var(--dark_gray);
+  background-color: var(--dark-gray);
+  color: var(--dark-gray);
 }
 
 h1, h2, h3 {
-  color: var(--main_headline);
+  color: var(--main-headline);
 }
 
 html, body {

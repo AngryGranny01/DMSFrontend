@@ -5,14 +5,16 @@
 
 .page-not-found h1 {
   font-size: 3em;
+  color: var(--danger);
 }
 
 .page-not-found p {
   font-size: 1.5em;
+  color: var(--main-content);
 }
 
 .page-not-found a {
   text-decoration: none;
-  color: #007bff;
+  color: var(--highlight);
   font-size: 1.2em;
 }

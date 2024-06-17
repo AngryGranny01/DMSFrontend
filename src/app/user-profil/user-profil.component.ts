@@ -99,7 +99,11 @@ export class UserProfilComponent implements OnInit {
     return this.userService.selectedUserIsAdmin();
   }
 
-  saveProfile(): void {
+  onSubmit(): void {
+    if (this.profileForm.invalid) {
+      return;
+    }
+
     if (this.isEditMode) {
       if (
         !this.userService.isPasswordStrong(this.profileForm.value.password) &&

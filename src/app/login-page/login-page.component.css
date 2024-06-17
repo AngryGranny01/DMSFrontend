@@ -13,8 +13,8 @@ input[type="password"] {
 }
 
 button {
-  background-color: #04aa6d;
-  color: white;
+  background-color: var(--success);
+  color: var(--white);
   padding: 14px 20px;
   margin: 8px 0;
   border: none;
@@ -29,7 +29,7 @@ button:hover {
 .form {
   width: 250px;
   height: 340px;
-  color: #fff;
+  color: var(--white);
   background: linear-gradient(
     to top,
     rgba(0, 0, 0, 0.8) 50%,
@@ -44,5 +44,5 @@ button:hover {
 }
 
 .login {
-  background-color: darkgray;
+  background-color: var(--dark-gray);
 }

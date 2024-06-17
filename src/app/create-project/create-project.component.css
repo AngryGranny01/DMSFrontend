@@ -1,14 +1,15 @@
-/* Set the same size, background color, and text color for input fields */
+/* Existing styles */
 .form-control,
 .mat-form-field,
 .mat-input-element {
   width: 100%;
-  background-color: #f5f5f5; /* Light gray background color */
-  color: #000; /* Black text color */
+  background-color: var(--light-gray);
+  color: #000;
 }
 
 .table-responsive {
   max-height: 800px;
+  overflow-y: auto;
 }
 
 .card-body {
@@ -17,18 +18,24 @@
 
 .table-wrapper {
   min-width: 600px;
-  background: #fff;
+  background: var(--white);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  position: relative;
 }
 
 .btn {
-  color: #fff; /* White text color */
+  color: var(--white);
   float: right;
   font-size: 15px;
   min-width: 50px;
   border-radius: 2px;
   margin-left: 10px;
   margin-bottom: 10px;
+}
+
+table.table {
+  width: 100%;
+  border-collapse: collapse;
 }
 
 table.table tr th,
@@ -38,45 +45,54 @@ table.table tr td {
   vertical-align: middle;
 }
 
+table.table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: #638bd4;
+  font-weight: bold;
+}
+
 table.table td a {
   font-weight: bold;
-  color: #566787;
+  color: var(--main-content);
   display: inline-block;
   text-decoration: none;
 }
 
 table.table td a.settings {
-  color: #313437;
+  color: var(--settings);
 }
+
 table.table td a.delete {
-  color: #f44336;
+  color: var(--danger);
 }
 
 .btn-primary {
-  background-color: #28a745;
-  border-color: #28a745;
+  background-color: var(--btn-primary-bg);
+  border-color: var(--btn-primary-border);
 }
 
 .btn-primary:hover {
-  background-color: #218838;
-  border-color: #1e7e34;
+  background-color: var(--btn-primary-hover-bg);
+  border-color: var(--btn-primary-hover-border);
 }
 
 .btn-secondary {
-  background-color: #dc3545;
-  border-color: #dc3545;
+  background-color: var(--btn-secondary-bg);
+  border-color: var(--btn-secondary-border);
 }
 
 .btn-secondary:hover {
-  background-color: #c82333;
-  border-color: #bd2130;
+  background-color: var(--btn-secondary-hover-bg);
+  border-color: var(--btn-secondary-hover-border);
 }
 
 .is-invalid .form-control,
 .is-invalid .mat-form-field-underline {
-  border-color: red !important;
+  border-color: var(--danger) !important;
 }
 
 .is-invalid .mat-form-field-outline {
-  border-color: red !important;
+  border-color: var(--danger) !important;
 }
