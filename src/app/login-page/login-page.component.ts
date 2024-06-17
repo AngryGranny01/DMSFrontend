@@ -44,7 +44,6 @@ export class LoginPageComponent {
         } else if (error.status === 500) {
           errorMessage = 'Internal server error. Please try again later.';
         }
-        console.log("Error:",errorMessage)
 
         alert(errorMessage);
         console.error('Login error:', error);

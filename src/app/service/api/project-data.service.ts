@@ -35,7 +35,6 @@ export class ProjectDataService {
         map((response: any[]) => response.map(this.extractProject)),
         catchError((error) => {
           console.error('Failed to fetch projects for user:', error);
-          this.logDataService.addErrorUserLog(`Failed to fetch projects for user: ${userID}`);
           throw new Error(('Failed to fetch projects for user'));
         })
       );
