@@ -87,7 +87,7 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
         this.project.manager.lastName
       ) +
       ' (' +
-      this.project.manager.orgEinheit +
+      this.project.manager.orgUnit +
       ')';
     this.selectedManager.userID = this.project.manager.userID;
     this.myControl = new FormControl(this.selectedManager.fullName);
@@ -121,16 +121,20 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
       if (this.userService.currentUser.role === Role.MANAGER) {
         // Only load the current user into filter options if they are a Project Manager
         const currentUser = this.userService.currentUser;
-        this.options = [{
-          fullName: `${currentUser.firstName} ${currentUser.lastName} (${currentUser.orgEinheit})`,
-          userID: currentUser.userID,
-        }];
+        this.options = [
+          {
+            fullName: `${currentUser.firstName} ${currentUser.lastName} (${currentUser.orgUnit})`,
+            userID: currentUser.userID,
+          },
+        ];
       } else {
         // Load all Project Managers or Admins into the options
         this.options = users
-          .filter((user) => user.role === Role.ADMIN || user.role === Role.MANAGER)
+          .filter(
+            (user) => user.role === Role.ADMIN || user.role === Role.MANAGER
+          )
           .map((user) => ({
-            fullName: `${user.firstName} ${user.lastName} (${user.orgEinheit})`,
+            fullName: `${user.firstName} ${user.lastName} (${user.orgUnit})`,
             userID: user.userID,
           }));
       }
@@ -163,8 +167,8 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if(this.projectDescription === undefined){
-      this.projectDescription = ""
+    if (this.projectDescription === undefined) {
+      this.projectDescription = '';
     }
 
     const selectedUser = this.findSelectedUser();
@@ -217,7 +221,10 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
 
     this.projectDataService.createProject(project, data.userIDs).subscribe(
       (response: any) => {
-        this.logDataService.addCreateProjectLog(response.projectID,project.projectName)
+        this.logDataService.addCreateProjectLog(
+          response.projectID,
+          project.projectName
+        );
         this.router.navigate(['/dashboard']);
       },
       (error) => {
@@ -238,7 +245,10 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     };
     this.projectDataService.updateProject(project, data.userIDs).subscribe(
       () => {
-        this.logDataService.addUpdateProjectLog(project.projectID,project.projectName)
+        this.logDataService.addUpdateProjectLog(
+          project.projectID,
+          project.projectName
+        );
         this.router.navigate(['/dashboard']);
       },
       (error) => {

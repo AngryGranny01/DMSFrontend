@@ -6,6 +6,6 @@ export interface Log {
   firstName: string;
   lastName: string;
   activityName: ActivityName;
-  description: string;
+  activityDescription: string;
   dateTime: Date;
 }

@@ -33,7 +33,7 @@ export class UserProfilComponent implements OnInit {
   ) {
     this.profileForm = this.fb.group({
       userName: ['', Validators.required],
-      orgEinheit: ['', Validators.required],
+      orgUnit: ['', Validators.required],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -56,7 +56,7 @@ export class UserProfilComponent implements OnInit {
       this.user = this.userService.getSelectedUser();
       this.profileForm.patchValue({
         userName: this.user.userName,
-        orgEinheit: this.user.orgEinheit,
+        orgUnit: this.user.orgUnit,
         firstName: this.user.firstName,
         lastName: this.user.lastName,
         email: this.user.email,
@@ -73,14 +73,17 @@ export class UserProfilComponent implements OnInit {
         email: '',
         salt: '',
         role: Role.USER,
-        orgEinheit: '',
+        orgUnit: '',
       };
       this.profileForm.get('role')?.setValue(Role.USER); // Default role
 
       this.profileForm.reset();
     }
 
-    if (this.profileForm.get('role')?.value === Role.ADMIN && this.isAdmin() || !this.isAdmin()) {
+    if (
+      (this.profileForm.get('role')?.value === Role.ADMIN && this.isAdmin()) ||
+      !this.isAdmin()
+    ) {
       this.profileForm.get('role')?.disable();
     }
     if (this.isAdmin() && this.profileForm.get('role')?.value !== Role.ADMIN) {

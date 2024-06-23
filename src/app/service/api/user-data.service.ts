@@ -20,7 +20,6 @@ export class UserDataService {
     private logDataService: LogDataService
   ) {}
 
-
   //-------------------------------------------- Get-Requests --------------------------------------------------------------//
 
   /**
@@ -28,14 +27,13 @@ export class UserDataService {
    * @returns An Observable containing the list of users.
    */
   getAllUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiConfig.baseURL}/users`)
-      .pipe(
-        catchError((error) => {
-          console.error('Failed to fetch users:', error);
-          this.logDataService.addErrorUserLog(`Failed to fetch all users`);
-          throw new Error(('Failed to fetch users'));
-        })
-      );
+    return this.http.get<User[]>(`${this.apiConfig.baseURL}/users`).pipe(
+      catchError((error) => {
+        console.error('Failed to fetch users:', error);
+        this.logDataService.addErrorUserLog(`Failed to fetch all users`);
+        throw new Error('Failed to fetch users');
+      })
+    );
   }
 
   /**
@@ -43,24 +41,26 @@ export class UserDataService {
    * @param senderID The ID of the sender.
    * @returns An Observable containing the last logins data.
    */
-  getLastLogins(senderID: number): Observable<{ [userID: string]: Date }> {
-    return this.http.get<any[]>(`${this.apiConfig.baseURL}/logs/lastLogins/${senderID}`)
+  getLastLogins(): Observable<{ [userID: string]: Date }> {
+    return this.http
+      .get<any[]>(`${this.apiConfig.baseURL}/logs/lastLogins`)
       .pipe(
         map((response: any[]) => {
           const lastLogins: { [userID: string]: Date } = {};
-          response.forEach(entry => {
+          response.forEach((entry) => {
             lastLogins[entry.userID] = new Date(entry.date);
           });
           return lastLogins;
         }),
         catchError((error) => {
           console.error('Failed to fetch last logins:', error);
-          this.logDataService.addErrorUserLog(`Failed to fetch last logins of users`);
+          this.logDataService.addErrorUserLog(
+            `Failed to fetch last logins of users`
+          );
           throw new Error('Failed to fetch last logins');
         })
       );
   }
-
 
   /**
    * Checks if the given user email exists.
@@ -68,9 +68,12 @@ export class UserDataService {
    * @returns An Observable indicating whether the user email exists.
    */
   checkIfUserEmailExists(userEmail: string): Observable<boolean> {
-    return this.http.get<any>(`${this.apiConfig.baseURL}/users/checkEmailExist?email=${userEmail}`)
+    return this.http
+      .get<any>(
+        `${this.apiConfig.baseURL}/users/checkEmailExist?email=${userEmail}`
+      )
       .pipe(
-        map(response => response.exist),
+        map((response) => response.exist),
         catchError((error) => {
           console.error('Failed to check email existence:', error);
           throw new Error('Failed to check email existence');
@@ -84,9 +87,12 @@ export class UserDataService {
    * @returns An Observable indicating whether the username exists.
    */
   checkIfUserNameExists(userName: string): Observable<boolean> {
-    return this.http.get<any>(`${this.apiConfig.baseURL}/users/checkUsernameExist?username=${userName}`)
+    return this.http
+      .get<any>(
+        `${this.apiConfig.baseURL}/users/checkUsernameExist?username=${userName}`
+      )
       .pipe(
-        map(response => response.exist),
+        map((response) => response.exist),
         catchError((error) => {
           console.error('Failed to check username existence:', error);
           throw new Error('Failed to check username existence');
@@ -108,9 +114,10 @@ export class UserDataService {
       lastName: user.lastName,
       email: user.email,
       role: user.role,
-      orgEinheit: user.orgEinheit,
+      orgUnit: user.orgUnit,
     };
-    return this.http.post<User>(`${this.apiConfig.baseURL}/users`, createUser)
+    return this.http
+      .post<User>(`${this.apiConfig.baseURL}/users`, createUser)
       .pipe(
         catchError((error) => {
           console.error('Failed to create user:', error);
@@ -128,10 +135,7 @@ export class UserDataService {
    */
   updateUser(user: User, passwordPlain: string) {
     let salt = this.encryptionService.generateSalt();
-    let passwordHash = this.encryptionService.getPBKDF2Key(
-      passwordPlain,
-      salt
-    );
+    let passwordHash = this.encryptionService.getPBKDF2Key(passwordPlain, salt);
 
     const updateUser = {
       userID: user.userID,
@@ -142,21 +146,22 @@ export class UserDataService {
       passwordHash: passwordHash,
       salt: salt,
       role: user.role,
-      orgEinheit: user.orgEinheit
+      orgUnit: user.orgUnit,
     };
 
-    if(passwordPlain === ""){
-      updateUser.passwordHash = ""
-      updateUser.salt = ""
+    if (passwordPlain === '') {
+      updateUser.passwordHash = '';
+      updateUser.salt = '';
     }
 
-    return this.http.put<User>(`${this.apiConfig.baseURL}/users`, updateUser)
-    .pipe(
-      catchError((error) => {
-        console.error('Failed to update user:', error);
-        throw new Error('Failed to update user');
-      })
-    );
+    return this.http
+      .put<User>(`${this.apiConfig.baseURL}/users`, updateUser)
+      .pipe(
+        catchError((error) => {
+          console.error('Failed to update user:', error);
+          throw new Error('Failed to update user');
+        })
+      );
   }
 
   //-------------------------------------------- Delete-Requests --------------------------------------------------------------//
@@ -167,7 +172,8 @@ export class UserDataService {
    * @returns An Observable representing the HTTP response.
    */
   deleteUser(userID: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiConfig.baseURL}/users/${userID}`)
+    return this.http
+      .delete<void>(`${this.apiConfig.baseURL}/users/${userID}`)
       .pipe(
         catchError((error) => {
           console.error('Failed to delete user:', error);
@@ -184,9 +190,13 @@ export class UserDataService {
    */
   verifyToken(token: string, passwordPlain: string): Observable<string> {
     const salt = this.encryptionService.generateSalt();
-    const passwordHash = this.encryptionService.getPBKDF2Key(passwordPlain, salt);
+    const passwordHash = this.encryptionService.getPBKDF2Key(
+      passwordPlain,
+      salt
+    );
     const data = { token, passwordHash, salt };
-    return this.http.put<string>(`${this.apiConfig.baseURL}/verifyToken`, data)
+    return this.http
+      .put<string>(`${this.apiConfig.baseURL}/verifyToken`, data)
       .pipe(
         catchError((error) => {
           console.error('Failed to verify token:', error);
@@ -218,7 +228,7 @@ export class UserDataService {
       response.salt,
       role,
       response.email,
-      response.orgEinheit
+      response.orgUnit
     );
   }
 }

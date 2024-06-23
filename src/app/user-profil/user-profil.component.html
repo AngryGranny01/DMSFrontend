@@ -31,10 +31,10 @@
                   type="text"
                   placeholder="Organizational Unit"
                   class="form-control"
-                  formControlName="orgEinheit"
+                  formControlName="orgUnit"
                   required
                 />
-                <div *ngIf="profileForm.controls['orgEinheit'].invalid && (profileForm.controls['orgEinheit'].dirty || profileForm.controls['orgEinheit'].touched)" class="alert alert-danger">
+                <div *ngIf="profileForm.controls['orgUnit'].invalid && (profileForm.controls['orgUnit'].dirty || profileForm.controls['orgUnit'].touched)" class="alert alert-danger">
                   Organizational Unit is required.
                 </div>
               </div>

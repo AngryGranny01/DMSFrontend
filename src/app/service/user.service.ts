@@ -16,7 +16,7 @@ export class UserService {
     salt: '',
     email: '',
     role: Role.USER,
-    orgEinheit: '',
+    orgUnit: '',
   };
 
   public isEditMode: boolean = true;
@@ -24,7 +24,9 @@ export class UserService {
   public currentUsername: BehaviorSubject<string> = new BehaviorSubject<string>(
     ''
   );
-  public currentUser$: BehaviorSubject<User> = new BehaviorSubject<User>(this.currentUser)
+  public currentUser$: BehaviorSubject<User> = new BehaviorSubject<User>(
+    this.currentUser
+  );
 
   constructor() {}
 

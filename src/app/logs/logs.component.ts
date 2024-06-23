@@ -75,7 +75,7 @@ export class LogsComponent implements OnInit {
                 log.activityName
                   .toLowerCase()
                   .includes(searchTerm!.toLowerCase()) ||
-                log.description
+                log.activityDescription
                   .toLowerCase()
                   .includes(searchTerm!.toLowerCase())
             )
@@ -87,17 +87,15 @@ export class LogsComponent implements OnInit {
 
   // Load logs associated with a project
   loadProjectLogs(project: Project) {
-    this.logDataService
-      .getProjectLogs(project.projectID)
-      .subscribe(
-        (logs) => {
-          this.processLogs(logs);
-        },
-        (error) => {
-          console.error('Error loading project logs:', error);
-          // Optionally, notify the user about the error
-        }
-      );
+    this.logDataService.getProjectLogs(project.projectID).subscribe(
+      (logs) => {
+        this.processLogs(logs);
+      },
+      (error) => {
+        console.error('Error loading project logs:', error);
+        // Optionally, notify the user about the error
+      }
+    );
   }
 
   // Load logs associated with a user
@@ -117,11 +115,13 @@ export class LogsComponent implements OnInit {
   private processLogs(logs: Log[]) {
     for (let log of logs) {
       let activityDescription =
-        this.translationHelper.getTranslatedLogDescription(log.description);
+        this.translationHelper.getTranslatedLogDescription(
+          log.activityDescription
+        );
       this.translate
         .get(log.activityName, activityDescription)
         .subscribe((translations) => {
-          log.description = translations;
+          log.activityDescription = translations;
         });
     }
     this.logs$ = of(logs);

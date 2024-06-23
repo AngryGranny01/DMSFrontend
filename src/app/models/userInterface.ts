@@ -9,6 +9,6 @@ export class User {
     public salt: string,
     public role: Role,
     public email: string,
-    public orgEinheit: string
+    public orgUnit: string
   ) {}
 }

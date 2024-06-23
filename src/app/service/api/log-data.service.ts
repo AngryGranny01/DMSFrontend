@@ -29,9 +29,10 @@ export class LogDataService {
    * @returns An Observable of Log array.
    */
   getUserLogs(userID: number): Observable<Log[]> {
-    return this.http.get<any[]>(`${this.apiConfig.baseURL}/logs/user/${userID}`)
+    return this.http
+      .get<any[]>(`${this.apiConfig.baseURL}/logs/user/${userID}`)
       .pipe(
-        map(response => response.map(log => this.extractLogs(log))),
+        map((response) => response.map((log) => this.extractLogs(log))),
         catchError((error) => {
           console.error('Failed to fetch user logs:', error);
           throw new Error('Failed to fetch user logs');
@@ -46,9 +47,10 @@ export class LogDataService {
    * @returns An Observable of Log array.
    */
   getProjectLogs(projectID: number): Observable<Log[]> {
-    return this.http.get<any[]>(`${this.apiConfig.baseURL}/logs/project/${projectID}`)
+    return this.http
+      .get<any[]>(`${this.apiConfig.baseURL}/logs/project/${projectID}`)
       .pipe(
-        map(response => response.map(log => this.extractLogs(log))),
+        map((response) => response.map((log) => this.extractLogs(log))),
         catchError((error) => {
           console.error('Failed to fetch project logs:', error);
           throw new Error('Failed to fetch project logs');
@@ -65,15 +67,14 @@ export class LogDataService {
     const data = {
       userID: log.userID,
       activityName: log.activityName,
-      activityDescription: log.description,
+      activityDescription: log.activityDescription,
     };
-    return this.http.post(`${this.apiConfig.baseURL}/logs`, data)
-      .pipe(
-        catchError((error) => {
-          console.error('Failed to create user log:', error);
-          throw new Error('Failed to create user log');
-        })
-      );
+    return this.http.post(`${this.apiConfig.baseURL}/logs`, data).pipe(
+      catchError((error) => {
+        console.error('Failed to create user log:', error);
+        throw new Error('Failed to create user log');
+      })
+    );
   }
   /**
    * Creates a project log entry.
@@ -85,16 +86,15 @@ export class LogDataService {
       projectID: log.projectID,
       userID: log.userID,
       activityName: log.activityName,
-      activityDescription: log.description,
+      activityDescription: log.activityDescription,
     };
 
-    return this.http.post(`${this.apiConfig.baseURL}/logs`, data)
-      .pipe(
-        catchError((error) => {
-          console.error('Failed to create project log:', error);
-          throw new Error('Failed to create project log');
-        })
-      );
+    return this.http.post(`${this.apiConfig.baseURL}/logs`, data).pipe(
+      catchError((error) => {
+        console.error('Failed to create project log:', error);
+        throw new Error('Failed to create project log');
+      })
+    );
   }
 
   /**
@@ -110,8 +110,10 @@ export class LogDataService {
       userID: parseInt(logData.userID),
       firstName: logData.firstName,
       lastName: logData.lastName,
-      activityName: this.logService.matchActivityNameWithString(logData.activityName),
-      description: logData.activityDescription,
+      activityName: this.logService.matchActivityNameWithString(
+        logData.activityName
+      ),
+      activityDescription: logData.activityDescription,
       dateTime: timeStamp,
     };
   }
@@ -119,7 +121,7 @@ export class LogDataService {
   //-------------------------------------------- User Logs --------------------------------------------------------------//
   addLoginLog() {
     const log = {
-      description: LogDescriptionValues.createLogDescription(
+      activityDescription: LogDescriptionValues.createLogDescription(
         ActivityName.LOGIN,
         this.userService.getCurrentUserID(),
         this.userService.getCurrentUsername()
@@ -136,7 +138,7 @@ export class LogDataService {
 
   addLogoutLog() {
     const log = {
-      description: LogDescriptionValues.createLogDescription(
+      activityDescription: LogDescriptionValues.createLogDescription(
         ActivityName.LOGOUT,
         this.userService.getCurrentUserID(),
         this.userService.getCurrentUsername()
@@ -153,7 +155,7 @@ export class LogDataService {
 
   addCreateUserLog(userID: number, username: string) {
     const log = {
-      description: LogDescriptionValues.createLogDescription(
+      activityDescription: LogDescriptionValues.createLogDescription(
         ActivityName.CREATE_USER,
         userID,
         username
@@ -169,7 +171,7 @@ export class LogDataService {
 
   addUpdateUserLog(user: User) {
     const log = {
-      description: LogDescriptionValues.createLogDescription(
+      activityDescription: LogDescriptionValues.createLogDescription(
         ActivityName.UPDATE_USER,
         user.userID,
         user.userName
@@ -186,7 +188,7 @@ export class LogDataService {
 
   addDeleteUserLog(user: User) {
     const log = {
-      description: LogDescriptionValues.createLogDescription(
+      activityDescription: LogDescriptionValues.createLogDescription(
         ActivityName.DELETE_USER,
         user.userID,
         user.userName
@@ -204,7 +206,7 @@ export class LogDataService {
   //-------------------------------------------- Project Logs --------------------------------------------------------------//
   addCreateProjectLog(projectID: number, projectName: string) {
     const log = {
-      description: LogDescriptionValues.createLogDescription(
+      activityDescription: LogDescriptionValues.createLogDescription(
         ActivityName.CREATE_PROJECT,
         '',
         '',
@@ -224,7 +226,7 @@ export class LogDataService {
 
   addUpdateProjectLog(projectID: number, projectName: string) {
     const log = {
-      description: LogDescriptionValues.createLogDescription(
+      activityDescription: LogDescriptionValues.createLogDescription(
         ActivityName.UPDATE_PROJECT,
         '',
         '',
@@ -244,7 +246,7 @@ export class LogDataService {
 
   addDeleteProjectLog(project: Project) {
     const log = {
-      description: LogDescriptionValues.createLogDescription(
+      activityDescription: LogDescriptionValues.createLogDescription(
         ActivityName.DELETE_PROJECT,
         '',
         '',
@@ -265,8 +267,15 @@ export class LogDataService {
   //-------------------------------------------- Error Logs --------------------------------------------------------------//
   addErrorUserLog(errorMessage: string) {
     const log = {
-      description: LogDescriptionValues.createLogDescription(
-        ActivityName.ERROR,"","","","","","","",
+      activityDescription: LogDescriptionValues.createLogDescription(
+        ActivityName.ERROR,
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
         errorMessage
       ),
       activityName: ActivityName.ERROR,
@@ -281,8 +290,15 @@ export class LogDataService {
 
   addErrorProjectLog(projectID: number, errorMessage: string) {
     const log = {
-      description: LogDescriptionValues.createLogDescription(
-        ActivityName.ERROR,"","","","","","","",
+      activityDescription: LogDescriptionValues.createLogDescription(
+        ActivityName.ERROR,
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
         errorMessage
       ),
       activityName: ActivityName.ERROR,

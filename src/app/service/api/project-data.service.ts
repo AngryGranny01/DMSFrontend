@@ -86,7 +86,7 @@ export class ProjectDataService {
       '',
       Role.MANAGER,
       managerData.email,
-      managerData.orgEinheit
+      managerData.orgUnit
     );
 
     const users = project.users.map(
@@ -103,7 +103,7 @@ export class ProjectDataService {
             ? Role.MANAGER
             : Role.USER,
           user.email,
-          user.orgEinheit
+          user.orgUnit
         )
     );
 

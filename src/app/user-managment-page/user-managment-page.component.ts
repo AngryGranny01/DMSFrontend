@@ -31,8 +31,8 @@ export class UserManagmentPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.lastLogin$ = this.userService.currentUser$.pipe(
-      switchMap((currentUser) =>
-        this.userDataService.getLastLogins(currentUser.userID)
+      switchMap(() =>
+        this.userDataService.getLastLogins()
       )
     );
 
