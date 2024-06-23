@@ -87,6 +87,7 @@ export class LogDataService {
       activityName: log.activityName,
       activityDescription: log.description,
     };
+
     return this.http.post(`${this.apiConfig.baseURL}/logs`, data)
       .pipe(
         catchError((error) => {
@@ -128,7 +129,7 @@ export class LogDataService {
     };
 
     this.createUserLog(log).subscribe(
-      () => console.log('Login logged successfully'),
+      () => {},
       (error) => console.error('Error logging login:', error)
     );
   }
@@ -145,7 +146,7 @@ export class LogDataService {
     };
 
     this.createUserLog(log).subscribe(
-      () => console.log('Logout logged successfully'),
+      () => {},
       (error) => console.error('Error logging logout:', error)
     );
   }
@@ -161,7 +162,7 @@ export class LogDataService {
       userID: userID,
     };
     this.createUserLog(log).subscribe(
-      () => console.log('User created logged successfully'),
+      () => {},
       (error) => console.error('Error logging user created:', error)
     );
   }
@@ -178,7 +179,7 @@ export class LogDataService {
     };
 
     this.createUserLog(log).subscribe(
-      () => console.log('User update logged successfully'),
+      () => {},
       (error) => console.error('Error logging user update:', error)
     );
   }
@@ -195,7 +196,7 @@ export class LogDataService {
     };
 
     this.createUserLog(log).subscribe(
-      () => console.log('User deletion logged successfully'),
+      () => {},
       (error) => console.error('Error logging user deletion:', error)
     );
   }
@@ -216,7 +217,7 @@ export class LogDataService {
     };
 
     this.createProjectLog(log).subscribe(
-      () => console.log('Project created logged successfully'),
+      () => {},
       (error) => console.error('Error logging Project created:', error)
     );
   }
@@ -236,7 +237,7 @@ export class LogDataService {
     };
 
     this.createProjectLog(log).subscribe(
-      () => console.log('Project update logged successfully'),
+      () => {},
       (error) => console.error('Error logging project update:', error)
     );
   }
@@ -256,7 +257,7 @@ export class LogDataService {
     };
 
     this.createUserLog(log).subscribe(
-      () => console.log('Project deletion logged successfully'),
+      () => {},
       (error) => console.error('Error logging project deletion:', error)
     );
   }
@@ -273,7 +274,7 @@ export class LogDataService {
     };
 
     this.createUserLog(log).subscribe(
-      () => console.log('User Error logged successfully'),
+      () => {},
       (error) => console.error('Error logging user error:', error)
     );
   }
@@ -290,7 +291,7 @@ export class LogDataService {
     };
 
     this.createProjectLog(log).subscribe(
-      () => console.log('Project Error logged successfully'),
+      () => {},
       (error) => console.error('Error logging project error:', error)
     );
   }

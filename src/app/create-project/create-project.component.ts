@@ -125,7 +125,6 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
           fullName: `${currentUser.firstName} ${currentUser.lastName} (${currentUser.orgEinheit})`,
           userID: currentUser.userID,
         }];
-        console.log(this.options)
       } else {
         // Load all Project Managers or Admins into the options
         this.options = users
@@ -218,7 +217,6 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
 
     this.projectDataService.createProject(project, data.userIDs).subscribe(
       (response: any) => {
-        console.log("Project", response)
         this.logDataService.addCreateProjectLog(response.projectID,project.projectName)
         this.router.navigate(['/dashboard']);
       },

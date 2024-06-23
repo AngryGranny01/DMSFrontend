@@ -27,8 +27,7 @@ export class LoginPageComponent {
     this.authService.loginUser(email, password).subscribe(
       (response) => {
         if (response) {
-          // Handle successful login response
-          console.log('Login successful:', response);
+          console.log('Login successful');
         } else {
           alert('Failed to login. Please try again later.');
         }
