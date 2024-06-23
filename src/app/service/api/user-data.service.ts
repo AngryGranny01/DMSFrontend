@@ -44,7 +44,7 @@ export class UserDataService {
    * @returns An Observable containing the last logins data.
    */
   getLastLogins(senderID: number): Observable<{ [userID: string]: Date }> {
-    return this.http.get<any[]>(`${this.apiConfig.baseURL}/user-logs/lastLogins/${senderID}`)
+    return this.http.get<any[]>(`${this.apiConfig.baseURL}/logs/lastLogins/${senderID}`)
       .pipe(
         map((response: any[]) => {
           const lastLogins: { [userID: string]: Date } = {};

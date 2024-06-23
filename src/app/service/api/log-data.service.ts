@@ -29,7 +29,7 @@ export class LogDataService {
    * @returns An Observable of Log array.
    */
   getUserLogs(userID: number): Observable<Log[]> {
-    return this.http.get<any[]>(`${this.apiConfig.baseURL}/user-logs/${userID}`)
+    return this.http.get<any[]>(`${this.apiConfig.baseURL}/logs/user/${userID}`)
       .pipe(
         map(response => response.map(log => this.extractLogs(log))),
         catchError((error) => {
@@ -46,7 +46,7 @@ export class LogDataService {
    * @returns An Observable of Log array.
    */
   getProjectLogs(projectID: number): Observable<Log[]> {
-    return this.http.get<any[]>(`${this.apiConfig.baseURL}/project-logs/${projectID}`)
+    return this.http.get<any[]>(`${this.apiConfig.baseURL}/logs/project/${projectID}`)
       .pipe(
         map(response => response.map(log => this.extractLogs(log))),
         catchError((error) => {
@@ -67,7 +67,7 @@ export class LogDataService {
       activityName: log.activityName,
       activityDescription: log.description,
     };
-    return this.http.post(`${this.apiConfig.baseURL}/user-logs`, data)
+    return this.http.post(`${this.apiConfig.baseURL}/logs`, data)
       .pipe(
         catchError((error) => {
           console.error('Failed to create user log:', error);
@@ -87,7 +87,7 @@ export class LogDataService {
       activityName: log.activityName,
       activityDescription: log.description,
     };
-    return this.http.post(`${this.apiConfig.baseURL}/project-logs`, data)
+    return this.http.post(`${this.apiConfig.baseURL}/logs`, data)
       .pipe(
         catchError((error) => {
           console.error('Failed to create project log:', error);
@@ -265,7 +265,7 @@ export class LogDataService {
   addErrorUserLog(errorMessage: string) {
     const log = {
       description: LogDescriptionValues.createLogDescription(
-        ActivityName.ERROR,
+        ActivityName.ERROR,"","","","","","","",
         errorMessage
       ),
       activityName: ActivityName.ERROR,
@@ -281,7 +281,7 @@ export class LogDataService {
   addErrorProjectLog(projectID: number, errorMessage: string) {
     const log = {
       description: LogDescriptionValues.createLogDescription(
-        ActivityName.ERROR,
+        ActivityName.ERROR,"","","","","","","",
         errorMessage
       ),
       activityName: ActivityName.ERROR,
