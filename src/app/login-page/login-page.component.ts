@@ -34,15 +34,7 @@ export class LoginPageComponent {
       },
       (error) => {
         // Handle login error
-        let errorMessage = 'Failed to login. Please try again later.';
-
-        if (error.status === 401) {
-          errorMessage = 'Invalid Login Data. Please try again.';
-        } else if (error.status === 404) {
-          errorMessage = 'User not found.';
-        } else if (error.status === 500) {
-          errorMessage = 'Internal server error. Please try again later.';
-        }
+        let errorMessage = 'Invalid Login Data.';
 
         alert(errorMessage);
         console.error('Login error:', error);

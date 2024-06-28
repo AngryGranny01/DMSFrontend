@@ -45,7 +45,7 @@ export class EmailPageComponent implements OnInit {
     }
 
     // Calls the UserDataService to verify the token and update the password
-    this.userDataService.verifyToken(this.token, this.password).subscribe(
+    this.userDataService.verifyEmailToken(this.token, this.password).subscribe(
       () => {
         // Success response handling
         alert('Password updated successfully!'); // You may replace this with your preferred success message
@@ -53,14 +53,8 @@ export class EmailPageComponent implements OnInit {
       },
       (error) => {
         // Error response handling
-        if (error.status === 400) {
-          this.errorMessage = 'Invalid or expired token';
-        } else if (error.status === 404) {
-          this.errorMessage = 'User not found';
-        } else {
-          this.errorMessage = error;
-        }
-        alert(this.errorMessage);
+        console.error('Error response:', error);
+        alert(error);
       }
     );
   }

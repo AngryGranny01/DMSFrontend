@@ -24,12 +24,21 @@ export class AuthInterceptor implements HttpInterceptor {
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
           // Handle unauthorized access
+          this.authService.setAuthenticated(false);
           this.router.navigate(['/login'], { queryParams: { returnUrl: request.url } });
         } else if (error.status === 403) {
           // Handle forbidden access
-          this.authService.setAuthenticated(false);
           this.router.navigate(['/forbidden']); // Redirect to a forbidden page or handle accordingly
           alert('Your session has expired or you do not have permission to access this resource.');
+        } else if (error.status === 500) {
+          // Handle server errors
+          console.error(error)
+        } else if (error.status === 0) {
+          // Handle network errors
+          console.error(error)
+          alert('Network error: Please check your internet connection.');
+        } else {
+          // Handle other types of error
         }
         return throwError(error);
       })

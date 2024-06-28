@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
@@ -114,7 +114,7 @@ export class UserDataService {
       email: user.email,
       role: user.role,
       orgUnit: user.orgUnit,
-      isDeactivated: true
+      isDeactivated: true,
     };
     return this.http
       .post<User>(`${this.apiConfig.baseURL}/users`, createUser)
@@ -146,12 +146,14 @@ export class UserDataService {
 
     console.log(updateUser);
 
-    return this.http.put<User>(`${this.apiConfig.baseURL}/users`, updateUser).pipe(
-      catchError((error) => {
-        console.error('Failed to update user:', error);
-        return throwError('Failed to update user');
-      })
-    );
+    return this.http
+      .put<User>(`${this.apiConfig.baseURL}/users`, updateUser)
+      .pipe(
+        catchError((error) => {
+          console.error('Failed to update user:', error);
+          return throwError('Failed to update user');
+        })
+      );
   }
 
   /**
@@ -162,7 +164,10 @@ export class UserDataService {
    */
   updatePassword(userID: number, passwordPlain: string): Observable<any> {
     const salt = this.encryptionService.generateSalt();
-    const passwordHash = this.encryptionService.getPBKDF2Key(passwordPlain, salt);
+    const passwordHash = this.encryptionService.getPBKDF2Key(
+      passwordPlain,
+      salt
+    );
 
     const updatedPassword = {
       accountID: userID,
@@ -170,12 +175,14 @@ export class UserDataService {
       salt: salt,
     };
 
-    return this.http.put(`${this.apiConfig.baseURL}/users/password`, updatedPassword).pipe(
-      catchError((error) => {
-        console.error('Failed to update password:', error);
-        return throwError('Failed to update password');
-      })
-    );
+    return this.http
+      .put(`${this.apiConfig.baseURL}/users/password`, updatedPassword)
+      .pipe(
+        catchError((error) => {
+          console.error('Failed to update password:', error);
+          return throwError('Failed to update password');
+        })
+      );
   }
 
   //-------------------------------------------- Delete-Requests --------------------------------------------------------------//
@@ -202,7 +209,7 @@ export class UserDataService {
    * @param passwordPlain The plain text password.
    * @returns An Observable containing the verification status.
    */
-  verifyToken(token: string, passwordPlain: string): Observable<string> {
+  verifyEmailToken(token: string, passwordPlain: string): Observable<string> {
     const salt = this.encryptionService.generateSalt();
     const passwordHash = this.encryptionService.getPBKDF2Key(
       passwordPlain,
@@ -212,9 +219,19 @@ export class UserDataService {
     return this.http
       .put<string>(`${this.apiConfig.baseURL}/verifyToken`, data)
       .pipe(
-        catchError((error) => {
-          console.error('Failed to verify token:', error);
-          throw new Error('Failed to verify token');
+        catchError((error: HttpErrorResponse) => {
+          let errorMessage = 'Failed to verify token';
+          if (error.status === 400) {
+            errorMessage = 'Invalid or expired token';
+          } else if (error.status === 401) {
+            errorMessage = 'Token expired';
+          } else if (error.status === 404) {
+            errorMessage = 'User not found';
+          } else {
+            errorMessage = 'An unknown error occurred';
+          }
+          console.error(errorMessage);
+          return throwError(errorMessage);
         })
       );
   }
