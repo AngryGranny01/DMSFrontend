@@ -218,8 +218,8 @@ export class UserDataService {
     const role =
       response.role === Role.ADMIN
         ? Role.ADMIN
-        : response.role === Role.MANAGER
-        ? Role.MANAGER
+        : response.role === Role.PROJECT_MANAGER
+        ? Role.PROJECT_MANAGER
         : Role.USER;
 
     return new User(

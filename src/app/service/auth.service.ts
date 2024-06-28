@@ -7,6 +7,7 @@ import { UserService } from './user.service';
 import { LogDataService } from './api/log-data.service';
 import { ApiConfigService } from './api/api-config.service';
 import { EncryptionService } from './encryption.service';
+import { Role } from '../models/role';
 
 @Injectable({
   providedIn: 'root',
@@ -60,6 +61,7 @@ export class AuthService {
       map((response: any) => {
         this.isAuthenticated = true;
         this.userService.currentUser = response.user;
+        this.userService.currentUser.role = response.user.role as Role;
         console.log(response);
         console.log(this.userService.currentUser);
         this.setToken(response.token); // Store the token

@@ -118,7 +118,7 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     this.users$ = this.userDataService.getAllUsers();
 
     this.users$.pipe(takeUntil(this.unsubscribe$)).subscribe((users) => {
-      if (this.userService.currentUser.role === Role.MANAGER) {
+      if (this.userService.currentUser.role === Role.PROJECT_MANAGER) {
         // Only load the current user into filter options if they are a Project Manager
         const currentUser = this.userService.currentUser;
         this.options = [
@@ -131,7 +131,7 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
         // Load all Project Managers or Admins into the options
         this.options = users
           .filter(
-            (user) => user.role === Role.ADMIN || user.role === Role.MANAGER
+            (user) => user.role === Role.ADMIN || user.role === Role.PROJECT_MANAGER
           )
           .map((user) => ({
             fullName: `${user.firstName} ${user.lastName} (${user.orgUnit})`,

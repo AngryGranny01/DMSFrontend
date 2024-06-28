@@ -82,7 +82,7 @@ export class ProjectDataService {
       managerData.userID,
       managerData.firstName,
       managerData.lastName,
-      Role.MANAGER,
+      Role.PROJECT_MANAGER,
       managerData.email,
       managerData.orgUnit,
       managerData.isDeactivated
@@ -96,8 +96,8 @@ export class ProjectDataService {
           user.lastName,
           user.role === Role.ADMIN
             ? Role.ADMIN
-            : user.role === Role.MANAGER
-            ? Role.MANAGER
+            : user.role === Role.PROJECT_MANAGER
+            ? Role.PROJECT_MANAGER
             : Role.USER,
           user.email,
           user.orgUnit,

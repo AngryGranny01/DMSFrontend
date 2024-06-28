@@ -80,15 +80,14 @@ export class UserManagmentPageComponent implements OnInit {
     return of(`${time} Uhr`);
   }
 
-  // Checks if a user is activated based if salt exist
-  //TODO: Check if activated
+  // Checks if a user is activated
   isActivated(user: User): boolean {
-    return true;
+    return !user.isDeactivated;
   }
 
   // Deletes a user from the system
   deleteUser(user: User): void {
-    if (user.role === Role.MANAGER) {
+    if (user.role === Role.PROJECT_MANAGER) {
       const confirmDelete = confirm(
         'Wenn Sie diesen Benutzer löschen, werden Sie zum Projektmanager für offene Projekte. Möchten Sie fortfahren?'
       );
