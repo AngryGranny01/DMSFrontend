@@ -5,7 +5,7 @@
 
 .table-wrapper {
   min-width: 1000px;
-  background: var(--white);;
+  background: var(--white);
   padding: 40px 25px;
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
 }
@@ -30,42 +30,29 @@
   font-size: 24px;
 }
 
-.table-title .btn {
-  color: var(--main-content);
+.table-title .btn, .btn-user {
   float: right;
+  color: var(--main-content);
   font-size: 13px;
+  font-family: sans-serif;
   background: var(--white);
   border: none;
-  min-width: 50px;
+  padding: 10px 20px;
   border-radius: 4px;
   outline: none !important;
-  margin-left: 10px;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.table-title .btn:hover {
-  color: var(--main-content);
-}
-
-.btn-secondary {
-  background-color: var(--btn-secondary-bg);
-  color: var(--white);
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  cursor: pointer;
-  border-radius: 4px;
+  margin-left: 4px;
   transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+  height: 100%; /* Set a fixed width */
 }
 
-.btn-secondary:hover {
-  background-color: var(--btn-secondary-hover-bg) !important;
+.table-title .btn:hover, .btn-user:hover {
+  background-color: var(--light-gray) !important;
   color: var(--main-content) !important;
   transform: scale(1.05);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.table-title .btn span {
+.btn-user span {
   float: left;
   margin-top: 2px;
 }

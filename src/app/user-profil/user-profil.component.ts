@@ -31,19 +31,21 @@ export class UserProfilComponent implements OnInit {
     private fb: FormBuilder,
     private userService: UserService,
     private userDataService: UserDataService,
-    private encryptionService: EncryptionService,
     private logDataService: LogDataService,
     private router: Router
   ) {
-    this.profileForm = this.fb.group({
-      orgUnit: ['', Validators.required],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      password: [''],
-      repeatPassword: [''],
-      role: new FormControl('', Validators.required),
-    }, { validator: this.passwordMatchValidator });
+    this.profileForm = this.fb.group(
+      {
+        orgUnit: ['', Validators.required],
+        firstName: ['', Validators.required],
+        lastName: ['', Validators.required],
+        email: ['', [Validators.required, Validators.email]],
+        password: [''],
+        repeatPassword: [''],
+        role: new FormControl('', Validators.required),
+      },
+      { validator: this.passwordMatchValidator }
+    );
   }
 
   ngOnInit(): void {
@@ -51,11 +53,14 @@ export class UserProfilComponent implements OnInit {
   }
 
   passwordMatchValidator(formGroup: FormGroup): any {
-    return formGroup.get('password')?.value === formGroup.get('repeatPassword')?.value
-      ? null : { 'mismatch': true };
+    return formGroup.get('password')?.value ===
+      formGroup.get('repeatPassword')?.value
+      ? null
+      : { mismatch: true };
   }
 
   initializeUser(): void {
+    console.log(this.userService.isEditMode);
     if (this.userService.isEditMode) {
       this.isEditMode = true;
       this.user = this.userService.getSelectedUser();
@@ -66,6 +71,13 @@ export class UserProfilComponent implements OnInit {
         email: this.user.email,
         role: this.user.role,
       });
+      // If the current user is an admin, disable the admin role option for the edited user
+      if (this.userService.currentUser.role !== Role.ADMIN) {
+        this.disableRoleOptions();
+      } else if (this.userService.currentUser.role === Role.ADMIN) {
+        const adminRadio = document.getElementById('ADMIN') as HTMLInputElement;
+        adminRadio.disabled = true;
+      }
     } else {
       this.isEditMode = false;
       this.user = {
@@ -78,10 +90,27 @@ export class UserProfilComponent implements OnInit {
         isDeactivated: false,
       };
       this.profileForm.reset({ role: Role.USER });
+      //disable checkbox Role admin
+      const adminRadio = document.getElementById('ADMIN') as HTMLInputElement;
+      adminRadio.disabled = true;
     }
+  }
 
-    if (this.profileForm.get('role')?.value === Role.ADMIN && this.isAdmin()) {
-      this.profileForm.get('role')?.disable();
+  disableRoleOptions(): void {
+    const adminRadio = document.getElementById('ADMIN') as HTMLInputElement;
+    const projectManagerRadio = document.getElementById(
+      'PROJECT_MANAGER'
+    ) as HTMLInputElement;
+    const userRadio = document.getElementById('USER') as HTMLInputElement;
+
+    if (adminRadio) {
+      adminRadio.disabled = true;
+    }
+    if (projectManagerRadio) {
+      projectManagerRadio.disabled = true;
+    }
+    if (userRadio) {
+      userRadio.disabled = true;
     }
   }
 
@@ -110,16 +139,21 @@ export class UserProfilComponent implements OnInit {
       ...this.profileForm.value,
     };
 
-    if (this.profileForm.value.password && this.profileForm.value.password.trim() !== '') {
-      this.userDataService.updatePassword(updatedUser.userID, this.profileForm.value.password).subscribe(
-        () => {
-          this.finalizeUserUpdate(updatedUser);
-        },
-        (error) => {
-          console.error('Failed to update password:', error);
-          alert('Failed to update password');
-        }
-      );
+    if (
+      this.profileForm.value.password &&
+      this.profileForm.value.password.trim() !== ''
+    ) {
+      this.userDataService
+        .updatePassword(updatedUser.userID, this.profileForm.value.password)
+        .subscribe(
+          () => {
+            this.finalizeUserUpdate(updatedUser);
+          },
+          (error) => {
+            console.error('Failed to update password:', error);
+            alert('Failed to update password');
+          }
+        );
     } else {
       this.finalizeUserUpdate(updatedUser);
     }

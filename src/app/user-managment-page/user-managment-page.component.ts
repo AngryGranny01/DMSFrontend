@@ -60,6 +60,7 @@ export class UserManagmentPageComponent implements OnInit {
     this.users$ = this.userDataService.getAllUsers().pipe(
       switchMap((users) => {
         this.cdr.detectChanges(); // Force change detection
+        console.log(users)
         return of(users);
       })
     );
