@@ -19,9 +19,7 @@ export class ProjectManagerDataService {
    */
   getManagerID(userID: number): Observable<number> {
     return this.http
-      .get(
-        `${this.apiConfig.baseURL}/projectManager/${userID}`
-      )
+      .get(`${this.apiConfig.baseURL}/projectManager/${userID}`)
       .pipe(
         map((response: any) => {
           return response.managerID;
@@ -32,12 +30,12 @@ export class ProjectManagerDataService {
   //-------------------------------------------- Put-Requests --------------------------------------------------------------//
 
   /**
-   * Updates the manager ID associated with the given user ID.
-   * @param userID The ID of the user.
-   * @param managerID The ID of the manager to be updated.
+   * Updates the manager associated with the given user ID.
+   * @param userID The userID of the current user.
+   * @param managerID The userID of the manager to be updated.
    * @returns An Observable of a boolean value indicating the success of the operation.
    */
-  updateManagerID(userID: number, managerID: number): Observable<boolean> {
+  transferProjects(userID: number, managerID: number): Observable<boolean> {
     const params = new HttpParams()
       .set('userID', userID.toString())
       .set('managerID', managerID.toString());

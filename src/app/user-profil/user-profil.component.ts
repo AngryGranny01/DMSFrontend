@@ -12,6 +12,8 @@ import { UserDataService } from '../service/api/user-data.service';
 import { ProjectManagerDataService } from '../service/api/project-manager-data.service';
 import { LogDataService } from '../service/api/log-data.service';
 import { Router } from '@angular/router';
+import { OrgUnit } from '../models/orgUnits';
+import { EncryptionService } from '../service/encryption.service';
 
 @Component({
   selector: 'app-user-profil',
@@ -22,32 +24,35 @@ export class UserProfilComponent implements OnInit {
   profileForm: FormGroup;
   user!: User;
   isEditMode: boolean = false;
+  changePassword: boolean = false;
+  orgUnits = Object.values(OrgUnit); // Get the list of organizational units from the enum
 
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
     private userDataService: UserDataService,
-    private managerDataService: ProjectManagerDataService,
+    private encryptionService: EncryptionService,
     private logDataService: LogDataService,
     private router: Router
   ) {
     this.profileForm = this.fb.group({
-      userName: ['', Validators.required],
       orgUnit: ['', Validators.required],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.minLength(8)],
-      repeatPassword: ['', Validators.minLength(8)],
-      role: new FormControl(
-        { value: '', disabled: false },
-        Validators.required
-      ),
-    });
+      password: [''],
+      repeatPassword: [''],
+      role: new FormControl('', Validators.required),
+    }, { validator: this.passwordMatchValidator });
   }
 
   ngOnInit(): void {
     this.initializeUser();
+  }
+
+  passwordMatchValidator(formGroup: FormGroup): any {
+    return formGroup.get('password')?.value === formGroup.get('repeatPassword')?.value
+      ? null : { 'mismatch': true };
   }
 
   initializeUser(): void {
@@ -61,7 +66,6 @@ export class UserProfilComponent implements OnInit {
         email: this.user.email,
         role: this.user.role,
       });
-      this.profileForm.get('role')?.setValue(this.user.role); // Default role
     } else {
       this.isEditMode = false;
       this.user = {
@@ -73,62 +77,31 @@ export class UserProfilComponent implements OnInit {
         orgUnit: '',
         isDeactivated: false,
       };
-      this.profileForm.get('role')?.setValue(Role.USER); // Default role
-
-      this.profileForm.reset();
+      this.profileForm.reset({ role: Role.USER });
     }
 
-    if (
-      (this.profileForm.get('role')?.value === Role.ADMIN && this.isAdmin()) ||
-      !this.isAdmin()
-    ) {
+    if (this.profileForm.get('role')?.value === Role.ADMIN && this.isAdmin()) {
       this.profileForm.get('role')?.disable();
     }
-    if (this.isAdmin() && this.profileForm.get('role')?.value !== Role.ADMIN) {
-      const adminRadio = document.getElementById('ADMIN') as HTMLInputElement;
-      if (adminRadio) {
-        adminRadio.disabled = true;
+  }
+
+  getInvalidControls() {
+    const invalid = [];
+    const controls = this.profileForm.controls;
+    for (const name in controls) {
+      if (controls[name].invalid) {
+        invalid.push(name);
       }
     }
-  }
-
-  isAdmin(): boolean {
-    return this.userService.isAdmin();
-  }
-
-  selectedUserIsAdmin(): boolean {
-    return this.userService.selectedUserIsAdmin();
+    return invalid;
   }
 
   onSubmit(): void {
+    console.log('Form Submitted', this.profileForm.value);
+    console.log('Form Validity', this.profileForm.valid);
+
     if (this.profileForm.invalid) {
-      return;
-    }
-
-    if (this.isEditMode) {
-      if (
-        !this.userService.isPasswordStrong(this.profileForm.value.password) &&
-        this.profileForm.value.password !== ''
-      ) {
-        alert(
-          'Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one number'
-        );
-        return;
-      }
-
-      if (
-        this.profileForm.value.password !==
-        this.profileForm.value.repeatPassword
-      ) {
-        alert('Passwords do not match');
-        return;
-      }
-    }
-
-    if (
-      !this.userService.checkIfEmailIsValidEmail(this.profileForm.value.email)
-    ) {
-      alert('Email is not a valid email');
+      console.log('Invalid Fields', this.getInvalidControls());
       return;
     }
 
@@ -137,121 +110,64 @@ export class UserProfilComponent implements OnInit {
       ...this.profileForm.value,
     };
 
-    if (
-      this.isEditMode &&
-      this.user.email === this.userService.getSelectedUser().email
-    ) {
-      this.updateSelectedUser(updatedUser);
-      return;
-    }
-
-    this.userDataService.checkIfUserEmailExists(updatedUser.email).subscribe(
-      (emailExists) => {
-        if (emailExists) {
-          alert('Email already exists.');
-          return;
-        }
-
-        this.isEditMode
-          ? this.updateSelectedUser(updatedUser)
-          : this.createNewUser(updatedUser);
-      },
-      (emailError) => {
-        this.logDataService.addErrorUserLog(
-          `Error checking if email: ${updatedUser.email} exists`
-        ),
-          console.error('Error checking if email exists:', emailError);
-      }
-    );
-  }
-
-  updateSelectedUser(user: User): void {
-    if (
-      user.role === Role.USER &&
-      Role.USER !== this.userService.getSelectedUser().role
-    ) {
-      const confirmResetToUser = confirm(
-        'Wenn Sie den Benutzer auf "User" zurücksetzen, werden Sie zum Projektmanager für die offenen Projekte. Möchten Sie fortfahren?'
-      );
-      if (!confirmResetToUser) {
-        return;
-      }
-
-      this.managerDataService.getManagerID(user.userID).subscribe(
-        (managerID) => {
-          this.managerDataService
-            .updateManagerID(this.userService.getCurrentUserID(), managerID)
-            .subscribe(
-              () => {
-                this.managerDataService
-                  .deleteProjectManager(managerID)
-                  .subscribe(
-                    () => {
-                      this.updateUserAndNavigate(user);
-                    },
-                    (error) => {
-                      this.logDataService.addErrorUserLog(
-                        `Error deleting Project Manager with id: ${managerID}`
-                      ),
-                        console.error('Error deleting Project Manager:', error);
-                    }
-                  );
-              },
-              (error) => {
-                this.logDataService.addErrorUserLog(
-                  `Error updating Project Manager with ID: ${managerID}`
-                ),
-                  console.error('Error updating manager ID:', error);
-              }
-            );
+    if (this.profileForm.value.password && this.profileForm.value.password.trim() !== '') {
+      this.userDataService.updatePassword(updatedUser.userID, this.profileForm.value.password).subscribe(
+        () => {
+          this.finalizeUserUpdate(updatedUser);
         },
         (error) => {
-          this.logDataService.addErrorUserLog(`${error.message}`),
-            console.error('Error getting manager ID:', error);
+          console.error('Failed to update password:', error);
+          alert('Failed to update password');
         }
       );
     } else {
-      this.updateUserAndNavigate(user);
+      this.finalizeUserUpdate(updatedUser);
     }
   }
 
-  updateUserAndNavigate(user: User): void {
-    if (user.userID === this.userService.currentUser.userID) {
-      this.userService.currentUser = user;
-      this.userService.currentUserFirstAndLastName$.next(
-        this.userService.concatenateFirstnameLastname(
-          this.user.firstName,
-          this.user.lastName
-        )
-      );
+  finalizeUserUpdate(user: User): void {
+    if (this.isEditMode) {
+      this.updateSelectedUser(user);
+    } else {
+      this.createNewUser(user);
     }
-    this.userDataService
-      .updateUser(user, this.profileForm.value.password)
-      .subscribe(
-        () => {
-          this.logDataService.addUpdateUserLog(user);
-          this.router.navigate(['/userManagment']);
-        },
-        (error) => {
-          this.logDataService.addErrorUserLog(
-            `Error updating user profile with userID: ${user.userID}`
-          ),
-            console.error('Error updating user profile:', error);
-        }
-      );
+  }
+
+  updateSelectedUser(user: User): void {
+    this.userDataService.updateUser(user).subscribe(
+      () => {
+        this.logDataService.addUpdateUserLog(user);
+        this.router.navigate(['/userManagment']);
+      },
+      (error) => {
+        console.error('Error updating user profile:', error);
+        alert('Error updating user profile');
+      }
+    );
   }
 
   createNewUser(user: User): void {
     this.userDataService.createUser(user).subscribe(
-      (response: any) => {
-        //this.logDataService.addCreateUserLog(response.userID, user.userName);
+      () => {
         this.router.navigate(['/userManagment']);
       },
       (error) => {
-        this.logDataService.addErrorUserLog(`Error creating user profile`),
-          console.error('Error creating user profile:', error);
+        console.error('Error creating user profile:', error);
+        alert('Error creating user profile');
       }
     );
+  }
+
+  isAdmin(): boolean {
+    return this.userService.isAdmin();
+  }
+
+  toggleChangePassword() {
+    this.changePassword = !this.changePassword;
+    if (!this.changePassword) {
+      this.profileForm.get('password')?.setValue('');
+      this.profileForm.get('repeatPassword')?.setValue('');
+    }
   }
 
   cancel(): void {

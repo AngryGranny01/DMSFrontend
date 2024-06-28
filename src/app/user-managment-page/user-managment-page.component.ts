@@ -30,11 +30,9 @@ export class UserManagmentPageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    console.log("Im Called")
+    console.log('Im Called');
     this.lastLogin$ = this.userService.currentUser$.pipe(
-      switchMap(() =>
-        this.userDataService.getLastLogins()
-      )
+      switchMap(() => this.userDataService.getLastLogins())
     );
 
     this.loadUsers(); // Initial load
@@ -60,7 +58,7 @@ export class UserManagmentPageComponent implements OnInit {
   // Triggers loading of all users
   loadUsers(): void {
     this.users$ = this.userDataService.getAllUsers().pipe(
-      switchMap(users => {
+      switchMap((users) => {
         this.cdr.detectChanges(); // Force change detection
         return of(users);
       })
@@ -99,7 +97,7 @@ export class UserManagmentPageComponent implements OnInit {
       this.managerDataService.getManagerID(user.userID).subscribe(
         (managerID) => {
           this.managerDataService
-            .updateManagerID(this.userService.getCurrentUserID(), managerID)
+            .transferProjects(this.userService.getCurrentUserID(), managerID)
             .subscribe(
               () => {
                 this.userDataService.deleteUser(user.userID).subscribe(
@@ -111,13 +109,17 @@ export class UserManagmentPageComponent implements OnInit {
                 );
               },
               (error) => {
-                this.logDataService.addErrorUserLog(`Error updating manager ID for user with userID: ${user.userID}`),
+                this.logDataService.addErrorUserLog(
+                  `Error updating manager ID for user with userID: ${user.userID}`
+                ),
                   console.error('Error updating manager ID:', error);
               }
             );
         },
         (error) => {
-          this.logDataService.addErrorUserLog(`Error getting manager ID for user with userID: ${user.userID}`),
+          this.logDataService.addErrorUserLog(
+            `Error getting manager ID for user with userID: ${user.userID}`
+          ),
             console.error('Error getting manager ID:', error);
         }
       );
@@ -130,7 +132,7 @@ export class UserManagmentPageComponent implements OnInit {
         },
         (error) => {
           this.logDataService.addErrorUserLog(`Error deleting user`),
-          console.error('Error deleting user:', error);
+            console.error('Error deleting user:', error);
         }
       );
     }

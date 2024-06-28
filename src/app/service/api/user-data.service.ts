@@ -129,41 +129,53 @@ export class UserDataService {
   //-------------------------------------------- Put-Requests --------------------------------------------------------------//
 
   /**
-   * Updates an existing user.
+   * Updates an existing user's information.
    * @param user The user data to be updated.
    * @returns An Observable representing the HTTP response.
    */
-  updateUser(user: User, passwordPlain: string) {
-    let salt = this.encryptionService.generateSalt();
-    let passwordHash = this.encryptionService.getPBKDF2Key(passwordPlain, salt);
-
+  updateUser(user: User): Observable<any> {
     const updateUser = {
-      userID: user.userID,
+      accountID: user.userID,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
-      passwordHash: passwordHash,
       role: user.role,
       orgUnit: user.orgUnit,
-      isDeactivated: user.isDeactivated
+      isDeactivated: user.isDeactivated,
     };
 
-    //TODO: Update Password
-    if (passwordPlain !== '') {
-      const updatePassword = {
-        passwordHash: passwordHash,
-        salt: salt
-      };
-    }
+    console.log(updateUser);
 
-    return this.http
-      .put<User>(`${this.apiConfig.baseURL}/users`, updateUser)
-      .pipe(
-        catchError((error) => {
-          console.error('Failed to update user:', error);
-          throw new Error('Failed to update user');
-        })
-      );
+    return this.http.put<User>(`${this.apiConfig.baseURL}/users`, updateUser).pipe(
+      catchError((error) => {
+        console.error('Failed to update user:', error);
+        return throwError('Failed to update user');
+      })
+    );
+  }
+
+  /**
+   * Updates an existing user's password.
+   * @param userID The ID of the account to update the password for.
+   * @param passwordPlain The new plain text password.
+   * @returns An Observable representing the HTTP response.
+   */
+  updatePassword(userID: number, passwordPlain: string): Observable<any> {
+    const salt = this.encryptionService.generateSalt();
+    const passwordHash = this.encryptionService.getPBKDF2Key(passwordPlain, salt);
+
+    const updatedPassword = {
+      accountID: userID,
+      passwordHash: passwordHash,
+      salt: salt,
+    };
+
+    return this.http.put(`${this.apiConfig.baseURL}/users/password`, updatedPassword).pipe(
+      catchError((error) => {
+        console.error('Failed to update password:', error);
+        return throwError('Failed to update password');
+      })
+    );
   }
 
   //-------------------------------------------- Delete-Requests --------------------------------------------------------------//
