@@ -30,6 +30,7 @@ export class UserManagmentPageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log("Im Called")
     this.lastLogin$ = this.userService.currentUser$.pipe(
       switchMap(() =>
         this.userDataService.getLastLogins()
