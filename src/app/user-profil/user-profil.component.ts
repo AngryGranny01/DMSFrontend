@@ -55,7 +55,6 @@ export class UserProfilComponent implements OnInit {
       this.isEditMode = true;
       this.user = this.userService.getSelectedUser();
       this.profileForm.patchValue({
-        userName: this.user.userName,
         orgUnit: this.user.orgUnit,
         firstName: this.user.firstName,
         lastName: this.user.lastName,
@@ -67,13 +66,12 @@ export class UserProfilComponent implements OnInit {
       this.isEditMode = false;
       this.user = {
         userID: 0,
-        userName: '',
         firstName: '',
         lastName: '',
         email: '',
-        salt: '',
         role: Role.USER,
         orgUnit: '',
+        isDeactivated: false,
       };
       this.profileForm.get('role')?.setValue(Role.USER); // Default role
 
@@ -147,39 +145,22 @@ export class UserProfilComponent implements OnInit {
       return;
     }
 
-    this.userDataService.checkIfUserNameExists(updatedUser.userName).subscribe(
-      (usernameExists) => {
-        if (usernameExists) {
-          alert('Username already exists.');
+    this.userDataService.checkIfUserEmailExists(updatedUser.email).subscribe(
+      (emailExists) => {
+        if (emailExists) {
+          alert('Email already exists.');
           return;
         }
 
-        this.userDataService
-          .checkIfUserEmailExists(updatedUser.email)
-          .subscribe(
-            (emailExists) => {
-              if (emailExists) {
-                alert('Email already exists.');
-                return;
-              }
-
-              this.isEditMode
-                ? this.updateSelectedUser(updatedUser)
-                : this.createNewUser(updatedUser);
-            },
-            (emailError) => {
-              this.logDataService.addErrorUserLog(
-                `Error checking if email: ${updatedUser.email} exists`
-              ),
-                console.error('Error checking if email exists:', emailError);
-            }
-          );
+        this.isEditMode
+          ? this.updateSelectedUser(updatedUser)
+          : this.createNewUser(updatedUser);
       },
-      (usernameError) => {
+      (emailError) => {
         this.logDataService.addErrorUserLog(
-          `Error checking if username: ${updatedUser.userName} exists`
+          `Error checking if email: ${updatedUser.email} exists`
         ),
-          console.error('Error checking if username exists:', usernameError);
+          console.error('Error checking if email exists:', emailError);
       }
     );
   }
@@ -237,7 +218,12 @@ export class UserProfilComponent implements OnInit {
   updateUserAndNavigate(user: User): void {
     if (user.userID === this.userService.currentUser.userID) {
       this.userService.currentUser = user;
-      this.userService.currentUsername.next(user.userName);
+      this.userService.currentUserFirstAndLastName$.next(
+        this.userService.concatenateFirstnameLastname(
+          this.user.firstName,
+          this.user.lastName
+        )
+      );
     }
     this.userDataService
       .updateUser(user, this.profileForm.value.password)
@@ -258,7 +244,7 @@ export class UserProfilComponent implements OnInit {
   createNewUser(user: User): void {
     this.userDataService.createUser(user).subscribe(
       (response: any) => {
-        this.logDataService.addCreateUserLog(response.userID, user.userName);
+        //this.logDataService.addCreateUserLog(response.userID, user.userName);
         this.router.navigate(['/userManagment']);
       },
       (error) => {

@@ -81,8 +81,9 @@ export class UserManagmentPageComponent implements OnInit {
   }
 
   // Checks if a user is activated based if salt exist
+  //TODO: Check if activated
   isActivated(user: User): boolean {
-    return user.salt !== '';
+    return true;
   }
 
   // Deletes a user from the system

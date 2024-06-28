@@ -124,7 +124,7 @@ export class LogDataService {
       activityDescription: LogDescriptionValues.createLogDescription(
         ActivityName.LOGIN,
         this.userService.getCurrentUserID(),
-        this.userService.getCurrentUsername()
+        this.userService.getCurrentFirstAndLastName()
       ),
       activityName: ActivityName.LOGIN,
       userID: this.userService.getCurrentUserID(),
@@ -141,7 +141,7 @@ export class LogDataService {
       activityDescription: LogDescriptionValues.createLogDescription(
         ActivityName.LOGOUT,
         this.userService.getCurrentUserID(),
-        this.userService.getCurrentUsername()
+        this.userService.getCurrentFirstAndLastName()
       ),
       activityName: ActivityName.LOGOUT,
       userID: this.userService.getCurrentUserID(),
@@ -174,7 +174,7 @@ export class LogDataService {
       activityDescription: LogDescriptionValues.createLogDescription(
         ActivityName.UPDATE_USER,
         user.userID,
-        user.userName
+        user.firstName
       ),
       activityName: ActivityName.UPDATE_USER,
       userID: this.userService.getCurrentUserID(),
@@ -191,7 +191,7 @@ export class LogDataService {
       activityDescription: LogDescriptionValues.createLogDescription(
         ActivityName.DELETE_USER,
         user.userID,
-        user.userName
+        user.firstName
       ),
       activityName: ActivityName.DELETE_USER,
       userID: this.userService.getCurrentUserID(),

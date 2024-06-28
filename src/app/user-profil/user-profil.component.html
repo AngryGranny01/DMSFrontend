@@ -9,22 +9,7 @@
       <div class="card-body">
         <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
           <div class="row">
-            <div class="col-md-5">
-              <div class="form-group">
-                <label class="control-label"><b>Username</b></label>
-                <input
-                  type="text"
-                  placeholder="Username"
-                  class="form-control"
-                  formControlName="userName"
-                  required
-                />
-                <div *ngIf="profileForm.controls['userName'].invalid && (profileForm.controls['userName'].dirty || profileForm.controls['userName'].touched)" class="alert alert-danger">
-                  Username is required.
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6 offset-md-1">
+            <div class="col-md-6">
               <div class="form-group">
                 <label class="control-label"><b>Organizational Unit</b></label>
                 <input

@@ -23,52 +23,61 @@ export class AuthService {
     private encryptionService: EncryptionService
   ) {}
 
-/**
- * Attempts to login a user with the provided email and password.
- * If successful, sets the current user, updates authentication status,
- * navigates to the dashboard, and logs the login action.
- * If unsuccessful, displays an error message.
- * @param email The email of the user attempting to login.
- * @param passwordPlain The plain text password of the user.
- * @returns Observable of the login response
- */
-loginUser(email: string, passwordPlain: string): Observable<any> {
-  if (passwordPlain.trim() === '') {
-    alert('Password field cannot be empty');
-    return of(null);
+  /**
+   * Attempts to login a user with the provided email and password.
+   * If successful, sets the current user, updates authentication status,
+   * navigates to the dashboard, and logs the login action.
+   * If unsuccessful, displays an error message.
+   * @param email The email of the user attempting to login.
+   * @param passwordPlain The plain text password of the user.
+   * @returns Observable of the login response
+   */
+  loginUser(email: string, passwordPlain: string): Observable<any> {
+    if (passwordPlain.trim() === '') {
+      alert('Password field cannot be empty');
+      return of(null);
+    }
+
+    const getSalt = (): Observable<string> => {
+      return this.http.get<string>(`${this.apiConfig.baseURL}/users/findSalt`, {
+        params: { email: email },
+        responseType: 'text' as 'json', // Ensures responseType is correct
+      });
+    };
+
+    return getSalt().pipe(
+      switchMap((salt: string) => {
+        const hashedPassword = this.encryptionService.getPBKDF2Key(
+          passwordPlain,
+          salt
+        );
+        const data = {
+          email: email,
+          hashedPassword: hashedPassword,
+        };
+        return this.http.post(`${this.apiConfig.baseURL}/login`, data);
+      }),
+      map((response: any) => {
+        this.isAuthenticated = true;
+        this.userService.currentUser = response.user;
+        console.log(response);
+        console.log(this.userService.currentUser);
+        this.setToken(response.token); // Store the token
+        const fullName = this.userService.concatenateFirstnameLastname(
+          response.user.firstName,
+          response.user.lastName
+        );
+        this.userService.currentUserFirstAndLastName$.next(fullName);
+        this.router.navigate(['/dashboard']);
+        this.logDataService.addLoginLog();
+        return response;
+      }),
+      catchError((error) => {
+        console.error('Login error:', error);
+        return throwError(error);
+      })
+    );
   }
-
-  const getSalt = (): Observable<string> => {
-    return this.http.get<string>(`${this.apiConfig.baseURL}/users/findSalt`, {
-      params: { email: email },
-      responseType: 'text' as 'json' // Ensures responseType is correct
-    });
-  };
-
-  return getSalt().pipe(
-    switchMap((salt: string) => {
-      const hashedPassword = this.encryptionService.getPBKDF2Key(passwordPlain, salt);
-      const data = {
-        email: email,
-        hashedPassword: hashedPassword,
-      };
-      return this.http.post(`${this.apiConfig.baseURL}/login`, data);
-    }),
-    map((response: any) => {
-      this.isAuthenticated = true;
-      this.userService.currentUser = response.user;
-      this.setToken(response.token); // Store the token
-      this.userService.currentUsername.next(response.user.userName);
-      this.router.navigate(['/dashboard']);
-      this.logDataService.addLoginLog();
-      return response;
-    }),
-    catchError((error) => {
-      console.error('Login error:', error);
-      return throwError(error);
-    })
-  );
-}
 
   /**
    * Checks if the user is currently logged in.

@@ -109,12 +109,12 @@ export class UserDataService {
    */
   createUser(user: User): Observable<User> {
     const createUser = {
-      userName: user.userName,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
       role: user.role,
       orgUnit: user.orgUnit,
+      isDeactivated: true
     };
     return this.http
       .post<User>(`${this.apiConfig.baseURL}/users`, createUser)
@@ -139,19 +139,21 @@ export class UserDataService {
 
     const updateUser = {
       userID: user.userID,
-      userName: user.userName,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
       passwordHash: passwordHash,
-      salt: salt,
       role: user.role,
       orgUnit: user.orgUnit,
+      isDeactivated: user.isDeactivated
     };
 
-    if (passwordPlain === '') {
-      updateUser.passwordHash = '';
-      updateUser.salt = '';
+    //TODO: Update Password
+    if (passwordPlain !== '') {
+      const updatePassword = {
+        passwordHash: passwordHash,
+        salt: salt
+      };
     }
 
     return this.http
@@ -222,13 +224,12 @@ export class UserDataService {
 
     return new User(
       response.userID,
-      response.userName,
       response.firstName,
       response.lastName,
-      response.salt,
       role,
       response.email,
-      response.orgUnit
+      response.orgUnit,
+      response.isDeactivated
     );
   }
 }

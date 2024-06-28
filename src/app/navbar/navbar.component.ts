@@ -9,8 +9,8 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./navbar.component.css'],
 })
 export class NavbarComponent implements OnInit, OnDestroy {
-  loginName: string = ''; // Holds the username for display in the navbar
-  private usernameSubscription!: Subscription; // Subscription to track changes in the username
+  loginName: string = ''; // Holds the User First and Last Name for display in the navbar
+  private userFirstAndLastNameSubscription!: Subscription; // Subscription to track changes in the user First and Last Name
 
   constructor(
     private authService: AuthService,
@@ -19,16 +19,15 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     // Subscribe to username changes
-    this.usernameSubscription = this.userService.currentUsername.subscribe(
-      (username) => {
-        this.loginName = username; // Update loginName when username changes
-      }
-    );
+    this.userFirstAndLastNameSubscription =
+      this.userService.currentUserFirstAndLastName$.subscribe((userName) => {
+        this.loginName = userName; // Update loginName when username changes
+      });
   }
 
   ngOnDestroy(): void {
     // Unsubscribe to prevent memory leaks
-    this.usernameSubscription.unsubscribe();
+    this.userFirstAndLastNameSubscription.unsubscribe();
   }
 
   // Checks if a user is logged in

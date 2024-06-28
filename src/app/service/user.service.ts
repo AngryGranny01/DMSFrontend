@@ -10,20 +10,18 @@ export class UserService {
   // Initialize currentUser with default values for properties
   public currentUser: User = {
     userID: 0,
-    userName: '',
     firstName: '',
     lastName: '',
-    salt: '',
     email: '',
     role: Role.USER,
     orgUnit: '',
+    isDeactivated: true,
   };
 
   public isEditMode: boolean = true;
   private selectedUser!: User;
-  public currentUsername: BehaviorSubject<string> = new BehaviorSubject<string>(
-    ''
-  );
+  public currentUserFirstAndLastName$: BehaviorSubject<string> =
+    new BehaviorSubject<string>('');
   public currentUser$: BehaviorSubject<User> = new BehaviorSubject<User>(
     this.currentUser
   );
@@ -72,8 +70,11 @@ export class UserService {
    * Retrieves the current username.
    * @returns The current username.
    */
-  getCurrentUsername(): string {
-    return this.currentUser.userName;
+  getCurrentFirstAndLastName(): string {
+    return this.concatenateFirstnameLastname(
+      this.currentUser.firstName,
+      this.currentUser.lastName
+    );
   }
 
   //--------------------- Getter and Setter -------------------------------------//
@@ -100,6 +101,10 @@ export class UserService {
    */
   getCurrentUser(): User {
     return this.currentUser;
+  }
+
+  getUserDeactivationStatus(user: User) {
+    return user.isDeactivated;
   }
 
   /**

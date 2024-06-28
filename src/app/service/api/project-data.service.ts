@@ -80,30 +80,28 @@ export class ProjectDataService {
     const managerData = project.manager[0];
     const manager = new User(
       managerData.userID,
-      managerData.userName,
       managerData.firstName,
       managerData.lastName,
-      '',
       Role.MANAGER,
       managerData.email,
-      managerData.orgUnit
+      managerData.orgUnit,
+      managerData.isDeactivated
     );
 
     const users = project.users.map(
       (user: any) =>
         new User(
           user.userID,
-          user.userName,
           user.firstName,
           user.lastName,
-          '',
           user.role === Role.ADMIN
             ? Role.ADMIN
             : user.role === Role.MANAGER
             ? Role.MANAGER
             : Role.USER,
           user.email,
-          user.orgUnit
+          user.orgUnit,
+          user.isDeactivated
         )
     );
 
