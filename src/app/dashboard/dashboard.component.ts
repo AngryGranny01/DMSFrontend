@@ -114,8 +114,10 @@ export class DashboardComponent implements OnInit {
     this.projectService.setSelectedProject(project);
   }
 
-  // Formats date
-  formateDate(date: Date): string {
+  formatDate(date: Date | null): string {
+    if (date === null) {
+      return 'Open Ended'; // Return an empty string or any other default value you prefer
+    }
     return this.niceDate.formatDate(date);
   }
 

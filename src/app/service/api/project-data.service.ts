@@ -77,12 +77,12 @@ export class ProjectDataService {
 
   // Helper Functions
   private extractProject(project: any): Project {
-    const managerData = project.manager[0];
+    const managerData = project.manager;
     const manager = new User(
-      managerData.userID,
+      managerData.accountID,
       managerData.firstName,
       managerData.lastName,
-      Role.PROJECT_MANAGER,
+      managerData.role === 'ADMIN' ? Role.ADMIN : Role.PROJECT_MANAGER,
       managerData.email,
       managerData.orgUnit,
       managerData.isDeactivated
@@ -91,7 +91,7 @@ export class ProjectDataService {
     const users = project.users.map(
       (user: any) =>
         new User(
-          user.userID,
+          user.accountID,
           user.firstName,
           user.lastName,
           user.role === Role.ADMIN
@@ -105,14 +105,15 @@ export class ProjectDataService {
         )
     );
 
+    const projectEndDate = project.projectEndDate ? new Date(project.projectEndDate) : null;
+
     return new Project(
       project.projectID,
       project.projectName,
-      project.managerID,
       manager,
       users,
       project.projectDescription,
-      new Date(project.projectEndDate)
+      projectEndDate
     );
   }
 }

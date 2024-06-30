@@ -55,12 +55,11 @@
                   matInput
                   [(ngModel)]="myDate"
                   name="projectEndDate"
-                  placeholder="Enter date"
+                  placeholder="Enter date or leave blank for Open End"
                   [min]="minDate"
                   [max]="maxDate"
                   [matDatepicker]="releasedAtPicker"
                   (click)="releasedAtPicker.open()"
-                  required
                 />
                 <mat-datepicker-toggle matSuffix [for]="releasedAtPicker"></mat-datepicker-toggle>
                 <mat-datepicker #releasedAtPicker></mat-datepicker>

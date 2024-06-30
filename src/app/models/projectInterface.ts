@@ -5,10 +5,9 @@ export class Project {
   constructor(
     public projectID: number,
     public name: string,
-    public managerID: number,
     public manager: User,
     public users: User[],
     public description: string,
-    public endDate: Date
+    public endDate: Date | null
   ) {}
 }

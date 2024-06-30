@@ -17,15 +17,12 @@ import { ProjectManagerDataService } from '../service/api/project-manager-data.s
 import { Router } from '@angular/router';
 import { ProjectDataService } from '../service/api/project-data.service';
 import { LogDataService } from '../service/api/log-data.service';
-import { EncryptionService } from '../service/encryption.service';
-import { DashboardComponent } from '../dashboard/dashboard.component';
 import { NgForm } from '@angular/forms';
 
 @Component({
   selector: 'app-create-project',
   templateUrl: './create-project.component.html',
-  styleUrl: './create-project.component.css',
-  providers: [DashboardComponent],
+  styleUrls: ['./create-project.component.css'],
 })
 export class CreateProjectComponent implements OnInit, OnDestroy {
   @ViewChild('input') input!: ElementRef<HTMLInputElement>;
@@ -36,7 +33,7 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
   startDateControl = new FormControl();
   project!: Project;
 
-  myDate!: Date;
+  myDate: Date | null = null;
   minDate: Date = new Date();
   maxDate!: Date;
 
@@ -68,6 +65,7 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     if (this.projectService.isProjectEditMode) {
       this.isEditMode = true;
       this.project = this.projectService.getSelectedProject();
+      console.log(this.project)
       this.setInputFieldsForEditProject();
     } else {
       this.isEditMode = false;
@@ -92,11 +90,15 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     this.selectedManager.userID = this.project.manager.userID;
     this.myControl = new FormControl(this.selectedManager.fullName);
 
-    this.myDate = new Date(this.project.endDate);
+    if (this.project.endDate !== null) {
+      this.myDate = new Date(this.project.endDate);
+    }
     this.maxDate = new Date(
-      this.myDate.getFullYear() + 5,
-      this.myDate.getMonth(),
-      this.myDate.getDate()
+      this.myDate
+        ? this.myDate.getFullYear() + 5
+        : new Date().getFullYear() + 5,
+      this.myDate ? this.myDate.getMonth() : new Date().getMonth(),
+      this.myDate ? this.myDate.getDate() : new Date().getDate()
     );
     // Set Project Description Field
     this.projectDescription = this.project.description;
@@ -131,7 +133,8 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
         // Load all Project Managers or Admins into the options
         this.options = users
           .filter(
-            (user) => user.role === Role.ADMIN || user.role === Role.PROJECT_MANAGER
+            (user) =>
+              user.role === Role.ADMIN || user.role === Role.PROJECT_MANAGER
           )
           .map((user) => ({
             fullName: `${user.firstName} ${user.lastName} (${user.orgUnit})`,
@@ -160,46 +163,40 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Saves the project to the server
-  saveProject(form: NgForm) {
-    if (!form.valid) {
-      alert('Please fill out all required fields.');
-      return;
-    }
-
-    if (this.projectDescription === undefined) {
-      this.projectDescription = '';
-    }
-
-    const selectedUser = this.findSelectedUser();
-    this.addProjectManagerToUsers();
-
-    this.projectManagerDataService.getManagerID(selectedUser.userID).subscribe(
-      (managerID) => {
-        const projectData = {
-          projectID: 0,
-          projectName: this.projectName,
-          projectDescription: this.projectDescription,
-          projectEndDate: this.myDate,
-          managerID: managerID,
-          userIDs: this.checkedUsers.map((user) => ({
-            userID: user.userID,
-          })),
-        };
-
-        if (this.isEditMode === true) {
-          projectData.projectID = this.project.projectID;
-          this.updateProject(projectData);
-        } else {
-          this.createNewProject(projectData);
-        }
-      },
-      (error) => {
-        console.error('Error getting manager ID:', error);
-        alert('An error occurred while retrieving the manager ID.');
-      }
-    );
+// Saves the project to the server
+saveProject(form: NgForm) {
+  if (!form.valid) {
+    alert('Please fill out all required fields.');
+    return;
   }
+
+  if (this.projectDescription === "") {
+    this.projectDescription = null;
+  }
+
+  const selectedUser = this.findSelectedUser();
+  if (!selectedUser) {
+    alert('Please select a valid project manager.');
+    return;
+  }
+
+  const projectData = {
+    projectID: this.isEditMode ? this.project.projectID : 0,
+    projectName: this.projectName,
+    projectDescription: this.projectDescription,
+    projectEndDate: this.myDate ? this.myDate.toISOString().split('T')[0] : null,
+    managerID: selectedUser.userID,
+    userIDs: this.checkedUsers
+      .filter(user => user.userID !== selectedUser.userID) // Exclude project manager from user IDs
+      .map(user => ({ userID: user.userID })),
+  };
+
+  if (this.isEditMode) {
+    this.updateProject(projectData);
+  } else {
+    this.createNewProject(projectData);
+  }
+}
 
   // Finds the selected user
   findSelectedUser(): any {
@@ -275,18 +272,6 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
       this.checkedUsers.splice(index, 1);
     } else {
       this.checkedUsers.push(user);
-    }
-  }
-
-  // Adds project manager to selected users if not already present
-  addProjectManagerToUsers() {
-    let selectedManager = this.findSelectedUser();
-    const managerAlreadySelected = this.checkedUsers.find(
-      (user) => user.userID === selectedManager.userID
-    );
-
-    if (!managerAlreadySelected) {
-      this.checkedUsers.push(selectedManager);
     }
   }
 }
