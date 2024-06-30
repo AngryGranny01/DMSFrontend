@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Injector } from '@angular/core';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -7,10 +7,11 @@ import { AuthService } from '../service/auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private injector: Injector, private router: Router) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const authToken = this.authService.getToken();
+    const authService = this.injector.get(AuthService); // Using injector to avoid direct circular dependency
+    const authToken = authService.getToken();
 
     if (authToken) {
       request = request.clone({
@@ -23,22 +24,17 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 401) {
-          // Handle unauthorized access
-          this.authService.setAuthenticated(false);
           this.router.navigate(['/login'], { queryParams: { returnUrl: request.url } });
+          authService.logout();
         } else if (error.status === 403) {
-          // Handle forbidden access
-          this.router.navigate(['/forbidden']); // Redirect to a forbidden page or handle accordingly
-          alert('Your session has expired or you do not have permission to access this resource.');
+          this.router.navigate(['/forbidden']);
         } else if (error.status === 500) {
-          // Handle server errors
-          console.error(error)
+          console.error(error);
         } else if (error.status === 0) {
-          // Handle network errors
-          console.error(error)
+          console.error(error);
           alert('Network error: Please check your internet connection.');
         } else {
-          // Handle other types of error
+          console.error(error);
         }
         return throwError(error);
       })

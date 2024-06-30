@@ -60,7 +60,6 @@ export class UserProfilComponent implements OnInit {
   }
 
   initializeUser(): void {
-    console.log(this.userService.isEditMode);
     if (this.userService.isEditMode) {
       this.isEditMode = true;
       this.user = this.userService.getSelectedUser();

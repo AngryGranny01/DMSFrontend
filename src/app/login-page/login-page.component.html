@@ -3,24 +3,25 @@
     <h1>LOGIN</h1>
     <form (ngSubmit)="onSignIn(login)" #login="ngForm">
       <input
-        type="text"
-        placeholder="Enter Email"
-        name="email"
-        class="form-control"
-        id="email"
-        ngModel
-        required
-      />
-
-      <input
-        type="password"
-        placeholder="Enter Password"
-        name="password"
-        class="form-control"
-        id="password"
-        ngModel
-        required
-      />
+      type="text"
+      placeholder="Enter Email"
+      name="email"
+      class="form-control"
+      id="email"
+      ngModel
+      autocomplete="email"
+      required
+    />
+    <input
+      type="password"
+      placeholder="Enter Password"
+      name="password"
+      class="form-control"
+      id="password"
+      ngModel
+      autocomplete="current-password"
+      required
+    />
 
       <button type="submit">Login</button>
     </form>

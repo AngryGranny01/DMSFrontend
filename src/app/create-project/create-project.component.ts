@@ -53,7 +53,6 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     private projectService: ProjectService,
     private userDataService: UserDataService,
     private userService: UserService,
-    private projectManagerDataService: ProjectManagerDataService,
     private projectDataService: ProjectDataService,
     private logDataService: LogDataService,
     private router: Router
@@ -65,7 +64,6 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     if (this.projectService.isProjectEditMode) {
       this.isEditMode = true;
       this.project = this.projectService.getSelectedProject();
-      console.log(this.project)
       this.setInputFieldsForEditProject();
     } else {
       this.isEditMode = false;
@@ -74,11 +72,8 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     this.loadAllUsers();
   }
 
-  // Sets input fields when editing an existing project
   setInputFieldsForEditProject() {
-    // Set Project Name Field
     this.projectName = this.project.name;
-    // Set Project Manager Field
     this.selectedManager.fullName =
       this.userService.concatenateFirstnameLastname(
         this.project.manager.firstName,
@@ -100,12 +95,10 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
       this.myDate ? this.myDate.getMonth() : new Date().getMonth(),
       this.myDate ? this.myDate.getDate() : new Date().getDate()
     );
-    // Set Project Description Field
     this.projectDescription = this.project.description;
     this.checkedUsers = this.project.users;
   }
 
-  // Sets input fields when creating a new project
   setInputFieldsForNewProject() {
     const today = new Date();
     this.maxDate = new Date(
@@ -115,13 +108,11 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     );
   }
 
-  // Loads all users from the server
   loadAllUsers() {
     this.users$ = this.userDataService.getAllUsers();
 
     this.users$.pipe(takeUntil(this.unsubscribe$)).subscribe((users) => {
       if (this.userService.currentUser.role === Role.PROJECT_MANAGER) {
-        // Only load the current user into filter options if they are a Project Manager
         const currentUser = this.userService.currentUser;
         this.options = [
           {
@@ -130,7 +121,6 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
           },
         ];
       } else {
-        // Load all Project Managers or Admins into the options
         this.options = users
           .filter(
             (user) =>
@@ -145,7 +135,6 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Checks if a user exists in the project
   userExistsInProject(user: User): boolean {
     if (this.project === undefined) {
       return false;
@@ -155,7 +144,6 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     );
   }
 
-  // Filters the list of options based on input
   filter(): void {
     const filterValue = this.input.nativeElement.value.toLowerCase();
     this.filteredOptions = this.options.filter((option) => {
@@ -163,42 +151,40 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     });
   }
 
-// Saves the project to the server
-saveProject(form: NgForm) {
-  if (!form.valid) {
-    alert('Please fill out all required fields.');
-    return;
+  saveProject(form: NgForm) {
+    if (!form.valid) {
+      alert('Please fill out all required fields.');
+      return;
+    }
+
+    if (this.projectDescription === undefined || this.projectDescription === ""  ) {
+      this.projectDescription = null;
+    }
+
+    const selectedUser = this.findSelectedUser();
+    if (!selectedUser) {
+      alert('Please select a valid project manager.');
+      return;
+    }
+
+    const projectData = {
+      projectID: this.isEditMode ? this.project.projectID : 0,
+      projectName: this.projectName,
+      projectDescription: this.projectDescription,
+      projectEndDate: this.myDate ? this.myDate.toISOString().split('T')[0] : null,
+      managerID: selectedUser.userID,
+      userIDs: this.checkedUsers
+        .filter(user => user.userID !== selectedUser.userID) // Exclude project manager from user IDs
+        .map(user => ({ userID: user.userID })),
+    };
+
+    if (this.isEditMode) {
+      this.updateProject(projectData);
+    } else {
+      this.createNewProject(projectData);
+    }
   }
 
-  if (this.projectDescription === "") {
-    this.projectDescription = null;
-  }
-
-  const selectedUser = this.findSelectedUser();
-  if (!selectedUser) {
-    alert('Please select a valid project manager.');
-    return;
-  }
-
-  const projectData = {
-    projectID: this.isEditMode ? this.project.projectID : 0,
-    projectName: this.projectName,
-    projectDescription: this.projectDescription,
-    projectEndDate: this.myDate ? this.myDate.toISOString().split('T')[0] : null,
-    managerID: selectedUser.userID,
-    userIDs: this.checkedUsers
-      .filter(user => user.userID !== selectedUser.userID) // Exclude project manager from user IDs
-      .map(user => ({ userID: user.userID })),
-  };
-
-  if (this.isEditMode) {
-    this.updateProject(projectData);
-  } else {
-    this.createNewProject(projectData);
-  }
-}
-
-  // Finds the selected user
   findSelectedUser(): any {
     const selectedOption = this.myControl.value;
     const selectedUser = this.options.find(
@@ -207,7 +193,6 @@ saveProject(form: NgForm) {
     return selectedUser;
   }
 
-  // Creates a new project
   createNewProject(data: any) {
     let project = {
       projectName: data.projectName,
@@ -222,7 +207,9 @@ saveProject(form: NgForm) {
           response.projectID,
           project.projectName
         );
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/dashboard']).then(() => {
+          window.location.reload(); // Force refresh the dashboard
+        });
       },
       (error) => {
         console.error('Error creating project:', error);
@@ -231,7 +218,6 @@ saveProject(form: NgForm) {
     );
   }
 
-  // Updates an existing project
   updateProject(data: any) {
     let project = {
       projectID: data.projectID,
@@ -246,23 +232,20 @@ saveProject(form: NgForm) {
           project.projectID,
           project.projectName
         );
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/dashboard'])
       },
       (error) => {
         console.error('Error updating project:', error);
         alert('An error occurred while updating the project.');
       }
     );
-    this.router.navigate(['/dashboard']);
   }
 
-  // Unsubscribes from observables to prevent memory leaks
   ngOnDestroy() {
     this.unsubscribe$.next();
     this.unsubscribe$.complete();
   }
 
-  // Toggles selection of a user
   toggleUserSelection(user: User) {
     const index = this.checkedUsers.findIndex(
       (checkedUser) => checkedUser.userID === user.userID

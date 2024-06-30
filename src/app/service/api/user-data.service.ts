@@ -8,6 +8,7 @@ import { ApiConfigService } from './api-config.service';
 import { Role } from '../../models/role';
 import { EncryptionService } from '../encryption.service';
 import { LogDataService } from './log-data.service';
+import { AuthService } from '../auth.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +18,8 @@ export class UserDataService {
     private http: HttpClient,
     private apiConfig: ApiConfigService,
     private encryptionService: EncryptionService,
-    private logDataService: LogDataService
+    private logDataService: LogDataService,
+    private authService: AuthService
   ) {}
 
   //-------------------------------------------- Get-Requests --------------------------------------------------------------//
@@ -27,7 +29,9 @@ export class UserDataService {
    * @returns An Observable containing the list of users.
    */
   getAllUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiConfig.baseURL}/users`).pipe(
+    return this.http.get<User[]>(`${this.apiConfig.baseURL}/users`, {
+      headers: this.authService.getAuthHeaders(),
+    }).pipe(
       catchError((error) => {
         console.error('Failed to fetch users:', error);
         this.logDataService.addErrorUserLog(`Failed to fetch all users`);
@@ -43,7 +47,9 @@ export class UserDataService {
    */
   getLastLogins(): Observable<{ [userID: string]: Date }> {
     return this.http
-      .get<any[]>(`${this.apiConfig.baseURL}/logs/lastLogins`)
+      .get<any[]>(`${this.apiConfig.baseURL}/logs/lastLogins`, {
+        headers: this.authService.getAuthHeaders(),
+      })
       .pipe(
         map((response: any[]) => {
           const lastLogins: { [userID: string]: Date } = {};
@@ -62,43 +68,7 @@ export class UserDataService {
       );
   }
 
-  /**
-   * Checks if the given user email exists.
-   * @param userEmail The email of the user.
-   * @returns An Observable indicating whether the user email exists.
-   */
-  checkIfUserEmailExists(userEmail: string): Observable<boolean> {
-    return this.http
-      .get<any>(
-        `${this.apiConfig.baseURL}/users/checkEmailExist?email=${userEmail}`
-      )
-      .pipe(
-        map((response) => response.exist),
-        catchError((error) => {
-          console.error('Failed to check email existence:', error);
-          throw new Error('Failed to check email existence');
-        })
-      );
-  }
 
-  /**
-   * Checks if the given username exists.
-   * @param userName The username to check.
-   * @returns An Observable indicating whether the username exists.
-   */
-  checkIfUserNameExists(userName: string): Observable<boolean> {
-    return this.http
-      .get<any>(
-        `${this.apiConfig.baseURL}/users/checkUsernameExist?username=${userName}`
-      )
-      .pipe(
-        map((response) => response.exist),
-        catchError((error) => {
-          console.error('Failed to check username existence:', error);
-          throw new Error('Failed to check username existence');
-        })
-      );
-  }
 
   //-------------------------------------------- Post-Requests --------------------------------------------------------------//
 
@@ -117,7 +87,9 @@ export class UserDataService {
       isDeactivated: true,
     };
     return this.http
-      .post<User>(`${this.apiConfig.baseURL}/users`, createUser)
+      .post<User>(`${this.apiConfig.baseURL}/users`, createUser, {
+        headers: this.authService.getAuthHeaders(),
+      })
       .pipe(
         catchError((error) => {
           console.error('Failed to create user:', error);
@@ -147,7 +119,9 @@ export class UserDataService {
     console.log(updateUser);
 
     return this.http
-      .put<User>(`${this.apiConfig.baseURL}/users`, updateUser)
+      .put<User>(`${this.apiConfig.baseURL}/users`, updateUser, {
+        headers: this.authService.getAuthHeaders(),
+      })
       .pipe(
         catchError((error) => {
           console.error('Failed to update user:', error);
@@ -176,7 +150,9 @@ export class UserDataService {
     };
 
     return this.http
-      .put(`${this.apiConfig.baseURL}/users/password`, updatedPassword)
+      .put(`${this.apiConfig.baseURL}/users/password`, updatedPassword, {
+        headers: this.authService.getAuthHeaders(),
+      })
       .pipe(
         catchError((error) => {
           console.error('Failed to update password:', error);
@@ -194,7 +170,9 @@ export class UserDataService {
    */
   deleteUser(userID: number): Observable<void> {
     return this.http
-      .delete<void>(`${this.apiConfig.baseURL}/users/${userID}`)
+      .delete<void>(`${this.apiConfig.baseURL}/users/${userID}`, {
+        headers: this.authService.getAuthHeaders(),
+      })
       .pipe(
         catchError((error) => {
           console.error('Failed to delete user:', error);

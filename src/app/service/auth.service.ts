@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { Observable, of, throwError } from 'rxjs';
 import { UserService } from './user.service';
@@ -13,7 +13,6 @@ import { Role } from '../models/role';
   providedIn: 'root',
 })
 export class AuthService {
-  private isAuthenticated = false;
 
   constructor(
     private readonly router: Router,
@@ -24,15 +23,6 @@ export class AuthService {
     private encryptionService: EncryptionService
   ) {}
 
-  /**
-   * Attempts to login a user with the provided email and password.
-   * If successful, sets the current user, updates authentication status,
-   * navigates to the dashboard, and logs the login action.
-   * If unsuccessful, displays an error message.
-   * @param email The email of the user attempting to login.
-   * @param passwordPlain The plain text password of the user.
-   * @returns Observable of the login response
-   */
   loginUser(email: string, passwordPlain: string): Observable<any> {
     if (passwordPlain.trim() === '') {
       alert('Password field cannot be empty');
@@ -42,33 +32,21 @@ export class AuthService {
     const getSalt = (): Observable<string> => {
       return this.http.get<string>(`${this.apiConfig.baseURL}/users/findSalt`, {
         params: { email: email },
-        responseType: 'text' as 'json', // Ensures responseType is correct
+        responseType: 'text' as 'json',
       });
     };
 
     return getSalt().pipe(
       switchMap((salt: string) => {
-        const hashedPassword = this.encryptionService.getPBKDF2Key(
-          passwordPlain,
-          salt
-        );
-        const data = {
-          email: email,
-          hashedPassword: hashedPassword,
-        };
+        const hashedPassword = this.encryptionService.getPBKDF2Key(passwordPlain, salt);
+        const data = { email, hashedPassword };
         return this.http.post(`${this.apiConfig.baseURL}/login`, data);
       }),
       map((response: any) => {
-        this.isAuthenticated = true;
-        this.userService.currentUser = response.user;
         this.userService.currentUser.role = response.user.role as Role;
-        console.log(response);
-        console.log(this.userService.currentUser);
-        this.setToken(response.token); // Store the token
-        const fullName = this.userService.concatenateFirstnameLastname(
-          response.user.firstName,
-          response.user.lastName
-        );
+        this.setToken(response.token);
+        this.userService.setCurrentUser(response.user)
+        const fullName = this.userService.concatenateFirstnameLastname(response.user.firstName, response.user.lastName);
         this.userService.currentUserFirstAndLastName$.next(fullName);
         this.router.navigate(['/dashboard']);
         this.logDataService.addLoginLog();
@@ -81,38 +59,42 @@ export class AuthService {
     );
   }
 
-  /**
-   * Checks if the user is currently logged in.
-   * @returns True if the user is authenticated, false otherwise.
-   */
   isLoggedIn(): boolean {
-    return this.isAuthenticated;
+    return !!this.getToken();
   }
 
-  /**
-   * Logs the user out by navigating to the login page,
-   * updating authentication status, and logging the logout action.
-   */
   logout(): void {
     this.router.navigate(['/login']);
-    this.isAuthenticated = false;
     this.logDataService.addLogoutLog();
-    this.removeToken(); // Remove the token
+    this.userService.clearCurrentUser()
+    this.removeToken();
   }
 
   setToken(token: string) {
-    localStorage.setItem('authToken', token);
+    sessionStorage.setItem('authToken', token);
   }
 
   getToken(): string {
-    return localStorage.getItem('authToken') || '';
+    return sessionStorage.getItem('authToken') || '';
   }
 
   removeToken() {
-    localStorage.removeItem('authToken');
+    sessionStorage.removeItem('authToken');
   }
 
-  setAuthenticated(authenticated: boolean) {
-    this.isAuthenticated = authenticated;
+  getAuthHeaders(): HttpHeaders {
+    const token = this.getToken();
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+  }
+
+  getUserRoleFromToken(): string {
+    const token = this.getToken();
+    if (token) {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.role;
+    }
+    return '';
   }
 }

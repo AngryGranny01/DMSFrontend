@@ -34,19 +34,16 @@ export class DashboardComponent implements OnInit {
     this.loadUserProjects();
   }
 
-  // Loads all projects
   loadAllProjects() {
     this.projects$ = this.projectDataService.getAllProjects();
   }
 
-  // Loads projects specific to the current user
   loadUserProjects() {
     this.projects$ = this.projectDataService.getProjectFromUser(
       this.userService.getCurrentUser().userID
     );
   }
 
-  // Refreshes the list of projects
   refreshProjects() {
     if (this.showProjects === true) {
       this.loadAllProjects();
@@ -55,60 +52,49 @@ export class DashboardComponent implements OnInit {
     }
   }
 
-  // Sets project to edit mode and selects the project to edit
   editProject(project: Project) {
     this.projectService.isProjectEditMode = true;
     this.projectService.setSelectedProject(project);
   }
 
-  // Sets project to create mode
   createProject() {
     this.projectService.isProjectEditMode = false;
   }
 
-  // Checks if the current user is an admin
   isAdmin(): boolean {
     return this.userService.isAdmin();
   }
 
-  // Checks if the current user is not a regular user
   isNotUser(): boolean {
     return this.userService.currentUser.role !== Role.USER;
   }
 
-  // Deletes a project
   deleteProject(project: Project) {
     this.projectDataService.deleteProject(project.projectID).subscribe(
       () => {
-        // Log Entry
         this.logDataService.addDeleteProjectLog(project);
-
-        // Refresh Project data after successful deletion
         this.refreshProjects();
       },
       (error) => {
         console.error('Error deleting Project:', error);
-        this.logDataService.addErrorProjectLog(project.projectID,`Failed to update project with ID: ${project.projectID}`)
-        throw new Error(`Failed to update project`)
+        this.logDataService.addErrorProjectLog(project.projectID,`Failed to update project with ID: ${project.projectID}`);
+        throw new Error(`Failed to update project`);
       }
     );
   }
 
-  // Navigates to view all projects
   navigateToAllProjects() {
     this.projectService.showAllProjects = true;
     this.selectedOption = 'All Projects';
     this.loadAllProjects();
   }
 
-  // Navigates to view projects specific to the current user
   navigateToMyProjects() {
     this.projectService.showAllProjects = false;
     this.selectedOption = 'My Projects';
     this.loadUserProjects();
   }
 
-  // Opens project logs
   openProjectLogs(project: Project) {
     this.logService.setIsProjectLog(true);
     this.projectService.setSelectedProject(project);
@@ -116,20 +102,16 @@ export class DashboardComponent implements OnInit {
 
   formatDate(date: Date | null): string {
     if (date === null) {
-      return 'Open Ended'; // Return an empty string or any other default value you prefer
+      return 'Open Ended';
     }
     return this.niceDate.formatDate(date);
   }
 
-  // Checks if the current user is an admin or project manager of the project
   isAdminOrProjectManager(project: Project): any {
     const currentUser = this.userService.currentUser;
-    if (
+    return (
       currentUser.role === Role.ADMIN ||
       project.manager.userID === currentUser.userID
-    ) {
-      return true;
-    }
-    return false;
+    );
   }
 }

@@ -8,38 +8,46 @@ import { Project } from '../../models/projectInterface';
 import { User } from '../../models/userInterface';
 import { Role } from '../../models/role';
 import { LogDataService } from './log-data.service';
+import { AuthService } from '../auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ProjectDataService {
-  constructor(private http: HttpClient, private apiConfig: ApiConfigService, private logDataService: LogDataService) {}
+  constructor(
+    private http: HttpClient,
+    private apiConfig: ApiConfigService,
+    private authService: AuthService
+  ) {}
 
   // Get-Requests
   getAllProjects(): Observable<Project[]> {
     return this.http
-      .get<any[]>(`${this.apiConfig.baseURL}/projects`)
+      .get<any[]>(`${this.apiConfig.baseURL}/projects`, {
+        headers: this.authService.getAuthHeaders(),
+      })
       .pipe(
         map((response: any[]) => response.map(this.extractProject)),
         catchError((error) => {
           console.error('Failed to fetch projects:', error);
-          throw new Error(('Failed to fetch projects'));
+          return throwError('Failed to fetch projects');
         })
       );
   }
 
   getProjectFromUser(userID: number): Observable<Project[]> {
     return this.http
-      .get<any[]>(`${this.apiConfig.baseURL}/projects/${userID}`)
+      .get<any[]>(`${this.apiConfig.baseURL}/projects/${userID}`, {
+        headers: this.authService.getAuthHeaders(),
+      })
       .pipe(
         map((response: any[]) => response.map(this.extractProject)),
         catchError((error) => {
           console.error('Failed to fetch projects for user:', error);
-          throw new Error(('Failed to fetch projects for user'));
+          return throwError('Failed to fetch projects for user');
         })
       );
   }
-
 
   // Post-Requests
   createProject(project: any, userIDs: any[]): Observable<any> {
@@ -51,7 +59,14 @@ export class ProjectDataService {
       userIDs: userIDs,
     };
 
-    return this.http.post(`${this.apiConfig.baseURL}/projects`, newProject);
+    return this.http.post(`${this.apiConfig.baseURL}/projects`, newProject, {
+      headers: this.authService.getAuthHeaders(),
+    }).pipe(
+      catchError((error) => {
+        console.error('Failed to create project:', error);
+        return throwError('Failed to create project');
+      })
+    );
   }
 
   // Put-Requests
@@ -65,13 +80,25 @@ export class ProjectDataService {
       userIDs: userIDs,
     };
 
-    return this.http.put(`${this.apiConfig.baseURL}/projects`, updatedProject);
+    return this.http.put(`${this.apiConfig.baseURL}/projects`, updatedProject, {
+      headers: this.authService.getAuthHeaders(),
+    }).pipe(
+      catchError((error) => {
+        console.error('Failed to update project:', error);
+        return throwError('Failed to update project');
+      })
+    );
   }
 
   // Delete-Requests
   deleteProject(projectID: number): Observable<any> {
-    return this.http.delete(
-      `${this.apiConfig.baseURL}/projects?projectID=${projectID}`
+    return this.http.delete(`${this.apiConfig.baseURL}/projects?projectID=${projectID}`, {
+      headers: this.authService.getAuthHeaders(),
+    }).pipe(
+      catchError((error) => {
+        console.error('Failed to delete project:', error);
+        return throwError('Failed to delete project');
+      })
     );
   }
 
