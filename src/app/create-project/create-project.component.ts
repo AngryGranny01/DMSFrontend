@@ -9,7 +9,7 @@ import { Observable, Subject, of, takeUntil } from 'rxjs';
 import { Project } from '../models/projectInterface';
 import { User } from '../models/userInterface';
 import { FormControl } from '@angular/forms';
-import { Role } from '../models/role';
+import { Role } from '../models/roleEnum';
 import { ProjectService } from '../service/project.service';
 import { UserDataService } from '../service/api/user-data.service';
 import { UserService } from '../service/user.service';
@@ -157,7 +157,10 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.projectDescription === undefined || this.projectDescription === ""  ) {
+    if (
+      this.projectDescription === undefined ||
+      this.projectDescription === ''
+    ) {
       this.projectDescription = null;
     }
 
@@ -171,11 +174,13 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
       projectID: this.isEditMode ? this.project.projectID : 0,
       projectName: this.projectName,
       projectDescription: this.projectDescription,
-      projectEndDate: this.myDate ? this.myDate.toISOString().split('T')[0] : null,
+      projectEndDate: this.myDate
+        ? this.myDate.toISOString().split('T')[0]
+        : null,
       managerID: selectedUser.userID,
       userIDs: this.checkedUsers
-        .filter(user => user.userID !== selectedUser.userID) // Exclude project manager from user IDs
-        .map(user => ({ userID: user.userID })),
+        .filter((user) => user.userID !== selectedUser.userID) // Exclude project manager from user IDs
+        .map((user) => ({ userID: user.userID })),
     };
 
     if (this.isEditMode) {
@@ -203,10 +208,7 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
 
     this.projectDataService.createProject(project, data.userIDs).subscribe(
       (response: any) => {
-        this.logDataService.addCreateProjectLog(
-          response.projectID,
-          project.projectName
-        );
+        this.logDataService.addCreateProjectLog(response.projectID);
         this.router.navigate(['/dashboard']).then(() => {
           window.location.reload(); // Force refresh the dashboard
         });
@@ -228,11 +230,8 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     };
     this.projectDataService.updateProject(project, data.userIDs).subscribe(
       () => {
-        this.logDataService.addUpdateProjectLog(
-          project.projectID,
-          project.projectName
-        );
-        this.router.navigate(['/dashboard'])
+        this.logDataService.addUpdateProjectLog(project.projectID,);
+        this.router.navigate(['/dashboard']);
       },
       (error) => {
         console.error('Error updating project:', error);

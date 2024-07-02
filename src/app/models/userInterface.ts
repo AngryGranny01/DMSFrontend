@@ -1,4 +1,4 @@
-import { Role } from './role';
+import { Role } from './roleEnum';
 
 export class User {
   constructor(

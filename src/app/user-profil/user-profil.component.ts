@@ -7,12 +7,12 @@ import {
 } from '@angular/forms';
 import { UserService } from '../service/user.service';
 import { User } from '../models/userInterface';
-import { Role } from '../models/role';
+import { Role } from '../models/roleEnum';
 import { UserDataService } from '../service/api/user-data.service';
 import { ProjectManagerDataService } from '../service/api/project-manager-data.service';
 import { LogDataService } from '../service/api/log-data.service';
 import { Router } from '@angular/router';
-import { OrgUnit } from '../models/orgUnits';
+import { OrgUnit } from '../models/orgUnitsEnum';
 import { EncryptionService } from '../service/encryption.service';
 
 @Component({
@@ -73,7 +73,9 @@ export class UserProfilComponent implements OnInit {
       // If the current user is an admin, disable the admin role option for the edited user
       if (this.userService.currentUser.role !== Role.ADMIN) {
         this.disableRoleOptions();
-      } else if (this.userService.currentUser.role === Role.ADMIN) {
+      } else if (this.userService.currentUser.role === Role.ADMIN && this.user.role === Role.ADMIN){
+        this.disableRoleOptions();
+      }else if (this.userService.currentUser.role === Role.ADMIN) {
         const adminRadio = document.getElementById('ADMIN') as HTMLInputElement;
         adminRadio.disabled = true;
       }
@@ -147,6 +149,7 @@ export class UserProfilComponent implements OnInit {
         .subscribe(
           () => {
             this.finalizeUserUpdate(updatedUser);
+            this.logDataService.addUpdatePasswordLog(updatedUser)
           },
           (error) => {
             console.error('Failed to update password:', error);

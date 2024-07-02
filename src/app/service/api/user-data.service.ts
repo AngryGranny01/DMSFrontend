@@ -5,7 +5,7 @@ import { catchError, map, switchMap } from 'rxjs/operators';
 
 import { User } from '../../models/userInterface';
 import { ApiConfigService } from './api-config.service';
-import { Role } from '../../models/role';
+import { Role } from '../../models/roleEnum';
 import { EncryptionService } from '../encryption.service';
 import { LogDataService } from './log-data.service';
 import { AuthService } from '../auth.service';
@@ -29,15 +29,16 @@ export class UserDataService {
    * @returns An Observable containing the list of users.
    */
   getAllUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.apiConfig.baseURL}/users`, {
-      headers: this.authService.getAuthHeaders(),
-    }).pipe(
-      catchError((error) => {
-        console.error('Failed to fetch users:', error);
-        this.logDataService.addErrorUserLog(`Failed to fetch all users`);
-        throw new Error('Failed to fetch users');
+    return this.http
+      .get<User[]>(`${this.apiConfig.baseURL}/users`, {
+        headers: this.authService.getAuthHeaders(),
       })
-    );
+      .pipe(
+        catchError((error) => {
+          console.error('Failed to fetch users:', error);
+          throw new Error('Failed to fetch users');
+        })
+      );
   }
 
   /**
@@ -60,15 +61,11 @@ export class UserDataService {
         }),
         catchError((error) => {
           console.error('Failed to fetch last logins:', error);
-          this.logDataService.addErrorUserLog(
-            `Failed to fetch last logins of users`
-          );
+          this.logDataService.addErrorUserLog(error.message);
           throw new Error('Failed to fetch last logins');
         })
       );
   }
-
-
 
   //-------------------------------------------- Post-Requests --------------------------------------------------------------//
 
@@ -92,6 +89,7 @@ export class UserDataService {
       })
       .pipe(
         catchError((error) => {
+          this.logDataService.addErrorUserCreateLog(error.message)
           console.error('Failed to create user:', error);
           throw new Error('Failed to create user');
         })
@@ -124,6 +122,7 @@ export class UserDataService {
       })
       .pipe(
         catchError((error) => {
+          this.logDataService.addErrorUserLog(error.message)
           console.error('Failed to update user:', error);
           return throwError('Failed to update user');
         })
@@ -156,6 +155,7 @@ export class UserDataService {
       .pipe(
         catchError((error) => {
           console.error('Failed to update password:', error);
+          this.logDataService.addErrorPasswordLog(userID,error.message)
           return throwError('Failed to update password');
         })
       );
@@ -175,6 +175,7 @@ export class UserDataService {
       })
       .pipe(
         catchError((error) => {
+          this.logDataService.addErrorUserLog(error.message)
           console.error('Failed to delete user:', error);
           throw new Error('Failed to delete user');
         })

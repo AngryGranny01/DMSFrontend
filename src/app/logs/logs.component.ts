@@ -38,8 +38,6 @@ export class LogsComponent implements OnInit {
     private userService: UserService,
     private logDataService: LogDataService,
     private logService: LogService,
-    private translationHelper: TranslationHelperService,
-    private translate: TranslateService,
     private niceDate: NiceDateService
   ) {}
 
@@ -56,7 +54,6 @@ export class LogsComponent implements OnInit {
       this.loadUserLogs(this.user);
     }
 
-    // Filter logs based on search term
     this.filteredLogs$ = this.searchControl.valueChanges.pipe(
       startWith(''), // Provide an initial value to start the stream
       debounceTime(300), // Debounce time to avoid processing every keystroke
@@ -72,10 +69,10 @@ export class LogsComponent implements OnInit {
                 log.lastName
                   .toLowerCase()
                   .includes(searchTerm!.toLowerCase()) ||
-                log.activityName
+                log.action
                   .toLowerCase()
                   .includes(searchTerm!.toLowerCase()) ||
-                log.activityDescription
+                log.target
                   .toLowerCase()
                   .includes(searchTerm!.toLowerCase())
             )
@@ -89,6 +86,7 @@ export class LogsComponent implements OnInit {
   loadProjectLogs(project: Project) {
     this.logDataService.getProjectLogs(project.projectID).subscribe(
       (logs) => {
+        console.log('Im Called');
         this.processLogs(logs);
       },
       (error) => {
@@ -102,6 +100,7 @@ export class LogsComponent implements OnInit {
   loadUserLogs(user: User) {
     this.logDataService.getUserLogs(user.userID).subscribe(
       (logs) => {
+        console.log('Im Called');
         this.processLogs(logs);
       },
       (error) => {
@@ -114,15 +113,7 @@ export class LogsComponent implements OnInit {
   // Process logs to translate log descriptions and update logs$ observable
   private processLogs(logs: Log[]) {
     for (let log of logs) {
-      let activityDescription =
-        this.translationHelper.getTranslatedLogDescription(
-          log.activityDescription
-        );
-      this.translate
-        .get(log.activityName, activityDescription)
-        .subscribe((translations) => {
-          log.activityDescription = translations;
-        });
+      //TODO: Translation
     }
     this.logs$ = of(logs);
   }

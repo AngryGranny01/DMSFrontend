@@ -6,9 +6,10 @@ import { catchError, map } from 'rxjs/operators';
 import { ApiConfigService } from './api-config.service';
 import { Project } from '../../models/projectInterface';
 import { User } from '../../models/userInterface';
-import { Role } from '../../models/role';
+import { Role } from '../../models/roleEnum';
 import { LogDataService } from './log-data.service';
 import { AuthService } from '../auth.service';
+import { LogService } from '../log.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +18,8 @@ export class ProjectDataService {
   constructor(
     private http: HttpClient,
     private apiConfig: ApiConfigService,
-    private authService: AuthService
+    private authService: AuthService,
+    private logDataService: LogDataService
   ) {}
 
   // Get-Requests
@@ -59,14 +61,17 @@ export class ProjectDataService {
       userIDs: userIDs,
     };
 
-    return this.http.post(`${this.apiConfig.baseURL}/projects`, newProject, {
-      headers: this.authService.getAuthHeaders(),
-    }).pipe(
-      catchError((error) => {
-        console.error('Failed to create project:', error);
-        return throwError('Failed to create project');
+    return this.http
+      .post(`${this.apiConfig.baseURL}/projects`, newProject, {
+        headers: this.authService.getAuthHeaders(),
       })
-    );
+      .pipe(
+        catchError((error) => {
+          this.logDataService.addErrorProjectCreateLog(error.message)
+          console.error('Failed to create project:', error);
+          return throwError('Failed to create project');
+        })
+      );
   }
 
   // Put-Requests
@@ -80,26 +85,32 @@ export class ProjectDataService {
       userIDs: userIDs,
     };
 
-    return this.http.put(`${this.apiConfig.baseURL}/projects`, updatedProject, {
-      headers: this.authService.getAuthHeaders(),
-    }).pipe(
-      catchError((error) => {
-        console.error('Failed to update project:', error);
-        return throwError('Failed to update project');
+    return this.http
+      .put(`${this.apiConfig.baseURL}/projects`, updatedProject, {
+        headers: this.authService.getAuthHeaders(),
       })
-    );
+      .pipe(
+        catchError((error) => {
+          this.logDataService.addErrorProjectLog(project.projectID, error.message)
+          console.error('Failed to update project:', error);
+          return throwError('Failed to update project');
+        })
+      );
   }
 
   // Delete-Requests
   deleteProject(projectID: number): Observable<any> {
-    return this.http.delete(`${this.apiConfig.baseURL}/projects?projectID=${projectID}`, {
-      headers: this.authService.getAuthHeaders(),
-    }).pipe(
-      catchError((error) => {
-        console.error('Failed to delete project:', error);
-        return throwError('Failed to delete project');
+    return this.http
+      .delete(`${this.apiConfig.baseURL}/projects?projectID=${projectID}`, {
+        headers: this.authService.getAuthHeaders(),
       })
-    );
+      .pipe(
+        catchError((error) => {
+          this.logDataService.addErrorProjectLog(projectID, error.message)
+          console.error('Failed to delete project:', error);
+          return throwError('Failed to delete project');
+        })
+      );
   }
 
   // Helper Functions
@@ -132,7 +143,9 @@ export class ProjectDataService {
         )
     );
 
-    const projectEndDate = project.projectEndDate ? new Date(project.projectEndDate) : null;
+    const projectEndDate = project.projectEndDate
+      ? new Date(project.projectEndDate)
+      : null;
 
     return new Project(
       project.projectID,

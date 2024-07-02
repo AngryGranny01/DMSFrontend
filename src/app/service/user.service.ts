@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { User } from '../models/userInterface';
-import { Role } from '../models/role';
+import { Role } from '../models/roleEnum';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
@@ -19,10 +19,16 @@ export class UserService {
 
   public isEditMode: boolean = true;
   private selectedUser!: User;
-  public currentUserFirstAndLastName$: BehaviorSubject<string> = new BehaviorSubject<string>(
-    this.concatenateFirstnameLastname(this.currentUser.firstName, this.currentUser.lastName)
+  public currentUserFirstAndLastName$: BehaviorSubject<string> =
+    new BehaviorSubject<string>(
+      this.concatenateFirstnameLastname(
+        this.currentUser.firstName,
+        this.currentUser.lastName
+      )
+    );
+  public currentUser$: BehaviorSubject<User> = new BehaviorSubject<User>(
+    this.currentUser
   );
-  public currentUser$: BehaviorSubject<User> = new BehaviorSubject<User>(this.currentUser);
 
   constructor() {}
 
@@ -43,7 +49,10 @@ export class UserService {
     this.currentUser = user;
     this.storeUser(user);
     this.currentUser$.next(user);
-    const fullName = this.concatenateFirstnameLastname(user.firstName, user.lastName);
+    const fullName = this.concatenateFirstnameLastname(
+      user.firstName,
+      user.lastName
+    );
     this.currentUserFirstAndLastName$.next(fullName);
   }
 
@@ -79,7 +88,10 @@ export class UserService {
   }
 
   getCurrentFirstAndLastName(): string {
-    return this.concatenateFirstnameLastname(this.currentUser.firstName, this.currentUser.lastName);
+    return this.concatenateFirstnameLastname(
+      this.currentUser.firstName,
+      this.currentUser.lastName
+    );
   }
 
   setSelectedUser(user: User): void {

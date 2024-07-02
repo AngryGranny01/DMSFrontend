@@ -65,13 +65,13 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
     MatMenuModule,
     MatButtonModule,
     HttpClientModule,
-    TranslateModule.forRoot({
+/*     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
         useFactory: HttpLoaderFactory,
         deps: [HttpClient],
       },
-    }),
+    }), */
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
@@ -81,6 +81,6 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
 })
 export class AppModule {}
 
-export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
+/* export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
   return new TranslateHttpLoader(http);
-}
+} */

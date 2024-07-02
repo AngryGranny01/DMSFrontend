@@ -1,5 +1,3 @@
-import { ActivityName } from "./activityName";
-
 export class LogDescriptionValues {
   constructor(
     public userID: number | string = "",
@@ -45,36 +43,4 @@ export class LogDescriptionValues {
   }
 
   // Method to create log description based on activity name
-  static createLogDescription(activity: ActivityName, userID: number | string = "", username: string = "", projectName: string = "", projectID: number | string = "", viewedUserID: number | string = "", viewedUsername: string = "", filename: string = "", errorMessage: string = ""): string {
-    switch (activity) {
-      case ActivityName.LOGIN:
-        return new LogDescriptionValues(userID, username, new Date(), "", "", "", "", "", "").toString();
-      case ActivityName.LOGOUT:
-        return new LogDescriptionValues(userID, username, new Date(), "", "", "", "", "", "").toString();
-      case ActivityName.CREATE_USER:
-        return new LogDescriptionValues(userID, username, "", "", "", "", "", "", "").toString();
-      case ActivityName.CREATE_PROJECT:
-        return new LogDescriptionValues("", "", "", projectName, projectID, "", "", "", "").toString();
-      case ActivityName.UPDATE_USER:
-        return new LogDescriptionValues(userID, username, "", "", "", "", "", "", "").toString();
-      case ActivityName.UPDATE_PROJECT:
-        return new LogDescriptionValues("", "", "", projectName, projectID, "", "", "", "").toString();
-      case ActivityName.DELETE_USER:
-        return new LogDescriptionValues(userID, username, "", "", "", "", "", "", "").toString();
-      case ActivityName.DELETE_PROJECT:
-        return new LogDescriptionValues("", "", "", projectName, projectID, "", "", "", "").toString();
-      case ActivityName.VIEW_PROJECT:
-        return new LogDescriptionValues(userID, username, "", projectName, projectID, "", "", "", "").toString();
-      case ActivityName.VIEW_USER:
-        return new LogDescriptionValues(userID, username, "", "", "", viewedUserID, viewedUsername, "", "").toString();
-      case ActivityName.UPLOAD:
-        return new LogDescriptionValues("", "", "", "", "", "", "", filename, "").toString();
-      case ActivityName.DOWNLOAD:
-        return new LogDescriptionValues("", "", "", "", "", "", "", filename, "").toString();
-      case ActivityName.ERROR:
-        return new LogDescriptionValues("", "", "", "", "", "", "", "", errorMessage).toString();
-      default:
-        return new LogDescriptionValues("", "", "", "", "", "", "", "", "").toString();
-    }
-  }
 }

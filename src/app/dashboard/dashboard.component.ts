@@ -7,7 +7,7 @@ import { ProjectDataService } from '../service/api/project-data.service';
 import { Project } from '../models/projectInterface';
 import { ProjectService } from '../service/project.service';
 import { NiceDateService } from '../service/nice-date.service';
-import { Role } from '../models/role';
+import { Role } from '../models/roleEnum';
 
 @Component({
   selector: 'app-dashboard',
@@ -70,6 +70,12 @@ export class DashboardComponent implements OnInit {
   }
 
   deleteProject(project: Project) {
+    const confirmDelete = confirm(
+      'Sind Sie sicher, dass Sie das Projekt löschen wollen'
+    );
+    if (!confirmDelete) {
+      return;
+    }
     this.projectDataService.deleteProject(project.projectID).subscribe(
       () => {
         this.logDataService.addDeleteProjectLog(project);
@@ -77,7 +83,10 @@ export class DashboardComponent implements OnInit {
       },
       (error) => {
         console.error('Error deleting Project:', error);
-        this.logDataService.addErrorProjectLog(project.projectID,`Failed to update project with ID: ${project.projectID}`);
+        this.logDataService.addErrorProjectLog(
+          project.projectID,
+          `Failed to update project with ID: ${project.projectID}`
+        );
         throw new Error(`Failed to update project`);
       }
     );

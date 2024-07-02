@@ -1,16 +1,17 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, catchError, map } from 'rxjs';
 
 import { User } from '../../models/userInterface';
 import { Project } from '../../models/projectInterface';
 import { Log } from '../../models/logInterface';
-import { ActivityName } from '../../models/activityName';
 import { LogDescriptionValues } from '../../models/logDescriptionValues';
 
 import { ApiConfigService } from './api-config.service';
 import { LogService } from '../log.service';
 import { UserService } from '../user.service';
+import { Action } from '../../models/logActionEnum';
+import { Target } from '../../models/logTargetEnum';
 
 @Injectable({
   providedIn: 'root',
@@ -19,7 +20,6 @@ export class LogDataService {
   constructor(
     private http: HttpClient,
     private apiConfig: ApiConfigService,
-    private logService: LogService,
     private userService: UserService
   ) {}
 
@@ -30,7 +30,9 @@ export class LogDataService {
    */
   getUserLogs(userID: number): Observable<Log[]> {
     return this.http
-      .get<any[]>(`${this.apiConfig.baseURL}/logs/user/${userID}`)
+      .get<any[]>(`${this.apiConfig.baseURL}/logs/user/${userID}`,{
+        headers: this.getAuthHeaders(),
+      })
       .pipe(
         map((response) => response.map((log) => this.extractLogs(log))),
         catchError((error) => {
@@ -43,12 +45,13 @@ export class LogDataService {
   /**
    * Retrieves project logs for the specified project ID and current user.
    * @param projectID The ID of the project whose logs are to be retrieved.
-   * @param currentUser The current user accessing the logs.
    * @returns An Observable of Log array.
    */
   getProjectLogs(projectID: number): Observable<Log[]> {
     return this.http
-      .get<any[]>(`${this.apiConfig.baseURL}/logs/project/${projectID}`)
+      .get<any[]>(`${this.apiConfig.baseURL}/logs/project/${projectID}`,{
+        headers: this.getAuthHeaders(),
+      })
       .pipe(
         map((response) => response.map((log) => this.extractLogs(log))),
         catchError((error) => {
@@ -59,78 +62,72 @@ export class LogDataService {
   }
 
   /**
-   * Creates a user log entry.
+   * Creates a log entry.
    * @param log The log data to be created.
    * @returns An Observable of the HTTP response.
    */
-  private createUserLog(log: any): Observable<any> {
+  private createLog(log: any): Observable<any> {
     const data = {
-      userID: log.userID,
-      activityName: log.activityName,
-      activityDescription: log.activityDescription,
+      actorId: log.userID,
+      action: log.action,
+      target: log.target,
+      targetId: log.targetID,
+      field: log.field,
+      value: log.value,
     };
-    return this.http.post(`${this.apiConfig.baseURL}/logs`, data).pipe(
+    return this.http.post(`${this.apiConfig.baseURL}/logs`, data,{
+      headers: this.getAuthHeaders(),
+    }).pipe(
       catchError((error) => {
-        console.error('Failed to create user log:', error);
-        throw new Error('Failed to create user log');
-      })
-    );
-  }
-  /**
-   * Creates a project log entry.
-   * @param log The log data to be created.
-   * @returns An Observable of the HTTP response.
-   */
-  private createProjectLog(log: any): Observable<any> {
-    const data = {
-      projectID: log.projectID,
-      userID: log.userID,
-      activityName: log.activityName,
-      activityDescription: log.activityDescription,
-    };
-
-    return this.http.post(`${this.apiConfig.baseURL}/logs`, data).pipe(
-      catchError((error) => {
-        console.error('Failed to create project log:', error);
-        throw new Error('Failed to create project log');
+        console.error('Failed to create log:', error);
+        throw new Error('Failed to create log');
       })
     );
   }
 
   /**
    * Extracts log data.
-   * @param logData The encrypted log data to be decrypted.
+   * @param logData The log data to be extracted.
    * @returns A Log object.
    */
   private extractLogs(logData: any): Log {
     const timeStamp = new Date(logData.timeStamp);
-
     return {
-      logID: parseInt(logData.logID),
-      userID: parseInt(logData.userID),
+      logID: parseInt(logData.id),
+      userID: parseInt(logData.actorId),
+      action: logData.action as Action,
+      target: logData.target as Target,
+      targetID: parseInt(logData.targetId),
+      field: logData.field,
+      value: logData.value,
+      timeStampLog: timeStamp,
       firstName: logData.firstName,
       lastName: logData.lastName,
-      activityName: this.logService.matchActivityNameWithString(
-        logData.activityName
-      ),
-      activityDescription: logData.activityDescription,
-      dateTime: timeStamp,
     };
+  }
+
+  getAuthHeaders(): HttpHeaders {
+    const token = this.getToken();
+    return new HttpHeaders({
+      Authorization: `Bearer ${token}`,
+    });
+  }
+  getToken(): string {
+    return sessionStorage.getItem('authToken') || '';
   }
 
   //-------------------------------------------- User Logs --------------------------------------------------------------//
   addLoginLog() {
     const log = {
-      activityDescription: LogDescriptionValues.createLogDescription(
-        ActivityName.LOGIN,
-        this.userService.getCurrentUserID(),
-        this.userService.getCurrentFirstAndLastName()
-      ),
-      activityName: ActivityName.LOGIN,
       userID: this.userService.getCurrentUserID(),
+      action: Action.LOGIN,
+      target: Target.ACCOUNT,
+      targetID: this.userService.getCurrentUserID(),
+      field: null,
+      value: null,
     };
 
-    this.createUserLog(log).subscribe(
+    this.createLog(log).subscribe(
       () => {},
       (error) => console.error('Error logging login:', error)
     );
@@ -138,49 +135,47 @@ export class LogDataService {
 
   addLogoutLog() {
     const log = {
-      activityDescription: LogDescriptionValues.createLogDescription(
-        ActivityName.LOGOUT,
-        this.userService.getCurrentUserID(),
-        this.userService.getCurrentFirstAndLastName()
-      ),
-      activityName: ActivityName.LOGOUT,
       userID: this.userService.getCurrentUserID(),
+      action: Action.LOGOUT,
+      target: Target.ACCOUNT,
+      targetID: this.userService.getCurrentUserID(),
+      field: null,
+      value: null,
     };
 
-    this.createUserLog(log).subscribe(
+    this.createLog(log).subscribe(
       () => {},
       (error) => console.error('Error logging logout:', error)
     );
   }
 
-  addCreateUserLog(userID: number, username: string) {
+  addCreateUserLog(createdUserID: number) {
     const log = {
-      activityDescription: LogDescriptionValues.createLogDescription(
-        ActivityName.CREATE_USER,
-        userID,
-        username
-      ),
-      activityName: ActivityName.CREATE_USER,
-      userID: userID,
+      userID: this.userService.getCurrentUserID(),
+      action: Action.CREATE,
+      target: Target.PERSON,
+      targetID: createdUserID,
+      field: null,
+      value: null,
     };
-    this.createUserLog(log).subscribe(
+    this.createLog(log).subscribe(
       () => {},
       (error) => console.error('Error logging user created:', error)
     );
   }
 
+  //TODO: Update
   addUpdateUserLog(user: User) {
     const log = {
-      activityDescription: LogDescriptionValues.createLogDescription(
-        ActivityName.UPDATE_USER,
-        user.userID,
-        user.firstName
-      ),
-      activityName: ActivityName.UPDATE_USER,
       userID: this.userService.getCurrentUserID(),
+      action: Action.UPDATE,
+      target: Target.PERSON,
+      targetID: user.userID,
+      field: null,
+      value: null,
     };
 
-    this.createUserLog(log).subscribe(
+    this.createLog(log).subscribe(
       () => {},
       (error) => console.error('Error logging user update:', error)
     );
@@ -188,57 +183,80 @@ export class LogDataService {
 
   addDeleteUserLog(user: User) {
     const log = {
-      activityDescription: LogDescriptionValues.createLogDescription(
-        ActivityName.DELETE_USER,
-        user.userID,
-        user.firstName
-      ),
-      activityName: ActivityName.DELETE_USER,
       userID: this.userService.getCurrentUserID(),
+      action: Action.DELETE,
+      target: Target.PERSON,
+      targetID: user.userID,
+      field: null,
+      value: null,
     };
 
-    this.createUserLog(log).subscribe(
+    this.createLog(log).subscribe(
       () => {},
       (error) => console.error('Error logging user deletion:', error)
     );
   }
 
-  //-------------------------------------------- Project Logs --------------------------------------------------------------//
-  addCreateProjectLog(projectID: number, projectName: string) {
+  addCreatePasswordLog(user: User) {
     const log = {
-      activityDescription: LogDescriptionValues.createLogDescription(
-        ActivityName.CREATE_PROJECT,
-        '',
-        '',
-        projectName,
-        projectID
-      ),
-      activityName: ActivityName.CREATE_PROJECT,
       userID: this.userService.getCurrentUserID(),
-      projectID: projectID,
+      action: Action.CREATE,
+      target: Target.PASSWORD,
+      targetID: user.userID,
+      field: null,
+      value: null,
     };
 
-    this.createProjectLog(log).subscribe(
+    this.createLog(log).subscribe(
+      () => {},
+      (error) => console.error('Error logging password creation:', error)
+    );
+  }
+
+  addUpdatePasswordLog(user: User) {
+    const log = {
+      userID: this.userService.getCurrentUserID(),
+      action: Action.UPDATE,
+      target: Target.PASSWORD,
+      targetID: user.userID,
+      field: null,
+      value: null,
+    };
+
+    this.createLog(log).subscribe(
+      () => {},
+      (error) => console.error('Error logging password update:', error)
+    );
+  }
+
+  //-------------------------------------------- Project Logs --------------------------------------------------------------//
+  addCreateProjectLog(createdProjectID: number) {
+    const log = {
+      userID: this.userService.getCurrentUserID(),
+      action: Action.CREATE,
+      target: Target.PROJECT,
+      targetID: createdProjectID,
+      field: null,
+      value: null,
+    };
+
+    this.createLog(log).subscribe(
       () => {},
       (error) => console.error('Error logging Project created:', error)
     );
   }
 
-  addUpdateProjectLog(projectID: number, projectName: string) {
+  addUpdateProjectLog(projectID: number) {
     const log = {
-      activityDescription: LogDescriptionValues.createLogDescription(
-        ActivityName.UPDATE_PROJECT,
-        '',
-        '',
-        projectName,
-        projectID
-      ),
-      activityName: ActivityName.UPDATE_PROJECT,
       userID: this.userService.getCurrentUserID(),
-      projectID: projectID,
+      action: Action.UPDATE,
+      target: Target.PROJECT,
+      targetID: projectID,
+      field: null,
+      value: null,
     };
 
-    this.createProjectLog(log).subscribe(
+    this.createLog(log).subscribe(
       () => {},
       (error) => console.error('Error logging project update:', error)
     );
@@ -246,43 +264,62 @@ export class LogDataService {
 
   addDeleteProjectLog(project: Project) {
     const log = {
-      activityDescription: LogDescriptionValues.createLogDescription(
-        ActivityName.DELETE_PROJECT,
-        '',
-        '',
-        project.name,
-        project.projectID
-      ),
-      activityName: ActivityName.DELETE_PROJECT,
       userID: this.userService.getCurrentUserID(),
-      projectID: project.projectID,
+      action: Action.DELETE,
+      target: Target.PROJECT,
+      targetID: project.projectID,
+      field: null,
+      value: null,
     };
 
-    this.createUserLog(log).subscribe(
+    this.createLog(log).subscribe(
       () => {},
       (error) => console.error('Error logging project deletion:', error)
     );
   }
 
   //-------------------------------------------- Error Logs --------------------------------------------------------------//
+  addErrorUserCreateLog(errorMessage: string) {
+    const log = {
+      userID: this.userService.getCurrentUserID(),
+      action: Action.ERROR,
+      target: Target.ACCOUNT,
+      targetID: null,
+      field: null,
+      value: errorMessage,
+    };
+    this.createLog(log).subscribe(
+      () => {},
+      (error) => console.error('Error logging creating User:', error)
+    );
+  }
+
+  addErrorProjectCreateLog(errorMessage: string) {
+    const log = {
+      userID: this.userService.getCurrentUserID(),
+      action: Action.ERROR,
+      target: Target.PROJECT,
+      targetID: null,
+      field: null,
+      value: errorMessage,
+    };
+    this.createLog(log).subscribe(
+      () => {},
+      (error) => console.error('Error logging creating Project:', error)
+    );
+  }
+
   addErrorUserLog(errorMessage: string) {
     const log = {
-      activityDescription: LogDescriptionValues.createLogDescription(
-        ActivityName.ERROR,
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        errorMessage
-      ),
-      activityName: ActivityName.ERROR,
       userID: this.userService.getCurrentUserID(),
+      action: Action.ERROR,
+      target: Target.ACCOUNT,
+      targetID: this.userService.getCurrentUserID(),
+      field: null,
+      value: errorMessage,
     };
 
-    this.createUserLog(log).subscribe(
+    this.createLog(log).subscribe(
       () => {},
       (error) => console.error('Error logging user error:', error)
     );
@@ -290,25 +327,33 @@ export class LogDataService {
 
   addErrorProjectLog(projectID: number, errorMessage: string) {
     const log = {
-      activityDescription: LogDescriptionValues.createLogDescription(
-        ActivityName.ERROR,
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        errorMessage
-      ),
-      activityName: ActivityName.ERROR,
       userID: this.userService.getCurrentUserID(),
-      projectID: projectID,
+      action: Action.ERROR,
+      target: Target.PROJECT,
+      targetID: projectID,
+      field: null,
+      value: errorMessage,
     };
 
-    this.createProjectLog(log).subscribe(
+    this.createLog(log).subscribe(
       () => {},
       (error) => console.error('Error logging project error:', error)
+    );
+  }
+
+  addErrorPasswordLog(selectedUserID: number,errorMessage: string) {
+    const log = {
+      userID: this.userService.getCurrentUserID(),
+      action: Action.ERROR,
+      target: Target.PASSWORD,
+      targetID: selectedUserID,
+      field: null,
+      value: errorMessage,
+    };
+
+    this.createLog(log).subscribe(
+      () => {},
+      (error) => console.error('Error logging password error:', error)
     );
   }
 }

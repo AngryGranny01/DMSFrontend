@@ -10,15 +10,39 @@ import { AuthGuard } from './guard/auth.guard';
 import { EmailPageComponent } from './email-page/email-page.component';
 import { ForbiddenComponent } from './forbidden/forbidden.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
-import { Role } from './models/role';
+import { Role } from './models/roleEnum';
 
 const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
-  { path: 'userManagment', component: UserManagmentPageComponent, canActivate: [AuthGuard], data: { roles: [Role.ADMIN] } },
-  { path: 'profil', component: UserProfilComponent, canActivate: [AuthGuard], data: { roles: [Role.USER, Role.ADMIN, Role.PROJECT_MANAGER] } },
-  { path: 'createProject', component: CreateProjectComponent, canActivate: [AuthGuard], data: { roles: [Role.ADMIN, Role.PROJECT_MANAGER] } },
-  { path: 'logs', component: LogsComponent, canActivate: [AuthGuard], data: { roles: [Role.ADMIN] } },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
+  {
+    path: 'userManagment',
+    component: UserManagmentPageComponent,
+    canActivate: [AuthGuard],
+    data: { roles: [Role.ADMIN] },
+  },
+  {
+    path: 'profil',
+    component: UserProfilComponent,
+    canActivate: [AuthGuard],
+    data: { roles: [Role.USER, Role.ADMIN, Role.PROJECT_MANAGER] },
+  },
+  {
+    path: 'createProject',
+    component: CreateProjectComponent,
+    canActivate: [AuthGuard],
+    data: { roles: [Role.ADMIN, Role.PROJECT_MANAGER] },
+  },
+  {
+    path: 'logs',
+    component: LogsComponent,
+    canActivate: [AuthGuard],
+    data: { roles: [Role.ADMIN] },
+  },
+  {
+    path: 'dashboard',
+    component: DashboardComponent,
+    canActivate: [AuthGuard],
+  },
   { path: 'setPassword', component: EmailPageComponent },
   { path: 'forbidden', component: ForbiddenComponent },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -27,6 +51,6 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

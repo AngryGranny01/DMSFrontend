@@ -29,19 +29,21 @@
                 <th scope="col">Zeit</th>
                 <th scope="col">Benutzer</th>
                 <th scope="col">Ereignisname</th>
+                <th scope="col">Ziel</th>
                 <th scope="col">Beschreibung</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let log of filteredLogs$ | async">
                 <th scope="row">
-                  {{ createDateString(log.dateTime) }} <br />{{
-                    createTimeString(log.dateTime)
+                  {{ createDateString(log.timeStampLog) }} <br />{{
+                    createTimeString(log.timeStampLog)
                   }}
                 </th>
                 <td>{{ log.firstName }} {{ log.lastName }}</td>
-                <td>{{ log.activityName }}</td>
-                <td>{{ log.activityDescription }}</td>
+                <td>{{ log.action }}</td>
+                <td>{{ log.target }}</td>
+                <td>{{ "Änderungen in" + log.field+"wobei es:"+log.value }}</td>
               </tr>
             </tbody>
           </table>

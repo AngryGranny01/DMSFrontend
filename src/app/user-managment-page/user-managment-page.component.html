@@ -81,6 +81,7 @@
                   href="#"
                   class="delete"
                   title="Delete"
+                  *ngIf="user.role !== Role.ADMIN"
                   (click)="this.deleteUser(user)"
                   routerLink="/userManagment"
                   routerLinkActive="active"

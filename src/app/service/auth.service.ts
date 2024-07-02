@@ -7,13 +7,12 @@ import { UserService } from './user.service';
 import { LogDataService } from './api/log-data.service';
 import { ApiConfigService } from './api/api-config.service';
 import { EncryptionService } from './encryption.service';
-import { Role } from '../models/role';
+import { Role } from '../models/roleEnum';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-
   constructor(
     private readonly router: Router,
     private userService: UserService,
@@ -38,15 +37,21 @@ export class AuthService {
 
     return getSalt().pipe(
       switchMap((salt: string) => {
-        const hashedPassword = this.encryptionService.getPBKDF2Key(passwordPlain, salt);
+        const hashedPassword = this.encryptionService.getPBKDF2Key(
+          passwordPlain,
+          salt
+        );
         const data = { email, hashedPassword };
         return this.http.post(`${this.apiConfig.baseURL}/login`, data);
       }),
       map((response: any) => {
         this.userService.currentUser.role = response.user.role as Role;
         this.setToken(response.token);
-        this.userService.setCurrentUser(response.user)
-        const fullName = this.userService.concatenateFirstnameLastname(response.user.firstName, response.user.lastName);
+        this.userService.setCurrentUser(response.user);
+        const fullName = this.userService.concatenateFirstnameLastname(
+          response.user.firstName,
+          response.user.lastName
+        );
         this.userService.currentUserFirstAndLastName$.next(fullName);
         this.router.navigate(['/dashboard']);
         this.logDataService.addLoginLog();
@@ -66,7 +71,7 @@ export class AuthService {
   logout(): void {
     this.router.navigate(['/login']);
     this.logDataService.addLogoutLog();
-    this.userService.clearCurrentUser()
+    this.userService.clearCurrentUser();
     this.removeToken();
   }
 

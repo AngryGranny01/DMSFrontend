@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { Role } from '../models/role';
+import { Role } from '../models/roleEnum';
 import { User } from '../models/userInterface';
 import { UserService } from '../service/user.service';
 import { UserDataService } from '../service/api/user-data.service';
@@ -18,6 +18,7 @@ import { NiceDateService } from '../service/nice-date.service';
 export class UserManagmentPageComponent implements OnInit {
   users$: Observable<User[]> = of([]);
   lastLogin$: Observable<{ [userID: string]: Date }> = of({});
+  Role = Role;
 
   constructor(
     private userService: UserService,
@@ -60,7 +61,7 @@ export class UserManagmentPageComponent implements OnInit {
     this.users$ = this.userDataService.getAllUsers().pipe(
       switchMap((users) => {
         this.cdr.detectChanges(); // Force change detection
-        console.log(users)
+        console.log(users);
         return of(users);
       })
     );
@@ -87,6 +88,12 @@ export class UserManagmentPageComponent implements OnInit {
 
   // Deletes a user from the system
   deleteUser(user: User): void {
+    const confirmDelete = confirm(
+      'Sind Sie sicher, dass Sie den Benutzer löschen wollen?'
+    );
+    if (!confirmDelete) {
+      return;
+    }
     if (user.role === Role.PROJECT_MANAGER) {
       const confirmDelete = confirm(
         'Wenn Sie diesen Benutzer löschen, werden Sie zum Projektmanager für offene Projekte. Möchten Sie fortfahren?'
@@ -95,33 +102,25 @@ export class UserManagmentPageComponent implements OnInit {
         return;
       }
 
-      this.managerDataService.getManagerID(user.userID).subscribe(
-        (managerID) => {
-          this.managerDataService
-            .transferProjects(this.userService.getCurrentUserID(), managerID)
-            .subscribe(
-              () => {
-                this.userDataService.deleteUser(user.userID).subscribe(
-                  () => {
-                    this.loadUsers();
-                    this.logDataService.addDeleteUserLog(user);
-                  },
-                  (error) => console.error('Error deleting user:', error)
-                );
-              },
-              (error) => {
-                this.logDataService.addErrorUserLog(
-                  `Error updating manager ID for user with userID: ${user.userID}`
-                ),
-                  console.error('Error updating manager ID:', error);
-              }
-            );
+      this.managerDataService.updateManagerID(user.userID, this.userService.getCurrentUser().userID).subscribe(
+        () => {
+          this.userDataService.deleteUser(user.userID).subscribe(
+            () => {
+              // Log entry
+              this.logDataService.addDeleteUserLog(user);
+              this.loadUsers();
+            },
+            (error) => {
+              this.logDataService.addErrorUserLog(`Error deleting user`),
+                console.error('Error deleting user:', error);
+            }
+          );
         },
         (error) => {
           this.logDataService.addErrorUserLog(
-            `Error getting manager ID for user with userID: ${user.userID}`
+            `Error updating manager ID for user with userID: ${user.userID}`
           ),
-            console.error('Error getting manager ID:', error);
+            console.error('Error updating manager ID:', error);
         }
       );
     } else {
