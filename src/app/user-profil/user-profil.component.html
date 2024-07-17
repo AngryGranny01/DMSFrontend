@@ -13,6 +13,7 @@
               <div class="form-group">
                 <label class="control-label"><b>Organizational Unit</b></label>
                 <select
+                  *ngIf="isAdmin()"
                   class="form-control"
                   formControlName="orgUnit"
                   required
@@ -21,6 +22,9 @@
                     {{ unit }}
                   </option>
                 </select>
+                <div *ngIf="!isAdmin()" class="form-control readonly-text">
+                  {{ profileForm.controls['orgUnit'].value }}
+                </div>
                 <div
                   *ngIf="profileForm.controls['orgUnit'].invalid && (profileForm.controls['orgUnit'].dirty || profileForm.controls['orgUnit'].touched)"
                   class="alert alert-danger"
@@ -40,6 +44,7 @@
                   class="form-control"
                   formControlName="firstName"
                   required
+                  [readonly]="!isAdmin()"
                 />
                 <div
                   *ngIf="profileForm.controls['firstName'].invalid && (profileForm.controls['firstName'].dirty || profileForm.controls['firstName'].touched)"
@@ -58,6 +63,7 @@
                   class="form-control"
                   formControlName="lastName"
                   required
+                  [readonly]="!isAdmin()"
                 />
                 <div
                   *ngIf="profileForm.controls['lastName'].invalid && (profileForm.controls['lastName'].dirty || profileForm.controls['lastName'].touched)"
@@ -78,6 +84,7 @@
                   class="form-control"
                   formControlName="email"
                   required
+                  [readonly]="!isAdmin()"
                 />
                 <div
                   *ngIf="profileForm.controls['email'].invalid && (profileForm.controls['email'].dirty || profileForm.controls['email'].touched)"

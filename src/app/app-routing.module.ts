@@ -42,6 +42,7 @@ const routes: Routes = [
     path: 'dashboard',
     component: DashboardComponent,
     canActivate: [AuthGuard],
+    data: { roles: [Role.ADMIN, Role.PROJECT_MANAGER, Role.USER] },
   },
   { path: 'setPassword', component: EmailPageComponent },
   { path: 'forbidden', component: ForbiddenComponent },

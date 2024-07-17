@@ -134,7 +134,7 @@ export class UserProfilComponent implements OnInit {
 
     if (this.profileForm.invalid) {
       console.log('Invalid Fields', this.getInvalidControls());
-      return;
+      this.router.navigate(['/dashboard']);
     }
 
     const updatedUser: User = {
@@ -150,7 +150,9 @@ export class UserProfilComponent implements OnInit {
         .updatePassword(updatedUser.userID, this.profileForm.value.password)
         .subscribe(
           () => {
-            this.finalizeUserUpdate(updatedUser);
+            if(this.userService.getCurrentUser().role === Role.ADMIN){
+              this.finalizeUserUpdate(updatedUser);
+            }
             this.logDataService.addUpdatePasswordLog(updatedUser)
           },
           (error) => {
@@ -158,7 +160,11 @@ export class UserProfilComponent implements OnInit {
             alert('Failed to update password');
           }
         );
-    } else {
+    }
+    if(this.userService.getCurrentUser().role !== Role.ADMIN) {
+      console.log("Going TO Dashboard")
+      this.router.navigate(['/dashboard']);
+    }else{
       this.finalizeUserUpdate(updatedUser);
     }
   }
@@ -210,7 +216,12 @@ export class UserProfilComponent implements OnInit {
   }
 
   cancel(): void {
-    this.router.navigate(['/userManagment']);
+    if(this.userService.getCurrentUser().role !== Role.ADMIN){
+      console.log("Going TO Dashboard")
+      this.router.navigate(['/dashboard']);
+    }else{
+      this.router.navigate(['/userManagment']);
+    }
   }
 
   logNewUser(newUser: User, userID: number) {

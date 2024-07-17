@@ -278,7 +278,7 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     this.logDataService.addCreateProjectLog(
       newProjectID,
       'End Date',
-      newProject.projectEndDate
+      newProject.projectEndDate || "open Ended"
     );
     this.logDataService.addCreateProjectLog(
       newProjectID,
@@ -315,7 +315,7 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
       this.logDataService.addUpdateProjectLog(
         oldProject.projectID,
         'End Date',
-        newProject.projectEndDate
+        newProject.projectEndDate || "open Ended"
       );
     }
     if (oldProject.manager.userID !== newProject.managerID) {
