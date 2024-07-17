@@ -52,13 +52,13 @@ export class ProjectDataService {
   }
 
   // Post-Requests
-  createProject(project: any, userIDs: any[]): Observable<any> {
+  createProject(project: any): Observable<any> {
     const newProject = {
       projectName: project.projectName,
       projectDescription: project.projectDescription,
       projectEndDate: project.projectEndDate,
       managerID: project.managerID,
-      userIDs: userIDs,
+      userIDs: project.userIDs,
     };
 
     return this.http
@@ -75,14 +75,14 @@ export class ProjectDataService {
   }
 
   // Put-Requests
-  updateProject(project: any, userIDs: any[]): Observable<any> {
+  updateProject(project: any): Observable<any> {
     const updatedProject = {
       projectID: project.projectID,
       managerID: project.managerID,
       projectName: project.projectName,
       projectDescription: project.projectDescription,
       projectEndDate: project.projectEndDate,
-      userIDs: userIDs,
+      userIDs: project.userIDs,
     };
 
     return this.http

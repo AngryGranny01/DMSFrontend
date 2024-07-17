@@ -38,7 +38,8 @@ export class LogsComponent implements OnInit {
     private userService: UserService,
     private logDataService: LogDataService,
     private logService: LogService,
-    private niceDate: NiceDateService
+    private niceDate: NiceDateService,
+    private translationHelper: TranslationHelperService
   ) {}
 
   ngOnInit() {
@@ -112,8 +113,9 @@ export class LogsComponent implements OnInit {
 
   // Process logs to translate log descriptions and update logs$ observable
   private processLogs(logs: Log[]) {
+    console.log(logs)
     for (let log of logs) {
-      //TODO: Translation
+      log.description = this.translationHelper.translateLog(log);
     }
     this.logs$ = of(logs);
   }

@@ -1,3 +1,4 @@
+// In navbar.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { AuthService } from '../service/auth.service';
 import { UserService } from '../service/user.service';
@@ -10,7 +11,9 @@ import { Subscription } from 'rxjs';
 })
 export class NavbarComponent implements OnInit, OnDestroy {
   loginName: string = '';
+  lastLogin: string = '';
   private userFirstAndLastNameSubscription!: Subscription;
+  private lastLoginSubscription!: Subscription;
 
   constructor(
     private authService: AuthService,
@@ -21,10 +24,15 @@ export class NavbarComponent implements OnInit, OnDestroy {
     this.userFirstAndLastNameSubscription = this.userService.currentUserFirstAndLastName$.subscribe((userName) => {
       this.loginName = userName;
     });
+
+    this.lastLoginSubscription = this.userService.getLastLoginTime().subscribe((lastLogin) => {
+      this.lastLogin = lastLogin;
+    });
   }
 
   ngOnDestroy(): void {
     this.userFirstAndLastNameSubscription.unsubscribe();
+    this.lastLoginSubscription.unsubscribe();
   }
 
   isLoggedIn(): boolean {

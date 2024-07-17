@@ -1,15 +1,13 @@
 {
-  "LOGIN": "User with ID {{userID}} and Username {{username}} logged in at {{timeStamp}}",
-  "LOGOUT": "User with ID {{userID}} and Username {{username}} logged out at {{timeStamp}}",
-  "CREATE_USER": "User with ID {{userID}} and Username {{username}} created",
-  "CREATE_PROJECT": "Project '{{projectName}}' with ID {{projectID}} created",
-  "UPDATE_USER": "User with ID {{userID}} and Username {{username}} updated",
-  "UPDATE_PROJECT": "Project '{{projectName}}' with ID {{projectID}} updated",
-  "DELETE_USER": "User with ID {{userID}} and Username {{username}} deleted",
-  "DELETE_PROJECT": "Project '{{projectName}}' with ID {{projectID}} deleted",
-  "VIEW_PROJECT": "User with ID {{userID}} and Username {{username}} viewed project '{{projectName}}' with ID {{projectID}}",
-  "VIEW_USER": "User with ID {{userID}} and Username {{username}} viewed user with ID {{viewedUserID}} and Username {{viewedUsername}}",
-  "UPLOAD": "File '{{filename}}' uploaded",
-  "DOWNLOAD": "File '{{filename}}' downloaded",
-  "ERROR": "An error occurred: {{errorMessage}}"
+  "LOGIN": "User with ID {{actorID}} logged in",
+  "LOGOUT": "User with ID {{actorID}} logged out",
+  "CREATE_USER": "User with ID {{actorID}} created User with ID {{targetID}} and set field {{field}} to {{value}}",
+  "CREATE_PROJECT": "User with ID {{actorID}} created Project with ID {{targetID}} and set field {{field}} to {{value}}",
+  "UPDATE_USER": "User with ID {{actorID}} updated User with ID {{targetID}}, setting field {{field}} to {{value}}",
+  "UPDATE_PROJECT": "User with ID {{actorID}} updated Project with ID {{targetID}}, setting field {{field}} to {{value}}",
+  "DELETE_USER": "User with ID {{actorID}} deleted User with ID {{targetID}}",
+  "DELETE_PROJECT": "User with ID {{actorID}} deleted Project with ID {{targetID}}",
+  "CREATE_PASSWORD": "User with ID {{actorID}} created a new Password",
+  "UPDATE_PASSWORD": "User with ID {{actorID}} updated the Password",
+  "ERROR": "An error occurred: {{value}}"
 }

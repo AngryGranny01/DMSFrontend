@@ -34,6 +34,12 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { ForbiddenComponent } from './forbidden/forbidden.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 
+
+// AoT requires an exported function for factories
+export function HttpLoaderFactory(http: HttpClient) {
+  return new TranslateHttpLoader(http);
+}
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -65,13 +71,13 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
     MatMenuModule,
     MatButtonModule,
     HttpClientModule,
-/*     TranslateModule.forRoot({
+    TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
         useFactory: HttpLoaderFactory,
         deps: [HttpClient],
       },
-    }), */
+    }),
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
@@ -80,7 +86,3 @@ import { PageNotFoundComponent } from './page-not-found/page-not-found.component
   bootstrap: [AppComponent],
 })
 export class AppModule {}
-
-/* export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
-  return new TranslateHttpLoader(http);
-} */

@@ -45,6 +45,7 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     userID: 0,
   };
 
+  oldUsers: User[] = [];
   projectName: any;
   projectDescription: any;
   private unsubscribe$ = new Subject<void>();
@@ -64,6 +65,7 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     if (this.projectService.isProjectEditMode) {
       this.isEditMode = true;
       this.project = this.projectService.getSelectedProject();
+      this.oldUsers = this.project.users.map(user => ({ ...user })); // Create a deep copy of the users array
       this.setInputFieldsForEditProject();
     } else {
       this.isEditMode = false;
@@ -84,6 +86,7 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
       ')';
     this.selectedManager.userID = this.project.manager.userID;
     this.myControl = new FormControl(this.selectedManager.fullName);
+    console.log(this.oldUsers)
 
     if (this.project.endDate !== null) {
       this.myDate = new Date(this.project.endDate);
@@ -182,7 +185,7 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
         .filter((user) => user.userID !== selectedUser.userID) // Exclude project manager from user IDs
         .map((user) => ({ userID: user.userID })),
     };
-
+    console.log(projectData);
     if (this.isEditMode) {
       this.updateProject(projectData);
     } else {
@@ -204,14 +207,13 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
       projectDescription: data.projectDescription,
       projectEndDate: data.projectEndDate,
       managerID: data.managerID,
+      userIDs: data.userIDs
     };
 
-    this.projectDataService.createProject(project, data.userIDs).subscribe(
+    this.projectDataService.createProject(project).subscribe(
       (response: any) => {
-        this.logDataService.addCreateProjectLog(response.projectID);
-        this.router.navigate(['/dashboard']).then(() => {
-          window.location.reload(); // Force refresh the dashboard
-        });
+        this.logNewProject(project,response.projectID);
+        this.router.navigate(['/dashboard']);
       },
       (error) => {
         console.error('Error creating project:', error);
@@ -221,16 +223,20 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
   }
 
   updateProject(data: any) {
-    let project = {
+    let updatedProject = {
       projectID: data.projectID,
       projectName: data.projectName,
       projectDescription: data.projectDescription,
       projectEndDate: data.projectEndDate,
       managerID: data.managerID,
+      userIDs: data.userIDs,
     };
-    this.projectDataService.updateProject(project, data.userIDs).subscribe(
+    const oldProject = this.project;
+    console.log(oldProject);
+    console.log(data.userIDs);
+    this.projectDataService.updateProject(updatedProject).subscribe(
       () => {
-        this.logDataService.addUpdateProjectLog(project.projectID,);
+        this.logChanges(oldProject, updatedProject, this.oldUsers);
         this.router.navigate(['/dashboard']);
       },
       (error) => {
@@ -254,6 +260,104 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
       this.checkedUsers.splice(index, 1);
     } else {
       this.checkedUsers.push(user);
+    }
+  }
+
+  logNewProject(newProject: any, newProjectID: any) {
+    console.log("Log New Project")
+    this.logDataService.addCreateProjectLog(
+      newProjectID,
+      'Name',
+      newProject.projectName
+    );
+    this.logDataService.addCreateProjectLog(
+      newProjectID,
+      'Description',
+      newProject.projectDescription || ""
+    );
+    this.logDataService.addCreateProjectLog(
+      newProjectID,
+      'End Date',
+      newProject.projectEndDate
+    );
+    this.logDataService.addCreateProjectLog(
+      newProjectID,
+      'ManagerID',
+      newProject.managerID
+    );
+
+    if (newProject.userIDs.length > 0) {
+      const userIdsString = newProject.userIDs.map((user: any) => user.userID).join(', ');
+      this.logDataService.addCreateProjectLog(
+        newProjectID,
+        'Added UserIDs',
+        userIdsString
+      );
+    }
+  }
+
+  logChanges(oldProject: Project, newProject: any, oldUsers: User[]) {
+    if (oldProject.name !== newProject.projectName) {
+      this.logDataService.addUpdateProjectLog(
+        oldProject.projectID,
+        'Name',
+        newProject.projectName
+      );
+    }
+    if (oldProject.description !== newProject.projectDescription) {
+      this.logDataService.addUpdateProjectLog(
+        oldProject.projectID,
+        'Description',
+        newProject.projectDescription || ""
+      );
+    }
+    if (oldProject.endDate !== newProject.projectEndDate) {
+      this.logDataService.addUpdateProjectLog(
+        oldProject.projectID,
+        'End Date',
+        newProject.projectEndDate
+      );
+    }
+    if (oldProject.manager.userID !== newProject.managerID) {
+      this.logDataService.addUpdateProjectLog(
+        oldProject.projectID,
+        'ManagerID',
+        newProject.managerID
+      );
+    }
+
+    // Ensure the user IDs are compared correctly
+    console.log(newProject.userIDs)
+    console.log(oldUsers)
+    const oldUserIDs = oldUsers
+      .map((user) => user.userID)
+      .sort((a, b) => a - b);
+    const newUserIDs = newProject.userIDs
+      .map((user: any) => user.userID)
+      .sort((a: number, b: number) => a - b);
+    console.log(oldUserIDs);
+    console.log(newUserIDs);
+    const addedUserIDs = newUserIDs.filter(
+      (id: number) => !oldUserIDs.includes(id)
+    );
+    const removedUserIDs = oldUserIDs.filter(
+      (id: number) => !newUserIDs.includes(id)
+    );
+
+    if (addedUserIDs.length > 0) {
+      this.logDataService.addUpdateProjectLog(
+        oldProject.projectID,
+        'Added UserIDs',
+        addedUserIDs.join(', ')
+      );
+    }
+
+    if (removedUserIDs.length > 0) {
+      this.logDataService.addUpdateProjectLog(
+        oldProject.projectID,
+        'Removed UserIDs',
+        removedUserIDs.join(', ')
+      );
     }
   }
 }

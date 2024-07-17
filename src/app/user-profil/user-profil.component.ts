@@ -26,7 +26,7 @@ export class UserProfilComponent implements OnInit {
   isEditMode: boolean = false;
   changePassword: boolean = false;
   orgUnits = Object.values(OrgUnit); // Get the list of organizational units from the enum
-
+  oldUser!: User;
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
@@ -63,6 +63,8 @@ export class UserProfilComponent implements OnInit {
     if (this.userService.isEditMode) {
       this.isEditMode = true;
       this.user = this.userService.getSelectedUser();
+      this.oldUser = { ...this.user };
+
       this.profileForm.patchValue({
         orgUnit: this.user.orgUnit,
         firstName: this.user.firstName,
@@ -172,7 +174,7 @@ export class UserProfilComponent implements OnInit {
   updateSelectedUser(user: User): void {
     this.userDataService.updateUser(user).subscribe(
       () => {
-        this.logDataService.addUpdateUserLog(user);
+        this.logUserChanges(this.user, user);
         this.router.navigate(['/userManagment']);
       },
       (error) => {
@@ -184,7 +186,8 @@ export class UserProfilComponent implements OnInit {
 
   createNewUser(user: User): void {
     this.userDataService.createUser(user).subscribe(
-      () => {
+      (response) => {
+        this.logNewUser(user, response.userID)
         this.router.navigate(['/userManagment']);
       },
       (error) => {
@@ -208,5 +211,31 @@ export class UserProfilComponent implements OnInit {
 
   cancel(): void {
     this.router.navigate(['/userManagment']);
+  }
+
+  logNewUser(newUser: User, userID: number) {
+    this.logDataService.addCreateUserLog(userID, 'First Name', newUser.firstName);
+    this.logDataService.addCreateUserLog(userID, 'Last Name', newUser.lastName);
+    this.logDataService.addCreateUserLog(userID, 'Email', newUser.email);
+    this.logDataService.addCreateUserLog(userID, 'Role', newUser.role);
+    this.logDataService.addCreateUserLog(userID, 'Org Unit', newUser.orgUnit);
+  }
+
+  logUserChanges(oldUser: User, newUser: User) {
+    if (oldUser.firstName !== newUser.firstName) {
+      this.logDataService.addUpdateUserLog(oldUser,'First Name', newUser.firstName);
+    }
+    if (oldUser.lastName !== newUser.lastName) {
+      this.logDataService.addUpdateUserLog(oldUser,'Last Name', newUser.lastName);
+    }
+    if (oldUser.email !== newUser.email) {
+      this.logDataService.addUpdateUserLog(oldUser,'Email', newUser.email);
+    }
+    if (oldUser.role !== newUser.role) {
+      this.logDataService.addUpdateUserLog(oldUser,'Role', newUser.role);
+    }
+    if (oldUser.orgUnit !== newUser.orgUnit) {
+      this.logDataService.addUpdateUserLog(oldUser,'Org Unit', newUser.orgUnit);
+    }
   }
 }

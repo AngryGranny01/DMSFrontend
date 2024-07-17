@@ -8,6 +8,7 @@ import { LogDataService } from './api/log-data.service';
 import { ApiConfigService } from './api/api-config.service';
 import { EncryptionService } from './encryption.service';
 import { Role } from '../models/roleEnum';
+import { now } from 'moment';
 
 @Injectable({
   providedIn: 'root',
@@ -48,6 +49,7 @@ export class AuthService {
         this.userService.currentUser.role = response.user.role as Role;
         this.setToken(response.token);
         this.userService.setCurrentUser(response.user);
+        this.userService.setLastLoginTime(Date())
         const fullName = this.userService.concatenateFirstnameLastname(
           response.user.firstName,
           response.user.lastName

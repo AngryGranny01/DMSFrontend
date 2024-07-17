@@ -101,6 +101,7 @@ export class LogDataService {
       field: logData.field,
       value: logData.value,
       timeStampLog: timeStamp,
+      description: "",
       firstName: logData.firstName,
       lastName: logData.lastName,
     };
@@ -149,14 +150,14 @@ export class LogDataService {
     );
   }
 
-  addCreateUserLog(createdUserID: number) {
+  addCreateUserLog(createdUserID: number, newField: string, newValue: any) {
     const log = {
       userID: this.userService.getCurrentUserID(),
       action: Action.CREATE,
       target: Target.PERSON,
       targetID: createdUserID,
-      field: null,
-      value: null,
+      field: newField,
+      value: newValue,
     };
     this.createLog(log).subscribe(
       () => {},
@@ -164,15 +165,14 @@ export class LogDataService {
     );
   }
 
-  //TODO: Update
-  addUpdateUserLog(user: User) {
+  addUpdateUserLog(updatedUser: User, updatedField: string, updatedValue: any) {
     const log = {
       userID: this.userService.getCurrentUserID(),
       action: Action.UPDATE,
       target: Target.PERSON,
-      targetID: user.userID,
-      field: null,
-      value: null,
+      targetID: updatedUser.userID,
+      field: updatedField,
+      value: updatedValue,
     };
 
     this.createLog(log).subscribe(
@@ -230,14 +230,14 @@ export class LogDataService {
   }
 
   //-------------------------------------------- Project Logs --------------------------------------------------------------//
-  addCreateProjectLog(createdProjectID: number) {
+  addCreateProjectLog(createdProjectID: number, newField:string, newValue:any) {
     const log = {
       userID: this.userService.getCurrentUserID(),
       action: Action.CREATE,
       target: Target.PROJECT,
       targetID: createdProjectID,
-      field: null,
-      value: null,
+      field: newField,
+      value: newValue,
     };
 
     this.createLog(log).subscribe(
@@ -246,14 +246,14 @@ export class LogDataService {
     );
   }
 
-  addUpdateProjectLog(projectID: number) {
+  addUpdateProjectLog(projectID: number, updatedField: string, newValue: any) {
     const log = {
       userID: this.userService.getCurrentUserID(),
       action: Action.UPDATE,
       target: Target.PROJECT,
       targetID: projectID,
-      field: null,
-      value: null,
+      field: updatedField,
+      value: newValue,
     };
 
     this.createLog(log).subscribe(

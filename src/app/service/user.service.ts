@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { User } from '../models/userInterface';
 import { Role } from '../models/roleEnum';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -30,7 +30,13 @@ export class UserService {
     this.currentUser
   );
 
-  constructor() {}
+  private lastLoginSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
+  public lastLogin$: Observable<string> = this.lastLoginSubject.asObservable();
+
+
+  constructor() {
+    this.setLastLoginTime('2024-07-17T12:34:56Z');  // Set this with actual API call or logic
+  }
 
   private getStoredUser(): User | null {
     const user = sessionStorage.getItem('currentUser');
@@ -46,6 +52,7 @@ export class UserService {
   }
 
   setCurrentUser(user: User): void {
+    console.log(user)
     this.currentUser = user;
     this.storeUser(user);
     this.currentUser$.next(user);
@@ -92,6 +99,14 @@ export class UserService {
       this.currentUser.firstName,
       this.currentUser.lastName
     );
+  }
+
+  setLastLoginTime(lastLogin: string) {
+    this.lastLoginSubject.next(lastLogin);
+  }
+
+  getLastLoginTime(): Observable<string> {
+    return this.lastLogin$;
   }
 
   setSelectedUser(user: User): void {

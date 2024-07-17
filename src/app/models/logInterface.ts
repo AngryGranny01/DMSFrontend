@@ -10,6 +10,7 @@ export interface Log {
   field: any;
   value: any;
   timeStampLog: Date;
+  description: string;
   firstName: string;
   lastName: string;
 }

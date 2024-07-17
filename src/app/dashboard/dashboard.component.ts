@@ -15,7 +15,7 @@ import { Role } from '../models/roleEnum';
   styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit {
-  projects$: Observable<Project[]> = of([]); // Initialize with an empty observable array
+  projects$: Observable<Project[]> = of([]); 
   showProjects: boolean;
   selectedOption: string = 'My Projects';
 
@@ -117,7 +117,7 @@ export class DashboardComponent implements OnInit {
   }
 
   isAdminOrProjectManager(project: Project): any {
-    const currentUser = this.userService.currentUser;
+    const currentUser = this.userService.getCurrentUser();
     return (
       currentUser.role === Role.ADMIN ||
       project.manager.userID === currentUser.userID

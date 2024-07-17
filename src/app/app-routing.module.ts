@@ -36,7 +36,7 @@ const routes: Routes = [
     path: 'logs',
     component: LogsComponent,
     canActivate: [AuthGuard],
-    data: { roles: [Role.ADMIN] },
+    data: { roles: [Role.ADMIN, Role.PROJECT_MANAGER] },
   },
   {
     path: 'dashboard',

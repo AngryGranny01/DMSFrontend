@@ -34,7 +34,7 @@
                 routerLink="/dashboard"
                 routerLinkActive="active"
               >
-              <span>All Projects</span>
+                <span>All Projects</span>
               </button>
               <button
                 mat-menu-item
@@ -42,7 +42,7 @@
                 routerLink="/dashboard"
                 routerLinkActive="active"
               >
-              <span>My Projects</span>
+                <span>My Projects</span>
               </button>
             </mat-menu>
           </div>
@@ -69,9 +69,9 @@
               </th>
               <td>
                 <a href="#"
-                (click)="this.editProject(project)"
-                routerLink="/createProject"
-                routerLinkActive="active"> {{ project.name }}</a>
+                  (click)="this.editProject(project)"
+                  routerLink="/createProject"
+                  routerLinkActive="active"> {{ project.name }}</a>
               </td>
               <td>
                 {{ project.manager.firstName }} {{ project.manager.lastName }}
@@ -85,6 +85,7 @@
                   (click)="openProjectLogs(project)"
                   routerLink="/logs"
                   routerLinkActive="active"
+                  *ngIf="isAdminOrProjectManager(project)"
                 >
                   <i class="material-icons">&#xE89E;</i>
                 </a>

@@ -38,6 +38,8 @@
             (click)="setEditModeToEditUser()"
             >Profil bearbeiten</a
           >
+          <div class="dropdown-divider"></div>
+          <span class="dropdown-item last-login-text">Last Login: {{ lastLogin | date:'shortTime' }}</span>
         </div>
       </li>
     </ul>
@@ -45,4 +47,3 @@
     <!-- Container wrapper -->
   </nav>
 </header>
-<!-- Navbar -->
