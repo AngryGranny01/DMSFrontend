@@ -75,7 +75,8 @@ export class LogsComponent implements OnInit {
                   .includes(searchTerm!.toLowerCase()) ||
                 log.target
                   .toLowerCase()
-                  .includes(searchTerm!.toLowerCase())
+                  .includes(searchTerm!.toLowerCase())||
+                log.description.toLowerCase().includes(searchTerm!.toLowerCase())
             )
           )
         );
