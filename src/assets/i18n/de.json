@@ -1,15 +1,13 @@
 {
-  "LOGIN": "Benutzer mit ID {{userID}} und Benutzername {{username}} hat sich um {{timeStamp}} angemeldet",
-  "LOGOUT": "Benutzer mit ID {{userID}} und Benutzername {{username}} hat sich um {{timeStamp}} abgemeldet",
-  "CREATE_USER": "Benutzer mit ID {{userID}} und Benutzername {{username}} wurde erstellt",
-  "CREATE_PROJECT": "Projekt '{{projectName}}' mit ID {{projectID}} wurde erstellt",
-  "UPDATE_USER": "Benutzer mit ID {{userID}} und Benutzername {{username}} wurde aktualisiert",
-  "UPDATE_PROJECT": "Projekt '{{projectName}}' mit ID {{projectID}} wurde aktualisiert",
-  "DELETE_USER": "Benutzer mit ID {{userID}} und Benutzername {{username}} wurde gelöscht",
-  "DELETE_PROJECT": "Projekt '{{projectName}}' mit ID {{projectID}} wurde gelöscht",
-  "VIEW_PROJECT": "Benutzer mit ID {{userID}} und Benutzername {{username}} hat Projekt '{{projectName}}' mit ID {{projectID}} angesehen",
-  "VIEW_USER": "Benutzer mit ID {{userID}} und Benutzername {{username}} hat Benutzer mit ID {{viewedUserID}} und Benutzername {{viewedUsername}} angesehen",
-  "UPLOAD": "Datei '{{filename}}' wurde hochgeladen",
-  "DOWNLOAD": "Datei '{{filename}}' wurde heruntergeladen",
-  "ERROR": "Es ist ein Fehler aufgetreten: {{errorMessage}}"
+  "LOGIN": "Benutzer mit ID {{actorID}} und Rolle {{actorRole}} hat sich angemeldet",
+  "LOGOUT": "Benutzer mit ID {{actorID}} und Rolle {{actorRole}} hat sich abgemeldet",
+  "CREATE_USER": "Benutzer mit ID {{actorID}} und Rolle {{actorRole}} hat Benutzer mit ID {{targetID}} erstellt und das Feld {{field}} auf {{value}} gesetzt",
+  "CREATE_PROJECT": "Benutzer mit ID {{actorID}} und Rolle {{actorRole}} hat Projekt mit ID {{targetID}} erstellt und das Feld {{field}} auf {{value}} gesetzt",
+  "UPDATE_USER": "Benutzer mit ID {{actorID}} und Rolle {{actorRole}} hat Benutzer mit ID {{targetID}} aktualisiert und das Feld {{field}} auf {{value}} gesetzt",
+  "UPDATE_PROJECT": "Benutzer mit ID {{actorID}} und Rolle {{actorRole}} hat Projekt mit ID {{targetID}} aktualisiert und das Feld {{field}} auf {{value}} gesetzt",
+  "DELETE_USER": "Benutzer mit ID {{actorID}} und Rolle {{actorRole}} hat Benutzer mit ID {{targetID}} gelöscht",
+  "DELETE_PROJECT": "Benutzer mit ID {{actorID}} und Rolle {{actorRole}} hat Projekt mit ID {{targetID}} gelöscht",
+  "CREATE_PASSWORD": "Benutzer mit ID {{actorID}} und Rolle {{actorRole}} hat ein neues Passwort erstellt",
+  "UPDATE_PASSWORD": "Benutzer mit ID {{actorID}} und Rolle {{actorRole}} hat das Passwort aktualisiert",
+  "ERROR": "Ein Fehler ist aufgetreten: {{value}}"
 }

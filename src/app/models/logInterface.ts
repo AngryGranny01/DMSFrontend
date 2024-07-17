@@ -1,5 +1,6 @@
 import { Action } from './logActionEnum';
 import { Target } from './logTargetEnum';
+import { Role } from './roleEnum';
 
 export interface Log {
   logID: number;
@@ -13,4 +14,5 @@ export interface Log {
   description: string;
   firstName: string;
   lastName: string;
+  currentActorRole: Role;
 }

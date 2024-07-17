@@ -57,6 +57,7 @@ export class TranslationHelperService {
       targetID: log.targetID,
       field: log.field,
       value: log.value,
+      actorRole: log.currentActorRole
     });
   }
 }

@@ -273,7 +273,7 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
     this.logDataService.addCreateProjectLog(
       newProjectID,
       'Description',
-      newProject.projectDescription || ""
+      newProject.projectDescription || "empty"
     );
     this.logDataService.addCreateProjectLog(
       newProjectID,
@@ -308,7 +308,7 @@ export class CreateProjectComponent implements OnInit, OnDestroy {
       this.logDataService.addUpdateProjectLog(
         oldProject.projectID,
         'Description',
-        newProject.projectDescription || ""
+        newProject.projectDescription || "empty"
       );
     }
     if (oldProject.endDate !== newProject.projectEndDate) {

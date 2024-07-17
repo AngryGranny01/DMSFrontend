@@ -67,6 +67,7 @@ export class LogDataService {
    * @returns An Observable of the HTTP response.
    */
   private createLog(log: any): Observable<any> {
+    console.log(log)
     const data = {
       actorId: log.userID,
       action: log.action,
@@ -74,6 +75,7 @@ export class LogDataService {
       targetId: log.targetID,
       field: log.field,
       value: log.value,
+      currentActorRole: log.currentActorRole
     };
     return this.http.post(`${this.apiConfig.baseURL}/logs`, data,{
       headers: this.getAuthHeaders(),
@@ -104,6 +106,7 @@ export class LogDataService {
       description: "",
       firstName: logData.firstName,
       lastName: logData.lastName,
+      currentActorRole: logData.currentActorRole
     };
   }
 
@@ -126,6 +129,7 @@ export class LogDataService {
       targetID: this.userService.getCurrentUserID(),
       field: null,
       value: null,
+      currentActorRole: this.userService.getCurrentUser().role,
     };
 
     this.createLog(log).subscribe(
@@ -142,6 +146,7 @@ export class LogDataService {
       targetID: this.userService.getCurrentUserID(),
       field: null,
       value: null,
+      currentActorRole: this.userService.getCurrentUser().role,
     };
 
     this.createLog(log).subscribe(
@@ -158,6 +163,7 @@ export class LogDataService {
       targetID: createdUserID,
       field: newField,
       value: newValue,
+      currentActorRole: this.userService.getCurrentUser().role,
     };
     this.createLog(log).subscribe(
       () => {},
@@ -173,6 +179,7 @@ export class LogDataService {
       targetID: updatedUser.userID,
       field: updatedField,
       value: updatedValue,
+      currentActorRole: this.userService.getCurrentUser().role,
     };
 
     this.createLog(log).subscribe(
@@ -189,6 +196,7 @@ export class LogDataService {
       targetID: user.userID,
       field: null,
       value: null,
+      currentActorRole: this.userService.getCurrentUser().role,
     };
 
     this.createLog(log).subscribe(
@@ -205,6 +213,7 @@ export class LogDataService {
       targetID: user.userID,
       field: null,
       value: null,
+      currentActorRole: this.userService.getCurrentUser().role,
     };
 
     this.createLog(log).subscribe(
@@ -221,6 +230,7 @@ export class LogDataService {
       targetID: user.userID,
       field: null,
       value: null,
+      currentActorRole: this.userService.getCurrentUser().role,
     };
 
     this.createLog(log).subscribe(
@@ -238,6 +248,7 @@ export class LogDataService {
       targetID: createdProjectID,
       field: newField,
       value: newValue,
+      currentActorRole: this.userService.getCurrentUser().role,
     };
 
     this.createLog(log).subscribe(
@@ -254,6 +265,7 @@ export class LogDataService {
       targetID: projectID,
       field: updatedField,
       value: newValue,
+      currentActorRole: this.userService.getCurrentUser().role,
     };
 
     this.createLog(log).subscribe(
@@ -270,6 +282,7 @@ export class LogDataService {
       targetID: project.projectID,
       field: null,
       value: null,
+      currentActorRole: this.userService.getCurrentUser().role,
     };
 
     this.createLog(log).subscribe(
@@ -287,6 +300,7 @@ export class LogDataService {
       targetID: null,
       field: null,
       value: errorMessage,
+      currentActorRole: this.userService.getCurrentUser().role,
     };
     this.createLog(log).subscribe(
       () => {},
@@ -302,6 +316,7 @@ export class LogDataService {
       targetID: null,
       field: null,
       value: errorMessage,
+      currentActorRole: this.userService.getCurrentUser().role,
     };
     this.createLog(log).subscribe(
       () => {},
@@ -317,6 +332,7 @@ export class LogDataService {
       targetID: this.userService.getCurrentUserID(),
       field: null,
       value: errorMessage,
+      currentActorRole: this.userService.getCurrentUser().role,
     };
 
     this.createLog(log).subscribe(
@@ -333,6 +349,7 @@ export class LogDataService {
       targetID: projectID,
       field: null,
       value: errorMessage,
+      currentActorRole: this.userService.getCurrentUser().role,
     };
 
     this.createLog(log).subscribe(
@@ -349,6 +366,7 @@ export class LogDataService {
       targetID: selectedUserID,
       field: null,
       value: errorMessage,
+      currentActorRole: this.userService.getCurrentUser().role,
     };
 
     this.createLog(log).subscribe(

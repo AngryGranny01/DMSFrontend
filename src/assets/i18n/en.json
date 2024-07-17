@@ -1,13 +1,13 @@
 {
-  "LOGIN": "User with ID {{actorID}} logged in",
-  "LOGOUT": "User with ID {{actorID}} logged out",
-  "CREATE_USER": "User with ID {{actorID}} created User with ID {{targetID}} and set field {{field}} to {{value}}",
-  "CREATE_PROJECT": "User with ID {{actorID}} created Project with ID {{targetID}} and set field {{field}} to {{value}}",
-  "UPDATE_USER": "User with ID {{actorID}} updated User with ID {{targetID}}, setting field {{field}} to {{value}}",
-  "UPDATE_PROJECT": "User with ID {{actorID}} updated Project with ID {{targetID}}, setting field {{field}} to {{value}}",
-  "DELETE_USER": "User with ID {{actorID}} deleted User with ID {{targetID}}",
-  "DELETE_PROJECT": "User with ID {{actorID}} deleted Project with ID {{targetID}}",
-  "CREATE_PASSWORD": "User with ID {{actorID}} created a new Password",
-  "UPDATE_PASSWORD": "User with ID {{actorID}} updated the Password",
+  "LOGIN": "User with ID {{actorID}} and Role {{actorRole}} logged in",
+  "LOGOUT": "User with ID {{actorID}} and Role {{actorRole}} logged out",
+  "CREATE_USER": "User with ID {{actorID}} and Role {{actorRole}} created User with ID {{targetID}} and set field {{field}} to {{value}}",
+  "CREATE_PROJECT": "User with ID {{actorID}} and Role {{actorRole}} created Project with ID {{targetID}} and set field {{field}} to {{value}}",
+  "UPDATE_USER": "User with ID {{actorID}} and Role {{actorRole}} updated User with ID {{targetID}}, setting field {{field}} to {{value}}",
+  "UPDATE_PROJECT": "User with ID {{actorID}} and Role {{actorRole}} updated Project with ID {{targetID}}, setting field {{field}} to {{value}}",
+  "DELETE_USER": "User with ID {{actorID}} and Role {{actorRole}} deleted User with ID {{targetID}}",
+  "DELETE_PROJECT": "User with ID {{actorID}} and Role {{actorRole}} deleted Project with ID {{targetID}}",
+  "CREATE_PASSWORD": "User with ID {{actorID}} and Role {{actorRole}} created a new Password",
+  "UPDATE_PASSWORD": "User with ID {{actorID}} and Role {{actorRole}} updated the Password",
   "ERROR": "An error occurred: {{value}}"
 }
