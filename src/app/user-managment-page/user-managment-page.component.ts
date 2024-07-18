@@ -87,47 +87,55 @@ export class UserManagmentPageComponent implements OnInit {
   }
 
   // Deletes a user from the system
-  deleteUser(user: User): void {
+  deactivateUser(user: User): void {
+    console.log(user.isDeactivated)
+    if (user.isDeactivated == true) {
+      console.log('User is already deactivated.'); // Debugging line
+      return;
+    }
+
     const confirmDelete = confirm(
-      'Sind Sie sicher, dass Sie den Benutzer löschen wollen?'
+      'Sind Sie sicher, dass Sie den Benutzer deaktivieren wollen?'
     );
     if (!confirmDelete) {
       return;
     }
     if (user.role === Role.PROJECT_MANAGER) {
       const confirmDelete = confirm(
-        'Wenn Sie diesen Benutzer löschen, werden Sie zum Projektmanager für offene Projekte. Möchten Sie fortfahren?'
+        'Wenn Sie diesen Benutzer deaktivieren, werden Sie zum Projektmanager für offene Projekte. Möchten Sie fortfahren?'
       );
       if (!confirmDelete) {
         return;
       }
 
-      this.managerDataService.updateManagerID(user.userID, this.userService.getCurrentUser().userID).subscribe(
-        () => {
-          this.userDataService.deleteUser(user.userID).subscribe(
-            () => {
-              // Log entry
-              this.logDataService.addDeleteUserLog(user);
-              this.loadUsers();
-            },
-            (error) => {
-              this.logDataService.addErrorUserLog(`Error deleting user`),
-                console.error('Error deleting user:', error);
-            }
-          );
-        },
-        (error) => {
-          this.logDataService.addErrorUserLog(
-            `Error updating manager ID for user with userID: ${user.userID}`
-          ),
-            console.error('Error updating manager ID:', error);
-        }
-      );
+      this.managerDataService
+        .updateManagerID(user.userID, this.userService.getCurrentUser().userID)
+        .subscribe(
+          () => {
+            this.userDataService.deactivateUser(user.userID).subscribe(
+              () => {
+                // Log entry
+                this.logDataService.addDeactivateUserLog(user);
+                this.loadUsers();
+              },
+              (error) => {
+                this.logDataService.addErrorUserLog(`Error deleting user`),
+                  console.error('Error deleting user:', error);
+              }
+            );
+          },
+          (error) => {
+            this.logDataService.addErrorUserLog(
+              `Error updating manager ID for user with userID: ${user.userID}`
+            ),
+              console.error('Error updating manager ID:', error);
+          }
+        );
     } else {
-      this.userDataService.deleteUser(user.userID).subscribe(
+      this.userDataService.deactivateUser(user.userID).subscribe(
         () => {
           // Log entry
-          this.logDataService.addDeleteUserLog(user);
+          this.logDataService.addDeactivateUserLog(user);
           this.loadUsers();
         },
         (error) => {

@@ -89,7 +89,7 @@ export class UserDataService {
       })
       .pipe(
         catchError((error) => {
-          this.logDataService.addErrorUserCreateLog(error.message)
+          this.logDataService.addErrorUserCreateLog(error.message);
           console.error('Failed to create user:', error);
           throw new Error('Failed to create user');
         })
@@ -122,7 +122,7 @@ export class UserDataService {
       })
       .pipe(
         catchError((error) => {
-          this.logDataService.addErrorUserLog(error.message)
+          this.logDataService.addErrorUserLog(error.message);
           console.error('Failed to update user:', error);
           return throwError('Failed to update user');
         })
@@ -155,7 +155,7 @@ export class UserDataService {
       .pipe(
         catchError((error) => {
           console.error('Failed to update password:', error);
-          this.logDataService.addErrorPasswordLog(userID,error.message)
+          this.logDataService.addErrorPasswordLog(userID, error.message);
           return throwError('Failed to update password');
         })
       );
@@ -164,20 +164,20 @@ export class UserDataService {
   //-------------------------------------------- Delete-Requests --------------------------------------------------------------//
 
   /**
-   * Deletes a user by user ID.
+   * Deactivates a user by user ID.
    * @param userID The ID of the user to be deleted.
    * @returns An Observable representing the HTTP response.
    */
-  deleteUser(userID: number): Observable<void> {
+  deactivateUser(userID: number): Observable<void> {
     return this.http
-      .delete<void>(`${this.apiConfig.baseURL}/users/${userID}`, {
+      .put<void>(`${this.apiConfig.baseURL}/users/deactivate/${userID}`, {
         headers: this.authService.getAuthHeaders(),
       })
       .pipe(
         catchError((error) => {
-          this.logDataService.addErrorUserLog(error.message)
-          console.error('Failed to delete user:', error);
-          throw new Error('Failed to delete user');
+          this.logDataService.addErrorUserLog(error.message);
+          console.error('Failed to deactivate user:', error);
+          throw new Error('Failed to deactivate user');
         })
       );
   }

@@ -80,9 +80,9 @@
                 <a
                   href="#"
                   class="delete"
-                  title="Delete"
-                  *ngIf="user.role !== Role.ADMIN"
-                  (click)="this.deleteUser(user)"
+                  title="deactivate"
+                  *ngIf="user.role !== Role.ADMIN && !user.isDeactivated"
+                  (click)="this.deactivateUser(user)"
                   routerLink="/userManagment"
                   routerLinkActive="active"
                   ><i class="material-icons">&#xE5C9;</i></a

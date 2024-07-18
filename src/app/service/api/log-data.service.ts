@@ -205,6 +205,23 @@ export class LogDataService {
     );
   }
 
+  addDeactivateUserLog(user: User) {
+    const log = {
+      userID: this.userService.getCurrentUserID(),
+      action: Action.DEACTIVATE,
+      target: Target.PERSON,
+      targetID: user.userID,
+      field: null,
+      value: null,
+      currentActorRole: this.userService.getCurrentUser().role,
+    };
+
+    this.createLog(log).subscribe(
+      () => {},
+      (error) => console.error('Error logging user deletion:', error)
+    );
+  }
+
   addCreatePasswordLog(user: User) {
     const log = {
       userID: this.userService.getCurrentUserID(),

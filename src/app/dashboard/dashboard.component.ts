@@ -15,7 +15,7 @@ import { Role } from '../models/roleEnum';
   styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements OnInit {
-  projects$: Observable<Project[]> = of([]); 
+  projects$: Observable<Project[]> = of([]);
   showProjects: boolean;
   selectedOption: string = 'My Projects';
 
@@ -76,7 +76,9 @@ export class DashboardComponent implements OnInit {
     if (!confirmDelete) {
       return;
     }
-    this.projectDataService.deleteProject(project.projectID).subscribe(
+
+    //TODO: Archive Project
+    /* this.projectDataService.deleteProject(project.projectID).subscribe(
       () => {
         this.logDataService.addDeleteProjectLog(project);
         this.refreshProjects();
@@ -89,7 +91,7 @@ export class DashboardComponent implements OnInit {
         );
         throw new Error(`Failed to update project`);
       }
-    );
+    ); */
   }
 
   navigateToAllProjects() {
