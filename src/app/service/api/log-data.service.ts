@@ -1,14 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, catchError, map } from 'rxjs';
-
 import { User } from '../../models/userInterface';
 import { Project } from '../../models/projectInterface';
 import { Log } from '../../models/logInterface';
-import { LogDescriptionValues } from '../../models/logDescriptionValues';
-
 import { ApiConfigService } from './api-config.service';
-import { LogService } from '../log.service';
 import { UserService } from '../user.service';
 import { Action } from '../../models/logActionEnum';
 import { Target } from '../../models/logTargetEnum';

@@ -9,11 +9,9 @@ import { UserService } from '../service/user.service';
 import { User } from '../models/userInterface';
 import { Role } from '../models/roleEnum';
 import { UserDataService } from '../service/api/user-data.service';
-import { ProjectManagerDataService } from '../service/api/project-manager-data.service';
 import { LogDataService } from '../service/api/log-data.service';
 import { Router } from '@angular/router';
 import { OrgUnit } from '../models/orgUnitsEnum';
-import { EncryptionService } from '../service/encryption.service';
 
 @Component({
   selector: 'app-user-profil',

@@ -14,7 +14,6 @@ import { User } from '../models/userInterface';
 import { Project } from '../models/projectInterface';
 import { LogDataService } from '../service/api/log-data.service';
 import { TranslationHelperService } from '../service/translation-helper.service';
-import { TranslateService } from '@ngx-translate/core';
 import { FormControl } from '@angular/forms';
 import { LogService } from '../service/log.service';
 import { NiceDateService } from '../service/nice-date.service';

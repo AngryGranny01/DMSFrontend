@@ -13,7 +13,6 @@ import { Role } from '../models/roleEnum';
 import { ProjectService } from '../service/project.service';
 import { UserDataService } from '../service/api/user-data.service';
 import { UserService } from '../service/user.service';
-import { ProjectManagerDataService } from '../service/api/project-manager-data.service';
 import { Router } from '@angular/router';
 import { ProjectDataService } from '../service/api/project-data.service';
 import { LogDataService } from '../service/api/log-data.service';

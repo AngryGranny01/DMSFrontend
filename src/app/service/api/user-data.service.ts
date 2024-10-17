@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError, map, switchMap } from 'rxjs/operators';
-
+import { catchError, map } from 'rxjs/operators';
 import { User } from '../../models/userInterface';
 import { ApiConfigService } from './api-config.service';
 import { Role } from '../../models/roleEnum';

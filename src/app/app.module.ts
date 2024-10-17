@@ -35,7 +35,6 @@ import { ForbiddenComponent } from './forbidden/forbidden.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 
 
-// AoT requires an exported function for factories
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http);
 }

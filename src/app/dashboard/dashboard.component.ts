@@ -76,22 +76,7 @@ export class DashboardComponent implements OnInit {
     if (!confirmDelete) {
       return;
     }
-
     //TODO: Archive Project
-    /* this.projectDataService.deleteProject(project.projectID).subscribe(
-      () => {
-        this.logDataService.addDeleteProjectLog(project);
-        this.refreshProjects();
-      },
-      (error) => {
-        console.error('Error deleting Project:', error);
-        this.logDataService.addErrorProjectLog(
-          project.projectID,
-          `Failed to update project with ID: ${project.projectID}`
-        );
-        throw new Error(`Failed to update project`);
-      }
-    ); */
   }
 
   navigateToAllProjects() {

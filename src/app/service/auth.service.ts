@@ -8,7 +8,6 @@ import { LogDataService } from './api/log-data.service';
 import { ApiConfigService } from './api/api-config.service';
 import { EncryptionService } from './encryption.service';
 import { Role } from '../models/roleEnum';
-import { now } from 'moment';
 
 @Injectable({
   providedIn: 'root',

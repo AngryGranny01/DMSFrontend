@@ -2,14 +2,12 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-
 import { ApiConfigService } from './api-config.service';
 import { Project } from '../../models/projectInterface';
 import { User } from '../../models/userInterface';
 import { Role } from '../../models/roleEnum';
 import { LogDataService } from './log-data.service';
 import { AuthService } from '../auth.service';
-import { LogService } from '../log.service';
 
 @Injectable({
   providedIn: 'root',
